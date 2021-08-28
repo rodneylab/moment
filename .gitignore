@@ -1,0 +1,13 @@
+dist
+node_modules
+
+# dotenv environment variable files
+.env*
+.env.*
+!.env.EXAMPLE
+
+# Mac files
+.DS_Store
+
+# Supabase
+.supabase

@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "fastify": "^3.20.2"
+  },
+  "scripts": {
+    "dev": "nodemon dist/server.js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "prettier:check": "prettier --config .prettierrc --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "start": "node dist/server.js",
+    "start:ts": "ts-node src/server.ts",
+    "watch": "tsc -w"
+  },
+  "name": "jffrank-server",
+  "version": "0.0.1",
+  "description": "jfFrank Server",
+  "main": "src/server.js",
+  "devDependencies": {
+    "@types/node": "^16.7.4",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "husky": "^7.0.2",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "author": "Rodney Lab <ask@rodneylab.com> (@rodneyLab)",
+  "license": "BSD-3-Clause"
+}
