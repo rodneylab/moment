@@ -1,7 +1,9 @@
 import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
 // import { Server, IncomingMessage, ServerResponse  } from 'http';
-
+import cors from 'fastify-cors';
 const server: FastifyInstance = Fastify({});
+
+server.register((cors), { origin: process.env.CORS_ORIGIN, methods: ['GET', 'POST'], credentials: true]});
 
 const opts: RouteShorthandOptions = {
   schema: {
