@@ -1,18 +1,22 @@
 import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
 // import { Server, IncomingMessage, ServerResponse  } from 'http';
-import cors from 'fastify-cors';
-import postgres from 'fastify-postgres';
+import fastifyCors from 'fastify-cors';
+import fastifyPostgres from 'fastify-postgres';
+import fastifySession from '@fastify/session';
+import fastifyCookie from 'fastify-cookie';
 
 const server: FastifyInstance = Fastify({});
 
-server.register(cors, {
+server.register(fastifyCors, {
   origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST'],
   credentials: true,
 });
-server.register(postgres, {
+server.register(fastifyPostgres, {
   connectionString: process.env.DATABASE_URL,
 });
+server.register(fastifyCookie);
+server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
 
 const opts: RouteShorthandOptions = {
   schema: {
