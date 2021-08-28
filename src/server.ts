@@ -4,6 +4,7 @@ import fastifyCors from 'fastify-cors';
 import fastifyPostgres from 'fastify-postgres';
 import fastifySession from '@fastify/session';
 import fastifyCookie from 'fastify-cookie';
+import fastifyRedis from 'fastify-redis';
 
 const server: FastifyInstance = Fastify({});
 
@@ -16,6 +17,7 @@ server.register(fastifyPostgres, {
   connectionString: process.env.DATABASE_URL,
 });
 server.register(fastifyCookie);
+server.register(fastifyRedis, { host: '127.0.0.1' });
 server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
 
 const opts: RouteShorthandOptions = {
