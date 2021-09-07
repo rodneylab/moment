@@ -1,4 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
+import TubeStation from './TubeStation';
 
 @ObjectType()
 class Gallery {
@@ -14,14 +15,14 @@ class Gallery {
   @Field({ nullable: true })
   name!: string;
 
-  @Field({ nullable: true })
-  address: string;
+  @Field(() => String, { nullable: true })
+  address?: string | null;
 
-  // @Field(() => [TubeStation], { nullable: true})
-  // nearestTubes: TubeStation[];
+  @Field(() => [TubeStation], { nullable: true })
+  nearestTubes?: TubeStation[];
 
-  @Field()
-  googleMap: string;
+  @Field(() => String, { nullable: true })
+  googleMap?: string | null;
 }
 
 export { Gallery as default };

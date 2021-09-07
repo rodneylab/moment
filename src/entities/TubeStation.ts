@@ -16,7 +16,7 @@ class TubeStation {
   name!: string;
 
   @Field(() => [Gallery], { nullable: true })
-  gallery: Gallery[];
+  galleries: Gallery[];
 }
 
 export { TubeStation as default };

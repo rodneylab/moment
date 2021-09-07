@@ -11,3 +11,5 @@ node_modules
 
 # Supabase
 .supabase
+
+prisma/migrations/**

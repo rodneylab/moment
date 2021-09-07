@@ -30,6 +30,7 @@
   "main": "src/server.js",
   "devDependencies": {
     "@types/node": "^16.7.13",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
