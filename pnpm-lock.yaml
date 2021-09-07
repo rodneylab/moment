@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@fastify/session': ^6.1.1
+  '@prisma/client': ^3.0.1
   '@types/node': ^16.7.13
   apollo-server-core: ^3.3.0
   apollo-server-fastify: ^3.3.0
@@ -14,6 +15,7 @@ specifiers:
   fastify: ^3.21.0
   fastify-cookie: ^5.3.1
   fastify-cors: ^6.0.2
+  fastify-plugin: ^3.0.0
   fastify-postgres: ^3.6.0
   fastify-redis: ^4.3.1
   graphql: ^15.5.3
@@ -28,11 +30,13 @@ specifiers:
 
 dependencies:
   '@fastify/session': 6.1.1
+  '@prisma/client': 3.0.1
   apollo-server-core: 3.3.0_graphql@15.5.3
   apollo-server-fastify: 3.3.0_fastify@3.21.0+graphql@15.5.3
   apollo-server-plugin-base: 3.2.0_graphql@15.5.3
   fastify: 3.21.0
   fastify-cookie: 5.3.1
+  fastify-plugin: 3.0.0
   fastify-postgres: 3.6.0_pg@8.7.1
   fastify-redis: 4.3.1
   graphql: 15.5.3
@@ -211,6 +215,23 @@ packages:
 
   /@josephg/resolvable/1.0.1:
     resolution: {integrity: sha512-CtzORUwWTTOTqfVtHaKRJ0I1kNQd1bpn3sUh8I3nJDVY+5/M/Oe1DnEWzPQvqq/xPIIkzzzIP7mfCoAjFRvDhg==}
+    dev: false
+
+  /@prisma/client/3.0.1:
+    resolution: {integrity: sha512-o/5wd1LqI2nr0/8L8Tg0cm5/wL/z7FLx5pd0D7MbnUoBv62sxHP5wRgturjljUwCBm4GpfRnBZUTWTuKA610MA==}
+    engines: {node: '>=12.6'}
+    requiresBuild: true
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+    dependencies:
+      '@prisma/engines-version': 2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db
+    dev: false
+
+  /@prisma/engines-version/2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db:
+    resolution: {integrity: sha512-iArSApZZImVmT9oC/rGOjzvpG2AOqlIeqYcVnop9poA3FxD4zfVPbNPH9DTgOWhc06OkBHujJZeAcsNddVabIQ==}
     dev: false
 
   /@protobufjs/aspromise/1.1.2:

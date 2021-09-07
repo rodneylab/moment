@@ -2,14 +2,16 @@ import fastifySession from '@fastify/session';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
+import 'dotenv/config';
 import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import fastifyCookie from 'fastify-cookie';
 // import { Server, IncomingMessage, ServerResponse  } from 'http';
-import fastifyCors from 'fastify-cors';
+// import fastifyCors from 'fastify-cors';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyRedis from 'fastify-redis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
+import { GalleryResolver } from './resolvers/gallery';
 import HelloResolver from './resolvers/hello';
 
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
@@ -37,8 +39,12 @@ async function startApolloServer() {
   });
   server.register(fastifyCookie);
   server.register(fastifyRedis, { host: '127.0.0.1' });
-  // server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
-  server.register(fastifySession, { secret: 'FyLpylnWxGIAzLGlkclUd4FWKJilc2gU' });
+  server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
+  // server.register(prismaPlugin);
+  
+
+
+  // await context.prisma.gallery.deleteMany({});
 
   const opts: RouteShorthandOptions = {
     schema: {
@@ -61,7 +67,7 @@ async function startApolloServer() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver],
+      resolvers: [GalleryResolver,HelloResolver],
       validate: false,
     }),
     plugins: [
