@@ -41,8 +41,6 @@ async function startApolloServer() {
   server.register(fastifyRedis, { host: '127.0.0.1' });
   server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
   // server.register(prismaPlugin);
-  
-
 
   // await context.prisma.gallery.deleteMany({});
 
@@ -67,7 +65,7 @@ async function startApolloServer() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [GalleryResolver,HelloResolver],
+      resolvers: [GalleryResolver, HelloResolver],
       validate: false,
     }),
     plugins: [

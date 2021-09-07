@@ -2,28 +2,26 @@ import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 class Gallery {
-	@Field()
-	id!: number;
+  @Field()
+  id!: number;
 
-	@Field()
-	createdAt: Date;
+  @Field()
+  createdAt: Date;
 
-	@Field()
-	updatedAt: Date;
+  @Field()
+  updatedAt: Date;
 
-	@Field({nullable: true})
-	name!: string;
+  @Field({ nullable: true })
+  name!: string;
 
-	@Field({nullable: true})
-	address: string;
+  @Field({ nullable: true })
+  address: string;
 
-	// @Field(() => [TubeStation], { nullable: true})
-	// nearestTubes: TubeStation[];
+  // @Field(() => [TubeStation], { nullable: true})
+  // nearestTubes: TubeStation[];
 
-	@Field()
-	googleMap: string;
+  @Field()
+  googleMap: string;
 }
 
 export { Gallery as default };
-
-
