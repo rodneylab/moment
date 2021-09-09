@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@fastify/session': ^6.1.1
   '@prisma/client': ^3.0.1
-  '@types/node': ^16.7.13
+  '@types/node': ^16.9.0
   '@typescript-eslint/eslint-plugin': ^4.31.0
   apollo-server-core: ^3.3.0
   apollo-server-fastify: ^3.3.0
@@ -20,7 +20,7 @@ specifiers:
   fastify-postgres: ^3.6.0
   fastify-redis: ^4.3.1
   graphql: ^15.5.3
-  husky: ^7.0.0
+  husky: ^7.0.2
   nodemon: ^2.0.12
   pg: ^8.7.1
   prettier: ^2.3.2
@@ -46,7 +46,7 @@ dependencies:
   type-graphql: 1.1.1_graphql@15.5.3
 
 devDependencies:
-  '@types/node': 16.7.13
+  '@types/node': 16.9.0
   '@typescript-eslint/eslint-plugin': 4.31.0_eslint@7.32.0+typescript@4.4.2
   dotenv: 10.0.0
   eslint: 7.32.0
@@ -57,7 +57,7 @@ devDependencies:
   husky: 7.0.2
   nodemon: 2.0.12
   prettier: 2.3.2
-  ts-node: 10.2.1_ba6070efdb19aacfdf37f0e70ee888df
+  ts-node: 10.2.1_9a8cc85b2d96f040413d5b20218085f6
   typescript: 4.4.2
 
 packages:
@@ -332,7 +332,7 @@ packages:
     resolution: {integrity: sha512-w+LsMxKyYQm347Otw+IfBXOv9UWVjpHpCDdbBMt8Kz/xbvCYNjP+0qPh91Km3iKfSRLBB0P7fAMf0KHrPu+MyA==}
     dependencies:
       '@types/minimatch': 3.0.5
-      '@types/node': 16.7.13
+      '@types/node': 16.9.0
     dev: false
 
   /@types/json-schema/7.0.9:
@@ -351,8 +351,8 @@ packages:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
     dev: false
 
-  /@types/node/16.7.13:
-    resolution: {integrity: sha512-pLUPDn+YG3FYEt/pHI74HmnJOWzeR+tOIQzUx93pi9M7D8OE7PSLr97HboXwk5F+JS+TLtWuzCOW97AHjmOXXA==}
+  /@types/node/16.9.0:
+    resolution: {integrity: sha512-nmP+VR4oT0pJUPFbKE4SXj3Yb4Q/kz3M9dSAO1GGMebRKWHQxLfDNmU/yh3xxCJha3N60nQ/JwXWwOE/ZSEVag==}
 
   /@types/semver/7.3.8:
     resolution: {integrity: sha512-D/2EJvAlCEtYFEYmmlGwbGXuK886HzyCc3nZX/tkFTQdEU8jZDAgiv08P162yB17y4ZXZoq7yFAnW4GDBb9Now==}
@@ -1032,14 +1032,15 @@ packages:
       ansi-colors: 4.1.1
     dev: true
 
-  /es-abstract/1.18.5:
-    resolution: {integrity: sha512-DDggyJLoS91CkJjgauM5c0yZMjiD1uK3KcaCeAmffGwZ+ODWzOkPN4QwRbsK5DOFf06fywmyLci3ZD8jLGhVYA==}
+  /es-abstract/1.18.6:
+    resolution: {integrity: sha512-kAeIT4cku5eNLNuUKhlmtuk1/TRZvQoYccn6TO0cSVdf1kzB0T7+dYuVK9MWM7l+/53W2Q8M7N2c6MQvhXFcUQ==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.2
       es-to-primitive: 1.2.1
       function-bind: 1.1.1
       get-intrinsic: 1.1.1
+      get-symbol-description: 1.0.0
       has: 1.0.3
       has-symbols: 1.0.2
       internal-slot: 1.0.3
@@ -1290,8 +1291,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /fast-safe-stringify/2.1.0:
-    resolution: {integrity: sha512-xHSIyDJTOVQjtMBGcUokl3tpaOKgTyVTjlHj255V4Q4J1oho3cnrWrf5sCx8z1jq7gzNMv8y0PH53pYYuZUFPQ==}
+  /fast-safe-stringify/2.1.1:
+    resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
     dev: false
 
   /fastify-accepts/2.0.1:
@@ -1463,6 +1464,14 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       pump: 3.0.0
+    dev: true
+
+  /get-symbol-description/1.0.0:
+    resolution: {integrity: sha512-2EmdH1YvIQiZpltCNgkuiUnyukzxM/R6NDJX31Ke3BG1Nq5b0S2PhX59UKi9vZpPDQVdqn+1IcaAwnzTT5vCjw==}
+    engines: {node: '>= 0.4'}
+    dependencies:
+      call-bind: 1.0.2
+      get-intrinsic: 1.1.1
     dev: true
 
   /glob-parent/5.1.2:
@@ -2081,7 +2090,7 @@ packages:
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.1.3
-      es-abstract: 1.18.5
+      es-abstract: 1.18.6
     dev: true
 
   /once/1.4.0:
@@ -2216,7 +2225,7 @@ packages:
     hasBin: true
     dependencies:
       fast-redact: 3.0.2
-      fast-safe-stringify: 2.1.0
+      fast-safe-stringify: 2.1.1
       fastify-warning: 0.2.0
       flatstr: 1.0.12
       pino-std-serializers: 3.2.0
@@ -2665,7 +2674,7 @@ packages:
       nopt: 1.0.10
     dev: true
 
-  /ts-node/10.2.1_ba6070efdb19aacfdf37f0e70ee888df:
+  /ts-node/10.2.1_9a8cc85b2d96f040413d5b20218085f6:
     resolution: {integrity: sha512-hCnyOyuGmD5wHleOQX6NIjJtYVIO8bPP8F2acWkB4W06wdlkgyvJtubO/I9NkI88hCFECbsEgoLc0VNkYmcSfw==}
     engines: {node: '>=12.0.0'}
     hasBin: true
@@ -2685,7 +2694,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
-      '@types/node': 16.7.13
+      '@types/node': 16.9.0
       acorn: 8.5.0
       acorn-walk: 8.2.0
       arg: 4.1.3
@@ -2740,7 +2749,7 @@ packages:
       graphql: ^15.3.0
     dependencies:
       '@types/glob': 7.1.4
-      '@types/node': 16.7.13
+      '@types/node': 16.9.0
       '@types/semver': 7.3.8
       glob: 7.1.7
       graphql: 15.5.3
