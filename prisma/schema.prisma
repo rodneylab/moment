@@ -24,8 +24,8 @@ model TubeStation {
   id        Int                   @id @default(autoincrement())
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
-  name      String
-  galeries  GalleryTubeStations[]
+  name      String                @unique
+  galleries GalleryTubeStations[]
 }
 
 model GalleryTubeStations {

@@ -24,6 +24,7 @@ specifiers:
   nodemon: ^2.0.12
   pg: ^8.7.1
   prettier: ^2.4.0
+  prisma: ^3.0.1
   reflect-metadata: ^0.1.13
   ts-node: ^10.2.1
   type-graphql: ^1.1.1
@@ -31,7 +32,7 @@ specifiers:
 
 dependencies:
   '@fastify/session': 6.1.1
-  '@prisma/client': 3.0.1
+  '@prisma/client': 3.0.1_prisma@3.0.1
   apollo-server-core: 3.3.0_graphql@15.5.3
   apollo-server-fastify: 3.3.0_fastify@3.21.0+graphql@15.5.3
   apollo-server-plugin-base: 3.2.0_graphql@15.5.3
@@ -57,6 +58,7 @@ devDependencies:
   husky: 7.0.2
   nodemon: 2.0.12
   prettier: 2.4.0
+  prisma: 3.0.1
   ts-node: 10.2.1_9a8cc85b2d96f040413d5b20218085f6
   typescript: 4.4.2
 
@@ -240,7 +242,7 @@ packages:
       fastq: 1.12.0
     dev: true
 
-  /@prisma/client/3.0.1:
+  /@prisma/client/3.0.1_prisma@3.0.1:
     resolution: {integrity: sha512-o/5wd1LqI2nr0/8L8Tg0cm5/wL/z7FLx5pd0D7MbnUoBv62sxHP5wRgturjljUwCBm4GpfRnBZUTWTuKA610MA==}
     engines: {node: '>=12.6'}
     requiresBuild: true
@@ -251,11 +253,17 @@ packages:
         optional: true
     dependencies:
       '@prisma/engines-version': 2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db
+      prisma: 3.0.1
     dev: false
 
   /@prisma/engines-version/2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db:
     resolution: {integrity: sha512-iArSApZZImVmT9oC/rGOjzvpG2AOqlIeqYcVnop9poA3FxD4zfVPbNPH9DTgOWhc06OkBHujJZeAcsNddVabIQ==}
     dev: false
+
+  /@prisma/engines/2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db:
+    resolution: {integrity: sha512-Q9CwN6e5E5Abso7J3A1fHbcF4NXGRINyMnf7WQ07fXaebxTTARY5BNUzy2Mo5uH82eRVO5v7ImNuR044KTjLJg==}
+    requiresBuild: true
+    dev: true
 
   /@protobufjs/aspromise/1.1.2:
     resolution: {integrity: sha1-m4sMxmPWaafY9vXQiToU00jzD78=}
@@ -2276,6 +2284,15 @@ packages:
     resolution: {integrity: sha512-DsEPLY1dE5HF3BxCRBmD4uYZ+5DCbvatnolqTqcxEgKVZnL2kUfyu7b8pPQ5+hTBkdhU9SLUmK0/pHb07RE4WQ==}
     engines: {node: '>=10.13.0'}
     hasBin: true
+    dev: true
+
+  /prisma/3.0.1:
+    resolution: {integrity: sha512-ENmYAopd56nkds5/IOSTGixbkbUN2QdEzB4cp/mtaGB/G0OArbP6cnbA/9u02Pe29RdErbNOoIdCGASjpItJwQ==}
+    engines: {node: '>=12.6'}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      '@prisma/engines': 2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db
     dev: true
 
   /progress/2.0.3:

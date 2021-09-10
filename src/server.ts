@@ -13,6 +13,7 @@ import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { GalleryResolver } from './resolvers/gallery';
 import HelloResolver from './resolvers/hello';
+import TubeStationResolver from './resolvers/tubeStation';
 
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
   return {
@@ -65,7 +66,7 @@ async function startApolloServer() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [GalleryResolver, HelloResolver],
+      resolvers: [GalleryResolver, HelloResolver, TubeStationResolver],
       validate: false,
     }),
     plugins: [
