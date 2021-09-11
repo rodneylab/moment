@@ -11,13 +11,18 @@ generator client {
 }
 
 model Gallery {
-  id           Int                   @id @default(autoincrement())
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-  name         String
-  address      String?
-  nearestTubes GalleryTubeStations[]
-  googleMap    String?
+  id              Int                   @id @default(autoincrement())
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  name            String
+  address         PostalAddress?        @relation(fields: [postalAddressId], references: [id])
+  openingHours    OpeningHours?         @relation(fields: [openingHoursId], references: [id])
+  nearestTubes    GalleryTubeStations[]
+  googleMap       String?
+  postalAddressId Int?
+  website         String?
+
+  openingHoursId Int?
 }
 
 model TubeStation {
@@ -37,4 +42,35 @@ model GalleryTubeStations {
   assignedBy    String?
 
   @@id([galleryId, tubeStationId])
+}
+
+model PostalAddress {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  streetAddress String
+  locality      String
+  postalCode    String
+  country       String
+  Gallery       Gallery[]
+}
+
+model OpeningHours {
+  id                 Int                 @id @default(autoincrement())
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  openingHoursRanges OpeningHoursRange[]
+  Gallery            Gallery[]
+}
+
+model OpeningHoursRange {
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  startDay       Int
+  endDay         Int
+  openingTime    String
+  closingTime    String
+  OpeningHours   OpeningHours @relation(fields: [openingHoursId], references: [id])
+  openingHoursId Int
 }
