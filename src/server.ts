@@ -1,4 +1,6 @@
+import { PrismaClient } from '.pnpm/@prisma+client@3.1.0_prisma@3.0.2/node_modules/.prisma/client';
 import fastifySession from '@fastify/session';
+import { createClient } from '@supabase/supabase-js';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
@@ -7,7 +9,7 @@ import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import fastifyCookie from 'fastify-cookie';
 // import { Server, IncomingMessage, ServerResponse  } from 'http';
 // import fastifyCors from 'fastify-cors';
-import fastifyPostgres from 'fastify-postgres';
+// import fastifyPostgres from 'fastify-postgres';
 import fastifyRedis from 'fastify-redis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
@@ -27,6 +29,12 @@ function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
   };
 }
 
+const prisma = new PrismaClient();
+const supabase = createClient(
+  process.env.SUPABASE_URL as string,
+  process.env.SUPABASE_KEY as string,
+);
+
 async function startApolloServer() {
   const server: FastifyInstance = Fastify({});
 
@@ -35,15 +43,18 @@ async function startApolloServer() {
   //   methods: ['GET', 'POST'],
   //   credentials: true,
   // });
-  server.register(fastifyPostgres, {
-    connectionString: process.env.DATABASE_URL,
-  });
+  // server.register(fastifyPostgres, {
+  //   connectionString: process.env.DATABASE_URL,
+  // });
   server.register(fastifyCookie);
   server.register(fastifyRedis, { host: '127.0.0.1' });
+  const { redis } = server;
   server.register(fastifySession, { secret: process.env.SESSION_SECRET as string });
+
   // server.register(prismaPlugin);
 
   // await context.prisma.gallery.deleteMany({});
+  // await prisma.tubeStation.deleteMany({});
 
   const opts: RouteShorthandOptions = {
     schema: {
@@ -73,6 +84,13 @@ async function startApolloServer() {
       fastifyAppClosePlugin(server),
       ApolloServerPluginDrainHttpServer({ httpServer: server.server }),
     ],
+    context: ({ req, res }) => ({
+      req,
+      res,
+      prisma,
+      redis,
+      supabase,
+    }),
   });
   await apolloServer.start();
   server.register(apolloServer.createHandler());

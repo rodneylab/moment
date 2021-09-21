@@ -1,5 +1,5 @@
-import { Arg, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
-import { context } from '../context';
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
+import type { Context } from '../context';
 import TubeStation from '../entities/TubeStation';
 import FieldError from './FieldError';
 
@@ -15,25 +15,35 @@ class CreateTubeStationResponse {
 @Resolver()
 export class TubeStationResolver {
   @Query(() => [TubeStation])
-  async tubeStations(): Promise<TubeStation[]> {
-    return context.prisma.tubeStation.findMany({ take: 999 });
+  async tubeStations(@Ctx() { prisma }: Context): Promise<TubeStation[]> {
+    try {
+      return prisma.tubeStation.findMany({ take: 999 });
+    } catch (error) {
+      console.error('Unknown error running tubeStations query');
+      return [];
+    }
   }
 
-  @Mutation(() => TubeStation)
-  async createTubeStation(@Arg('name') name: string): Promise<CreateTubeStationResponse> {
-    // check gallery does not already exist
-    const existingTubeStation = await context.prisma.tubeStation.findFirst({ where: { name } });
-    if (existingTubeStation) {
-      return {
-        errors: [{ field: 'name', message: 'There is already a tube station with that name.' }],
-      };
+  @Mutation(() => CreateTubeStationResponse)
+  async createTubeStation(
+    @Arg('name') name: string,
+    @Ctx() { prisma }: Context,
+  ): Promise<CreateTubeStationResponse> {
+    try {
+      const existingTubeStation = await prisma.tubeStation.findUnique({ where: { name } });
+      if (existingTubeStation) {
+        return {
+          errors: [{ field: 'name', message: 'There is already a tube station with that name.' }],
+        };
+      }
+      const tubeStation = await prisma.tubeStation.create({
+        data: { name },
+      });
+      return { tubeStation };
+    } catch (error) {
+      console.error('Error creating new tubeStation');
+      return { errors: [{ field: 'unknown', message: error }] };
     }
-
-    const tubeStation = await context.prisma.tubeStation.create({
-      data: { name },
-    });
-
-    return { tubeStation };
   }
 }
 

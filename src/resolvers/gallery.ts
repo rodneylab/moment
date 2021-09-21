@@ -1,5 +1,6 @@
-import { Arg, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
-import { context } from '../context';
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
+import type { Context } from '../context';
+// import { context } from '../context';
 import Gallery from '../entities/Gallery';
 import FieldError from './FieldError';
 
@@ -85,8 +86,8 @@ class PaginatedGalleries {
 @Resolver()
 export class GalleryResolver {
   @Query(() => PaginatedGalleries)
-  async galleries(): Promise<PaginatedGalleries> {
-    const galleries = await context.prisma.gallery.findMany({
+  async galleries(@Ctx() { prisma }: Context): Promise<PaginatedGalleries> {
+    const galleries = await prisma.gallery.findMany({
       take: 100,
       include: {
         nearestTubes: true,
@@ -117,7 +118,7 @@ export class GalleryResolver {
       }
       const tubeStationPromises = nearestTubes.map(async (element) => {
         const { tubeStationId } = element;
-        return context.prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
+        return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
       });
       const tubeStations = await Promise.all(tubeStationPromises);
       return {
@@ -139,12 +140,15 @@ export class GalleryResolver {
 
   // tube stations must aleady exist
   @Mutation(() => CreateGalleryResponse)
-  async createGallery(@Arg('input') input: CreateGalleryInput): Promise<CreateGalleryResponse> {
+  async createGallery(
+    @Arg('input') input: CreateGalleryInput,
+    @Ctx() { prisma }: Context,
+  ): Promise<CreateGalleryResponse> {
     try {
       const { name, postalAddress, googleMap, nearestTubes, openingHours, website } = input;
 
       // check gallery does not already exist
-      const existingGallery = await context.prisma.gallery.findFirst({ where: { name } });
+      const existingGallery = await prisma.gallery.findFirst({ where: { name } });
       if (existingGallery) {
         return {
           errors: [{ field: 'name', message: 'There is already a gallery with that name.' }],
@@ -153,13 +157,13 @@ export class GalleryResolver {
 
       // query existing tube stations
       const promises = nearestTubes.map((element) =>
-        context.prisma.tubeStation.findUnique({ where: { name: element } }),
+        prisma.tubeStation.findUnique({ where: { name: element } }),
       );
       const tubeStations = await Promise.all(promises);
       const tubeStationsNotEmpty = tubeStations.filter(notEmpty);
 
       // create new gallery
-      const gallery = await context.prisma.gallery.create({
+      const gallery = await prisma.gallery.create({
         data: {
           name,
           address: {
