@@ -1,12 +1,12 @@
 {
   "dependencies": {
     "@fastify/session": "^6.2.0",
-    "@prisma/client": "^3.1.0",
-    "@supabase/supabase-js": "^1.22.6",
+    "@prisma/client": "^3.1.1",
+    "@supabase/supabase-js": "^1.23.0",
     "apollo-server-core": "^3.3.0",
     "apollo-server-fastify": "^3.3.0",
     "apollo-server-plugin-base": "^3.2.0",
-    "fastify": "^3.21.3",
+    "fastify": "^3.21.5",
     "fastify-cookie": "^5.3.1",
     "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.6.0",
@@ -31,7 +31,7 @@
   "description": "jfFrank Server",
   "main": "src/server.js",
   "devDependencies": {
-    "@types/node": "^16.9.4",
+    "@types/node": "^16.9.6",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
@@ -42,7 +42,7 @@
     "husky": "^7.0.2",
     "nodemon": "^2.0.12",
     "prettier": "^2.4.1",
-    "prisma": "^3.0.2",
+    "prisma": "^3.1.1",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
   },
