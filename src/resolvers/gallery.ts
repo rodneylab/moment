@@ -1,7 +1,12 @@
+import type { TubeStation } from '.prisma/client';
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import type { Context } from '../context';
-// import { context } from '../context';
 import Gallery from '../entities/Gallery';
+import {
+  addressStringFromPostalAddress,
+  graphqlOpeningHoursFromOpeningHours,
+  openingTimesFromOpeningHours,
+} from '../utilities/gallery';
 import FieldError from './FieldError';
 
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
@@ -15,6 +20,9 @@ class AddressInput {
 
   @Field({ nullable: true })
   locality: string;
+
+  @Field({ nullable: true })
+  city: string;
 
   @Field({ nullable: true })
   postalCode: string;
@@ -41,7 +49,7 @@ class OpeningHoursRangeInput {
 @InputType()
 class OpeningHoursInput {
   @Field(() => [OpeningHoursRangeInput], { nullable: true })
-  ranges: OpeningHoursRangeInput[];
+  openingHoursRanges: OpeningHoursRangeInput[];
 }
 
 @InputType()
@@ -53,7 +61,7 @@ class CreateGalleryInput {
   postalAddress: AddressInput;
 
   @Field(() => OpeningHoursInput, { nullable: true })
-  openingHours: OpeningHoursInput[];
+  openingHours: OpeningHoursInput;
 
   @Field(() => [String], { nullable: true })
   nearestTubes: string[];
@@ -99,36 +107,26 @@ export class GalleryResolver {
     const galleriesPromise = galleries.map(async (element) => {
       const { id, createdAt, updatedAt, name, address, googleMap, nearestTubes, openingHours } =
         element;
-      // todo(rodneyj): move this to a utility function
-      let addressString;
-      if (address) {
-        const { streetAddress, locality, postalCode } = address;
-        addressString = [streetAddress, locality, postalCode]
-          .filter((element) => element)
-          .join(', ');
-      }
-      // todo(rodneyj): move this to a utility function
-      let openingTimes: string[] = [];
-      if (openingHours) {
-        const { openingHoursRanges } = openingHours;
-        openingHoursRanges.map((element) => {
-          const { startDay, endDay, openingTime, closingTime } = element;
-          return `${openingTime} to ${closingTime} ${startDay} to ${endDay}`;
-        });
-      }
+
       const tubeStationPromises = nearestTubes.map(async (element) => {
         const { tubeStationId } = element;
         return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
       });
       const tubeStations = await Promise.all(tubeStationPromises);
+      const openingHoursRanges = returnedOpeningHours
+        ? await prisma.openingHoursRange.findMany({
+            where: { openingHoursId: returnedOpeningHours.id },
+            orderBy: { startDay: 'asc' },
+          })
+        : [];
       return {
         id,
         createdAt,
         updatedAt,
         name,
-        address: addressString,
+        address: address ? addressStringFromPostalAddress(address) : null,
         openingHours,
-        openingTimes: openingTimes.filter(notEmpty).join(', '),
+        openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
         postalAddress: address,
         googleMap,
         nearestTubes: tubeStations.filter(notEmpty),
@@ -156,11 +154,14 @@ export class GalleryResolver {
       }
 
       // query existing tube stations
-      const promises = nearestTubes.map((element) =>
-        prisma.tubeStation.findUnique({ where: { name: element } }),
-      );
-      const tubeStations = await Promise.all(promises);
-      const tubeStationsNotEmpty = tubeStations.filter(notEmpty);
+      let tubeStationsNotEmpty: TubeStation[] = [];
+      if (nearestTubes) {
+        const promises = nearestTubes.map((element) =>
+          prisma.tubeStation.findUnique({ where: { name: element } }),
+        );
+        const tubeStations = await Promise.all(promises);
+        tubeStationsNotEmpty = tubeStations.filter(notEmpty);
+      }
 
       // create new gallery
       const gallery = await prisma.gallery.create({
@@ -171,11 +172,18 @@ export class GalleryResolver {
               ...postalAddress,
             },
           },
-          openingHours: {
-            create: { ...openingHours },
-          },
+          openingHours: openingHours
+            ? {
+                create: {
+                  openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
+                },
+              }
+            : undefined,
           googleMap,
           nearestTubes: {
+            /* creating a gallery/station pairing here which is why we use create even though
+             * stations exist already
+             */
             createMany: {
               data: tubeStationsNotEmpty.map((element) => ({
                 tubeStationId: element.id,
@@ -187,20 +195,39 @@ export class GalleryResolver {
         include: {
           nearestTubes: true,
           address: true,
+          openingHours: true,
         },
       });
 
       // map database nearestTubes to GraphQL type
-      const { nearestTubes: galleryNearestTubes, address, ...rest } = gallery;
+      const {
+        nearestTubes: galleryNearestTubes,
+        address,
+        openingHours: returnedOpeningHours,
+        ...rest
+      } = gallery;
       const galleryTubeStations = galleryNearestTubes.map((element) => {
         const { tubeStationId } = element;
         return tubeStationsNotEmpty.find((element) => element?.id === tubeStationId);
       });
+
+      const openingHoursRanges = returnedOpeningHours
+        ? await prisma.openingHoursRange.findMany({
+            where: { openingHoursId: returnedOpeningHours.id },
+            orderBy: { startDay: 'asc' },
+          })
+        : [];
+
       return {
         gallery: {
           ...rest,
           nearestTubes: galleryTubeStations.filter(notEmpty),
           postalAddress: address,
+          address: address ? addressStringFromPostalAddress(address) : null,
+          openingHours: returnedOpeningHours
+            ? graphqlOpeningHoursFromOpeningHours(openingHoursRanges)
+            : null,
+          openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
         },
       };
     } catch (error) {

@@ -18,6 +18,9 @@ class PostalAddress {
   locality: string;
 
   @Field({ nullable: true })
+  city: string;
+
+  @Field({ nullable: true })
   postalCode: string;
 
   @Field()

@@ -1,4 +1,4 @@
-import { PrismaClient } from '.pnpm/@prisma+client@3.1.0_prisma@3.0.2/node_modules/.prisma/client';
+import { PrismaClient } from '.prisma/client';
 import fastifySession from '@fastify/session';
 import { createClient } from '@supabase/supabase-js';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';

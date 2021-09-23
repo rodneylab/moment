@@ -50,6 +50,7 @@ model PostalAddress {
   updatedAt     DateTime  @updatedAt
   streetAddress String
   locality      String
+  city          String
   postalCode    String
   country       String
   Gallery       Gallery[]
