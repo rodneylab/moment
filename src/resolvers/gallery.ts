@@ -6,29 +6,15 @@ import {
   addressStringFromPostalAddress,
   graphqlOpeningHoursFromOpeningHours,
   openingTimesFromOpeningHours,
+  validName,
+  validPostalAddress,
+  validUrl,
 } from '../utilities/gallery';
+import AddressInput from './AddressInput';
 import FieldError from './FieldError';
 
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined;
-}
-
-@InputType()
-class AddressInput {
-  @Field()
-  streetAddress: string;
-
-  @Field({ nullable: true })
-  locality: string;
-
-  @Field({ nullable: true })
-  city: string;
-
-  @Field({ nullable: true })
-  postalCode: string;
-
-  @Field({ nullable: true })
-  country: string;
 }
 
 @InputType()
@@ -113,9 +99,9 @@ export class GalleryResolver {
         return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
       });
       const tubeStations = await Promise.all(tubeStationPromises);
-      const openingHoursRanges = returnedOpeningHours
+      const openingHoursRanges = openingHours
         ? await prisma.openingHoursRange.findMany({
-            where: { openingHoursId: returnedOpeningHours.id },
+            where: { openingHoursId: openingHours.id },
             orderBy: { startDay: 'asc' },
           })
         : [];
@@ -145,13 +131,17 @@ export class GalleryResolver {
     try {
       const { name, postalAddress, googleMap, nearestTubes, openingHours, website } = input;
 
+      const errors: FieldError[] = [];
+
       // check gallery does not already exist
       const existingGallery = await prisma.gallery.findFirst({ where: { name } });
       if (existingGallery) {
-        return {
-          errors: [{ field: 'name', message: 'There is already a gallery with that name.' }],
-        };
+        errors.push({ field: 'name', message: 'There is already a gallery with that name.' });
       }
+
+      errors.push(...validName(name, 'Name'));
+      errors.push(...validPostalAddress(postalAddress));
+      errors.push(...validUrl(googleMap, 'Google Map'));
 
       // query existing tube stations
       let tubeStationsNotEmpty: TubeStation[] = [];
@@ -160,7 +150,19 @@ export class GalleryResolver {
           prisma.tubeStation.findUnique({ where: { name: element } }),
         );
         const tubeStations = await Promise.all(promises);
+        tubeStations.forEach((element, index) => {
+          if (element == null) {
+            errors.push({
+              field: 'tubeStations',
+              message: `${tubeStations[index]} is not yet in database, add it first`,
+            });
+          }
+        });
         tubeStationsNotEmpty = tubeStations.filter(notEmpty);
+      }
+
+      if (errors.length > 0) {
+        return { errors };
       }
 
       // create new gallery

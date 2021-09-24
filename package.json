@@ -17,12 +17,14 @@
     "type-graphql": "^1.1.1"
   },
   "scripts": {
+    "build": "tsc",
     "dev": "nodemon dist/server.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "gen": "prisma migrate dev --name init",
     "prettier:check": "prettier --config .prettierrc --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "start": "node dist/server.js",
     "start:ts": "ts-node src/server.ts",
+    "test": "uvu -r ts-node/register tests",
     "watch": "tsc -w",
     "prepare": "husky install"
   },
@@ -44,7 +46,8 @@
     "prettier": "^2.4.1",
     "prisma": "^3.1.1",
     "ts-node": "^10.2.1",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "uvu": "^0.5.1"
   },
   "author": "Rodney Lab <ask@rodneylab.com> (@rodneyLab)",
   "license": "BSD-3-Clause"
