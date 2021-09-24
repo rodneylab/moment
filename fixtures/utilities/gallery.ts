@@ -23,7 +23,7 @@ export const openingHours1: OpeningHoursRange[] = [
     openingHoursId: 1,
   },
   {
-    id: 1,
+    id: 2,
     createdAt: new Date('2021-09-24T14:21:14.000+0100'),
     updatedAt: new Date('2021-09-24T14:21:14.000+0100'),
     startDay: 6,
