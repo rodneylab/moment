@@ -91,8 +91,17 @@ export class GalleryResolver {
     });
 
     const galleriesPromise = galleries.map(async (element) => {
-      const { id, createdAt, updatedAt, name, address, googleMap, nearestTubes, openingHours } =
-        element;
+      const {
+        id,
+        createdAt,
+        updatedAt,
+        name,
+        address,
+        googleMap,
+        nearestTubes,
+        openingHours,
+        website,
+      } = element;
 
       const tubeStationPromises = nearestTubes.map(async (element) => {
         const { tubeStationId } = element;
@@ -116,6 +125,7 @@ export class GalleryResolver {
         postalAddress: address,
         googleMap,
         nearestTubes: tubeStations.filter(notEmpty),
+        website,
       };
     });
     const galleriesResult = await Promise.all(galleriesPromise);
