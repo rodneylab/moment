@@ -40,7 +40,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "fastify-cors": "^6.0.2",
     "husky": "^7.0.2",
-    "nodemon": "^2.0.12",
+    "nodemon": "^2.0.13",
     "prettier": "^2.4.1",
     "prisma": "^3.1.1",
     "ts-node": "^10.2.1",
