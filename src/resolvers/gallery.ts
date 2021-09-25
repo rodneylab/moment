@@ -10,6 +10,7 @@ import {
   validPostalAddress,
   validUrl,
 } from '../utilities/gallery';
+import { graphqlTubeStation } from '../utilities/tubeStation';
 import AddressInput from './AddressInput';
 import FieldError from './FieldError';
 
@@ -92,7 +93,7 @@ export class GalleryResolver {
 
     const galleriesPromise = galleries.map(async (element) => {
       const {
-        id,
+        uid: id,
         createdAt,
         updatedAt,
         name,
@@ -124,7 +125,7 @@ export class GalleryResolver {
         openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
         postalAddress: address,
         googleMap,
-        nearestTubes: tubeStations.filter(notEmpty),
+        nearestTubes: tubeStations.filter(notEmpty).map((element) => graphqlTubeStation(element)),
         website,
       };
     });
@@ -213,6 +214,8 @@ export class GalleryResolver {
 
       // map database nearestTubes to GraphQL type
       const {
+        id,
+        uid,
         nearestTubes: galleryNearestTubes,
         address,
         openingHours: returnedOpeningHours,
@@ -232,8 +235,11 @@ export class GalleryResolver {
 
       return {
         gallery: {
+          id: uid,
           ...rest,
-          nearestTubes: galleryTubeStations.filter(notEmpty),
+          nearestTubes: galleryTubeStations
+            .filter(notEmpty)
+            .map((element) => graphqlTubeStation(element)),
           postalAddress: address,
           address: address ? addressStringFromPostalAddress(address) : null,
           openingHours: returnedOpeningHours
@@ -245,6 +251,27 @@ export class GalleryResolver {
     } catch (error) {
       console.error('Error creating new gallery');
       return { errors: [{ field: 'unknown', message: error }] };
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteGallery(@Arg('id') id: string, @Ctx() { prisma }: Context): Promise<boolean> {
+    try {
+      // todo(rodneylab): check relations and only allow deletions where it makes sense
+      const gallery = await prisma.gallery.findUnique({
+        where: { uid: id },
+      });
+      if (!gallery) {
+        console.log('id: ', id);
+        return false;
+      }
+      const { id: galleryId } = gallery;
+      await prisma.galleryTubeStations.deleteMany({ where: { galleryId } });
+      await prisma.gallery.delete({ where: { id: galleryId } });
+      return true;
+    } catch (error) {
+      console.error(`Error deleting tubeStation ${id}: ${error}`);
+      return false;
     }
   }
 }

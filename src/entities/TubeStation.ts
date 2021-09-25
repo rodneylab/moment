@@ -4,7 +4,7 @@ import Gallery from './Gallery';
 @ObjectType()
 class TubeStation {
   @Field()
-  id!: number;
+  id!: string;
 
   @Field()
   createdAt: Date;

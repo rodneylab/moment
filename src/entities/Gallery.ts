@@ -7,7 +7,7 @@ import TubeStation from './TubeStation';
 @ObjectType()
 class Gallery {
   @Field()
-  id!: number;
+  id!: string;
 
   @Field()
   createdAt: Date;
