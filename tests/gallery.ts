@@ -5,6 +5,7 @@ import {
   addressStringFromPostalAddress,
   openingTimesFromOpeningHours,
   validName,
+  validSlug,
 } from '../src/utilities/gallery';
 
 test('addressStringFromPostalAddress', () => {
@@ -28,6 +29,19 @@ test('validName', () => {
   const { field, message } = validName('John\t', 'name')[0];
   assert.is(field, 'name');
   assert.is(message, 'name contains invalid characters');
+});
+
+test('validSlug', () => {
+  assert.type(validSlug, 'function');
+  assert.is(validSlug('a-valid-slug').length, 0);
+  assert.is(validSlug('another-valid-slug', 'slug').length, 0);
+  assert.is(validSlug('an-Invalid-slug').length, 1);
+  assert.is(validSlug('-another-invalid-slug').length, 1);
+  assert.is(validSlug('yet-another-invalid-slug-').length, 1);
+
+  const { field, message } = validSlug('an-Invalid-slug')[0];
+  assert.is(field, 'slug');
+  assert.is(message, 'Check the slug is valid');
 });
 
 test.run();

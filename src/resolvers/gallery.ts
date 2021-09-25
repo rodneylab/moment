@@ -8,6 +8,7 @@ import {
   openingTimesFromOpeningHours,
   validName,
   validPostalAddress,
+  validSlug,
   validUrl,
 } from '../utilities/gallery';
 import { graphqlTubeStation } from '../utilities/tubeStation';
@@ -43,6 +44,9 @@ class OpeningHoursInput {
 class CreateGalleryInput {
   @Field()
   name: string;
+
+  @Field(() => String)
+  slug: string;
 
   @Field(() => AddressInput, { nullable: true })
   postalAddress: AddressInput;
@@ -84,6 +88,7 @@ export class GalleryResolver {
   async galleries(@Ctx() { prisma }: Context): Promise<PaginatedGalleries> {
     const galleries = await prisma.gallery.findMany({
       take: 100,
+      orderBy: { name: 'asc' },
       include: {
         nearestTubes: true,
         address: true,
@@ -97,6 +102,7 @@ export class GalleryResolver {
         createdAt,
         updatedAt,
         name,
+        slug,
         address,
         googleMap,
         nearestTubes,
@@ -120,6 +126,7 @@ export class GalleryResolver {
         createdAt,
         updatedAt,
         name,
+        slug,
         address: address ? addressStringFromPostalAddress(address) : null,
         openingHours,
         openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
@@ -140,17 +147,24 @@ export class GalleryResolver {
     @Ctx() { prisma }: Context,
   ): Promise<CreateGalleryResponse> {
     try {
-      const { name, postalAddress, googleMap, nearestTubes, openingHours, website } = input;
+      const { name, postalAddress, googleMap, nearestTubes, openingHours, slug, website } = input;
 
       const errors: FieldError[] = [];
 
       // check gallery does not already exist
-      const existingGallery = await prisma.gallery.findFirst({ where: { name } });
+      const existingGallery = await prisma.gallery.findFirst({
+        where: { OR: [{ name }, { slug }] },
+      });
       if (existingGallery) {
-        errors.push({ field: 'name', message: 'There is already a gallery with that name.' });
+        if (existingGallery.name === name) {
+          errors.push({ field: 'name', message: 'There is already a gallery with that name.' });
+        } else {
+          errors.push({ field: 'slug', message: 'There is already a gallery with that slug.' });
+        }
       }
 
       errors.push(...validName(name, 'Name'));
+      errors.push(...validSlug(slug, 'Slug'));
       errors.push(...validPostalAddress(postalAddress));
       errors.push(...validUrl(googleMap, 'Google Map'));
 
@@ -180,6 +194,7 @@ export class GalleryResolver {
       const gallery = await prisma.gallery.create({
         data: {
           name,
+          slug,
           address: {
             create: {
               ...postalAddress,

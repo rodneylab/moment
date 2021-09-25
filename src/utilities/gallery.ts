@@ -63,6 +63,15 @@ export function validPostalAddress(address: AddressInput) {
   return errors;
 }
 
+export function validSlug(slug: string, field: string = 'slug') {
+  const errors: FieldError[] = [];
+  const slugRegex = /^[a-z]+(-[a-z]+)*$/;
+  if (!slugRegex.test(slug)) {
+    errors.push({ field, message: 'Check the slug is valid' });
+  }
+  return errors;
+}
+
 export function validUrl(url: string, field: string) {
   const result: FieldError[] = [];
   const urlRegex =

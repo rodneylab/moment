@@ -15,8 +15,11 @@ class Gallery {
   @Field()
   updatedAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => String)
   name!: string;
+
+  @Field(() => String)
+  slug!: string;
 
   @Field(() => String, { nullable: true })
   address?: string | null;

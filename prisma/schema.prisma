@@ -16,6 +16,7 @@ model Gallery {
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   name            String
+  slug            String                @unique
   address         PostalAddress?        @relation(fields: [postalAddressId], references: [id])
   openingHours    OpeningHours?         @relation(fields: [openingHoursId], references: [id])
   nearestTubes    GalleryTubeStations[]
