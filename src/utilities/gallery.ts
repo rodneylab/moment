@@ -1,6 +1,7 @@
 import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
 import type FieldError from 'src/resolvers/FieldError';
 import type AddressInput from '../resolvers/AddressInput';
+import type { OpeningHoursInput } from '../resolvers/gallery';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const N_DASH_ENTITY = '\u2013';
@@ -43,6 +44,91 @@ export function validName(name: string, fieldName: string): FieldError[] {
   if (/[\0\n\f\v\n\r\t]/.test(name)) {
     result.push({ field: fieldName, message: `${fieldName} contains invalid characters` });
   }
+  return result;
+}
+
+export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[] {
+  const result: FieldError[] = [];
+  openingHours.openingHoursRanges.forEach((element, index) => {
+    const { startDay, endDay, openingTime, closingTime } = element;
+
+    let errorsFoundOnThisElement = false;
+    const openingHour = parseInt(openingTime.slice(0, 2), 10);
+    const openingMinute = parseInt(openingTime.slice(3, 5), 10);
+    const openingDate = new Date('2000');
+    openingDate.setHours(openingHour);
+    openingDate.setMinutes(openingMinute);
+
+    const closingHour = parseInt(closingTime.slice(0, 2), 10);
+    const closingMinute = parseInt(closingTime.slice(3, 5), 10);
+    const closingDate = new Date('2000');
+    closingDate.setHours(closingHour);
+    closingDate.setMinutes(closingMinute);
+
+    if (
+      typeof openingHour === 'undefined' ||
+      openingHour < 0 ||
+      openingHour > 23 ||
+      openingMinute < 0 ||
+      openingMinute > 59 ||
+      openingTime[2] !== ':'
+    ) {
+      result.push({ field: `openingHours${index}`, message: `Check time is in 18:30 format` });
+      errorsFoundOnThisElement = true;
+    }
+
+    if (
+      typeof closingHour === 'undefined' ||
+      closingHour < 0 ||
+      closingHour > 23 ||
+      closingMinute < 0 ||
+      closingMinute > 59 ||
+      closingTime[2] !== ':'
+    ) {
+      result.push({ field: `closingHours${index}`, message: `Check time is in 18:30 format` });
+      errorsFoundOnThisElement = true;
+    }
+
+    if (!errorsFoundOnThisElement && closingDate < openingDate) {
+      result.push({
+        field: `openingHours${index}`,
+        message: 'Check opening time is earlier than closing time',
+      });
+      result.push({
+        field: `closingHours${index}`,
+        message: 'Check opening time is earlier than closing time',
+      });
+    }
+
+    if (startDay < 0 || startDay > 6) {
+      result.push({
+        field: `startDay${index}`,
+        message: 'Check this is a valid day',
+      });
+    }
+
+    if (endDay < 0 || endDay > 6) {
+      result.push({
+        field: `endDay${index}`,
+        message: 'Check this is a valid day',
+      });
+    }
+
+    if (
+      endDay < startDay ||
+      (index > 0 && startDay <= openingHours.openingHoursRanges[index - 1].endDay)
+    ) {
+      result.push({
+        field: `startDay${index}`,
+        message: 'Check days are in sequence, if Sunday is included, it should come first',
+      });
+      result.push({
+        field: `endDay${index}`,
+        message: 'Check days are in sequence, if Sunday is included, it should come first',
+      });
+    }
+  });
+
   return result;
 }
 

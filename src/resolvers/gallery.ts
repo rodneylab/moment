@@ -7,6 +7,7 @@ import {
   graphqlOpeningHoursFromOpeningHours,
   openingTimesFromOpeningHours,
   validName,
+  validOpeningHours,
   validPostalAddress,
   validSlug,
   validUrl,
@@ -35,7 +36,7 @@ class OpeningHoursRangeInput {
 }
 
 @InputType()
-class OpeningHoursInput {
+export class OpeningHoursInput {
   @Field(() => [OpeningHoursRangeInput], { nullable: true })
   openingHoursRanges: OpeningHoursRangeInput[];
 }
@@ -71,6 +72,15 @@ class CreateGalleryResponse {
 
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
+}
+
+@ObjectType()
+class GalleryQueryResponse {
+  @Field(() => Gallery, { nullable: true })
+  gallery?: Gallery;
+
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
@@ -140,6 +150,64 @@ export class GalleryResolver {
     return { galleries: galleriesResult, hasMore: false };
   }
 
+  @Query(() => GalleryQueryResponse)
+  async gallery(
+    @Arg('slug') slug: string,
+    @Ctx() { prisma }: Context,
+  ): Promise<GalleryQueryResponse> {
+    const gallery = await prisma.gallery.findUnique({
+      where: { slug },
+      include: {
+        nearestTubes: true,
+        address: true,
+        openingHours: { include: { openingHoursRanges: true } },
+      },
+    });
+
+    if (!gallery) {
+      return { error: 'No gallery found with that slug' };
+    }
+    const {
+      uid: id,
+      createdAt,
+      updatedAt,
+      name,
+      address,
+      googleMap,
+      nearestTubes,
+      openingHours,
+      website,
+    } = gallery;
+
+    const tubeStationPromises = nearestTubes.map(async (element) => {
+      const { tubeStationId } = element;
+      return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
+    });
+    const tubeStations = await Promise.all(tubeStationPromises);
+    const openingHoursRanges = openingHours
+      ? await prisma.openingHoursRange.findMany({
+          where: { openingHoursId: openingHours.id },
+          orderBy: { startDay: 'asc' },
+        })
+      : [];
+    return {
+      gallery: {
+        id,
+        createdAt,
+        updatedAt,
+        name,
+        slug,
+        address: address ? addressStringFromPostalAddress(address) : null,
+        openingHours,
+        openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
+        postalAddress: address,
+        googleMap,
+        nearestTubes: tubeStations.filter(notEmpty).map((element) => graphqlTubeStation(element)),
+        website,
+      },
+    };
+  }
+
   // tube stations must aleady exist
   @Mutation(() => CreateGalleryResponse)
   async createGallery(
@@ -163,10 +231,14 @@ export class GalleryResolver {
         }
       }
 
-      errors.push(...validName(name, 'Name'));
-      errors.push(...validSlug(slug, 'Slug'));
+      errors.push(...validName(name, 'name'));
+      errors.push(...validOpeningHours(openingHours));
+      errors.push(...validSlug(slug, 'slug'));
       errors.push(...validPostalAddress(postalAddress));
-      errors.push(...validUrl(googleMap, 'Google Map'));
+      if (googleMap) {
+        errors.push(...validUrl(googleMap, 'googleMap'));
+      }
+      errors.push(...validUrl(website, 'website'));
 
       // query existing tube stations
       let tubeStationsNotEmpty: TubeStation[] = [];
@@ -175,7 +247,8 @@ export class GalleryResolver {
           prisma.tubeStation.findUnique({ where: { name: element } }),
         );
         const tubeStations = await Promise.all(promises);
-        tubeStations.forEach((element, index) => {
+        tubeStationsNotEmpty = tubeStations.filter(notEmpty);
+        tubeStationsNotEmpty.forEach((element, index) => {
           if (element == null) {
             errors.push({
               field: 'tubeStations',
@@ -183,7 +256,6 @@ export class GalleryResolver {
             });
           }
         });
-        tubeStationsNotEmpty = tubeStations.filter(notEmpty);
       }
 
       if (errors.length > 0) {
@@ -207,7 +279,7 @@ export class GalleryResolver {
                 },
               }
             : undefined,
-          googleMap,
+          googleMap: googleMap ?? undefined,
           nearestTubes: {
             /* creating a gallery/station pairing here which is why we use create even though
              * stations exist already
