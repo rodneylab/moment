@@ -27,6 +27,7 @@ model Gallery {
 
 model TubeStation {
   id        Int                   @id @default(autoincrement())
+  uid       String?               @default(cuid())
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
   name      String                @unique

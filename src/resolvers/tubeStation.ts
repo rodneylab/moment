@@ -17,7 +17,7 @@ export class TubeStationResolver {
   @Query(() => [TubeStation])
   async tubeStations(@Ctx() { prisma }: Context): Promise<TubeStation[]> {
     try {
-      return prisma.tubeStation.findMany({ take: 999 });
+      return prisma.tubeStation.findMany({ take: 999, orderBy: { name: 'asc' } });
     } catch (error) {
       console.error('Unknown error running tubeStations query');
       return [];
@@ -43,6 +43,18 @@ export class TubeStationResolver {
     } catch (error) {
       console.error('Error creating new tubeStation');
       return { errors: [{ field: 'unknown', message: error }] };
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteTubeStation(@Arg('id') id: number, @Ctx() { prisma }: Context): Promise<boolean> {
+    try {
+      // todo(rodneylab): check relations and only allow deletions if it makes sense
+      await prisma.tubeStation.delete({ where: { id } });
+      return true;
+    } catch (error) {
+      console.error(`Error deleting tubeStation ${id}: ${error}`);
+      return false;
     }
   }
 }
