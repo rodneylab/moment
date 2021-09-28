@@ -1,6 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
 import OpeningHours from './OpeningHours';
-// import OpeningHoursRange from './OpeningHoursRange';
 import PostalAddress from './PostalAddress';
 import TubeStation from './TubeStation';
 

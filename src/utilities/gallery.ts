@@ -1,9 +1,12 @@
 import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
+import { Gallery, GalleryTubeStations, OpeningHours } from '.prisma/client';
+import { TubeStation } from '@prisma/client';
+import GraphQLGallery from 'src/entities/Gallery';
 import type FieldError from 'src/resolvers/FieldError';
 import type AddressInput from '../resolvers/AddressInput';
 import type { OpeningHoursInput } from '../resolvers/gallery';
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const N_DASH_ENTITY = '\u2013';
 
 export function addressStringFromPostalAddress(postalAddress: PostalAddress) {
@@ -130,6 +133,62 @@ export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[]
   });
 
   return result;
+}
+
+export function graphqlGallery(
+  gallery: Gallery & {
+    nearestTubes: (GalleryTubeStations & {
+      tubeStation: TubeStation;
+    })[];
+    address: PostalAddress | null;
+    openingHours:
+      | (OpeningHours & {
+          openingHoursRanges: OpeningHoursRange[];
+        })
+      | null;
+  },
+): GraphQLGallery {
+  const {
+    uid,
+    createdAt,
+    updatedAt,
+    name: updatedName,
+    slug: updatedSlug,
+    address,
+    openingHours,
+    nearestTubes,
+    googleMap: updatedGoogleMap,
+    website: updatedWebsite,
+  } = gallery;
+
+  const graphqlTubeStations = nearestTubes.map((element) => {
+    const { createdAt, name, updatedAt, uid: id } = element.tubeStation;
+    return { id, createdAt, name, updatedAt };
+  });
+
+  const graphqlOpeningHours = {
+    openingHoursRanges: openingHours?.openingHoursRanges.map((element) => {
+      const { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime } = element;
+      return { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime };
+    }),
+  };
+
+  return {
+    id: uid,
+    createdAt,
+    updatedAt,
+    name: updatedName,
+    slug: updatedSlug,
+    address: address ? addressStringFromPostalAddress(address) : null,
+    postalAddress: address,
+    openingTimes: openingHours
+      ? openingTimesFromOpeningHours(openingHours?.openingHoursRanges)
+      : null,
+    openingHours: graphqlOpeningHours,
+    nearestTubes: graphqlTubeStations,
+    googleMap: updatedGoogleMap,
+    website: updatedWebsite,
+  };
 }
 
 export function validPostalAddress(address: AddressInput) {

@@ -4,6 +4,7 @@ import type { Context } from '../context';
 import Gallery from '../entities/Gallery';
 import {
   addressStringFromPostalAddress,
+  graphqlGallery,
   graphqlOpeningHoursFromOpeningHours,
   openingTimesFromOpeningHours,
   validName,
@@ -90,6 +91,24 @@ class PaginatedGalleries {
 
   @Field()
   hasMore: boolean;
+}
+
+@InputType()
+class UpdateGalleryInput {
+  @Field()
+  id: string;
+
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => String, { nullable: true })
+  slug?: string;
+
+  @Field(() => String, { nullable: true })
+  googleMap?: string;
+
+  @Field(() => String, { nullable: true })
+  website?: string;
 }
 
 @Resolver()
@@ -349,7 +368,6 @@ export class GalleryResolver {
         where: { uid: id },
       });
       if (!gallery) {
-        console.log('id: ', id);
         return false;
       }
       const { id: galleryId } = gallery;
@@ -359,6 +377,43 @@ export class GalleryResolver {
     } catch (error) {
       console.error(`Error deleting tubeStation ${id}: ${error}`);
       return false;
+    }
+  }
+
+  @Mutation(() => CreateGalleryResponse)
+  async updateGallery(
+    @Arg('input') input: UpdateGalleryInput,
+    @Ctx() { prisma }: Context,
+  ): Promise<CreateGalleryResponse> {
+    try {
+      const { id: uid } = input;
+      const gallery = await prisma.gallery.findUnique({
+        where: { uid },
+      });
+      if (!gallery) {
+        return { errors: [{ field: 'id', message: `Wasn't able to find a gallery with that id` }] };
+      }
+      const { name, slug, googleMap, website } = input;
+      const updatedGallery = await prisma.gallery.update({
+        where: {
+          uid,
+        },
+        data: {
+          ...(name ? { name } : {}),
+          ...(slug ? { slug } : {}),
+          ...(googleMap ? { googleMap } : {}),
+          ...(website ? { website } : {}),
+        },
+        include: {
+          nearestTubes: { include: { tubeStation: true } },
+          address: true,
+          openingHours: { include: { openingHoursRanges: true } },
+        },
+      });
+      return { gallery: graphqlGallery(updatedGallery) };
+    } catch (error) {
+      console.error(`Error updating gallery ${input.id}: ${error}`);
+      return { errors: [{ field: 'unknown', message: error }] };
     }
   }
 }
