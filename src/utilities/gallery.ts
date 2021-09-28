@@ -14,23 +14,6 @@ export function addressStringFromPostalAddress(postalAddress: PostalAddress) {
   return [streetAddress, locality, postalCode].filter((element) => element).join(', ');
 }
 
-export function graphqlOpeningHoursFromOpeningHours(openingHoursRanges: OpeningHoursRange[]) {
-  return {
-    openingHoursRanges: openingHoursRanges.map((element) => {
-      const { closingTime, createdAt, endDay, id, openingTime, startDay, updatedAt } = element;
-      return {
-        id,
-        createdAt,
-        updatedAt,
-        startDay,
-        endDay,
-        openingTime,
-        closingTime,
-      };
-    }),
-  };
-}
-
 export function openingTimesFromOpeningHours(openingHoursRanges: OpeningHoursRange[]) {
   return openingHoursRanges
     .map((element: OpeningHoursRange) => {

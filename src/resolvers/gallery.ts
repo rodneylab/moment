@@ -1,19 +1,15 @@
-import type { TubeStation } from '.prisma/client';
+import { TubeStation } from '.prisma/client';
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import type { Context } from '../context';
 import Gallery from '../entities/Gallery';
 import {
-  addressStringFromPostalAddress,
   graphqlGallery,
-  graphqlOpeningHoursFromOpeningHours,
-  openingTimesFromOpeningHours,
   validName,
   validOpeningHours,
   validPostalAddress,
   validSlug,
   validUrl,
 } from '../utilities/gallery';
-import { graphqlTubeStation } from '../utilities/tubeStation';
 import AddressInput from './AddressInput';
 import FieldError from './FieldError';
 
@@ -119,54 +115,13 @@ export class GalleryResolver {
       take: 100,
       orderBy: { name: 'asc' },
       include: {
-        nearestTubes: true,
+        nearestTubes: { include: { tubeStation: true } },
         address: true,
         openingHours: { include: { openingHoursRanges: true } },
       },
     });
 
-    const galleriesPromise = galleries.map(async (element) => {
-      const {
-        uid: id,
-        createdAt,
-        updatedAt,
-        name,
-        slug,
-        address,
-        googleMap,
-        nearestTubes,
-        openingHours,
-        website,
-      } = element;
-
-      const tubeStationPromises = nearestTubes.map(async (element) => {
-        const { tubeStationId } = element;
-        return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
-      });
-      const tubeStations = await Promise.all(tubeStationPromises);
-      const openingHoursRanges = openingHours
-        ? await prisma.openingHoursRange.findMany({
-            where: { openingHoursId: openingHours.id },
-            orderBy: { startDay: 'asc' },
-          })
-        : [];
-      return {
-        id,
-        createdAt,
-        updatedAt,
-        name,
-        slug,
-        address: address ? addressStringFromPostalAddress(address) : null,
-        openingHours,
-        openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
-        postalAddress: address,
-        googleMap,
-        nearestTubes: tubeStations.filter(notEmpty).map((element) => graphqlTubeStation(element)),
-        website,
-      };
-    });
-    const galleriesResult = await Promise.all(galleriesPromise);
-    return { galleries: galleriesResult, hasMore: false };
+    return { galleries: galleries.map((element) => graphqlGallery(element)), hasMore: false };
   }
 
   @Query(() => GalleryQueryResponse)
@@ -177,7 +132,7 @@ export class GalleryResolver {
     const gallery = await prisma.gallery.findUnique({
       where: { slug },
       include: {
-        nearestTubes: true,
+        nearestTubes: { include: { tubeStation: true } },
         address: true,
         openingHours: { include: { openingHoursRanges: true } },
       },
@@ -186,45 +141,7 @@ export class GalleryResolver {
     if (!gallery) {
       return { error: 'No gallery found with that slug' };
     }
-    const {
-      uid: id,
-      createdAt,
-      updatedAt,
-      name,
-      address,
-      googleMap,
-      nearestTubes,
-      openingHours,
-      website,
-    } = gallery;
-
-    const tubeStationPromises = nearestTubes.map(async (element) => {
-      const { tubeStationId } = element;
-      return prisma.tubeStation.findUnique({ where: { id: tubeStationId } });
-    });
-    const tubeStations = await Promise.all(tubeStationPromises);
-    const openingHoursRanges = openingHours
-      ? await prisma.openingHoursRange.findMany({
-          where: { openingHoursId: openingHours.id },
-          orderBy: { startDay: 'asc' },
-        })
-      : [];
-    return {
-      gallery: {
-        id,
-        createdAt,
-        updatedAt,
-        name,
-        slug,
-        address: address ? addressStringFromPostalAddress(address) : null,
-        openingHours,
-        openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
-        postalAddress: address,
-        googleMap,
-        nearestTubes: tubeStations.filter(notEmpty).map((element) => graphqlTubeStation(element)),
-        website,
-      },
-    };
+    return { gallery: graphqlGallery(gallery) };
   }
 
   // tube stations must aleady exist
@@ -312,48 +229,12 @@ export class GalleryResolver {
           website,
         },
         include: {
-          nearestTubes: true,
+          nearestTubes: { include: { tubeStation: true } },
           address: true,
-          openingHours: true,
+          openingHours: { include: { openingHoursRanges: true } },
         },
       });
-
-      // map database nearestTubes to GraphQL type
-      const {
-        id,
-        uid,
-        nearestTubes: galleryNearestTubes,
-        address,
-        openingHours: returnedOpeningHours,
-        ...rest
-      } = gallery;
-      const galleryTubeStations = galleryNearestTubes.map((element) => {
-        const { tubeStationId } = element;
-        return tubeStationsNotEmpty.find((element) => element?.id === tubeStationId);
-      });
-
-      const openingHoursRanges = returnedOpeningHours
-        ? await prisma.openingHoursRange.findMany({
-            where: { openingHoursId: returnedOpeningHours.id },
-            orderBy: { startDay: 'asc' },
-          })
-        : [];
-
-      return {
-        gallery: {
-          id: uid,
-          ...rest,
-          nearestTubes: galleryTubeStations
-            .filter(notEmpty)
-            .map((element) => graphqlTubeStation(element)),
-          postalAddress: address,
-          address: address ? addressStringFromPostalAddress(address) : null,
-          openingHours: returnedOpeningHours
-            ? graphqlOpeningHoursFromOpeningHours(openingHoursRanges)
-            : null,
-          openingTimes: openingHours ? openingTimesFromOpeningHours(openingHoursRanges) : null,
-        },
-      };
+      return { gallery: graphqlGallery(gallery) };
     } catch (error) {
       console.error('Error creating new gallery');
       return { errors: [{ field: 'unknown', message: error }] };
