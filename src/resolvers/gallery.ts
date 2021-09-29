@@ -215,7 +215,7 @@ export class GalleryResolver {
                 },
               }
             : undefined,
-          googleMap: googleMap ?? undefined,
+          ...(googleMap ? { googleMap } : {}),
           nearestTubes: {
             /* creating a gallery/station pairing here which is why we use create even though
              * stations exist already
