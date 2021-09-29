@@ -1,6 +1,6 @@
 import { PrismaClient } from '.prisma/client';
 import fastifySession from '@fastify/session';
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
@@ -9,7 +9,7 @@ import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import fastifyCookie from 'fastify-cookie';
 // import { Server, IncomingMessage, ServerResponse  } from 'http';
 // import fastifyCors from 'fastify-cors';
-// import fastifyPostgres from 'fastify-postgres';
+import fastifyPostgres from 'fastify-postgres';
 import fastifyRedis from 'fastify-redis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
@@ -30,10 +30,10 @@ function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
 }
 
 const prisma = new PrismaClient();
-const supabase = createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_KEY as string,
-);
+// const supabase = createClient(
+//   process.env.SUPABASE_URL as string,
+//   process.env.SUPABASE_KEY as string,
+// );
 
 async function startApolloServer() {
   const server: FastifyInstance = Fastify({});
@@ -43,9 +43,9 @@ async function startApolloServer() {
   //   methods: ['GET', 'POST'],
   //   credentials: true,
   // });
-  // server.register(fastifyPostgres, {
-  //   connectionString: process.env.DATABASE_URL,
-  // });
+  server.register(fastifyPostgres, {
+    connectionString: process.env.DATABASE_URL,
+  });
   server.register(fastifyCookie);
   server.register(fastifyRedis, { host: '127.0.0.1' });
   const { redis } = server;
@@ -89,7 +89,6 @@ async function startApolloServer() {
       res,
       prisma,
       redis,
-      supabase,
     }),
   });
   await apolloServer.start();
