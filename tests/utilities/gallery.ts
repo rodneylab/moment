@@ -46,31 +46,31 @@ test('validOpeningHours', () => {
   assert.is(validOpeningHours({ openingHoursRanges: openingHours4 }).length, 4);
 
   const { field, message } = validOpeningHours({ openingHoursRanges: openingHours2 })[0];
-  assert.is(field, 'openingHours0');
+  assert.is(field, 'openingTime0');
   assert.is(message, 'Check time is in 18:30 format');
 
   const { field: field1, message: message1 } = validOpeningHours({
     openingHoursRanges: openingHours2,
   })[1];
-  assert.is(field1, 'openingHours1');
+  assert.is(field1, 'openingTime1');
   assert.is(message1, 'Check time is in 18:30 format');
 
   const { field: field2, message: message2 } = validOpeningHours({
     openingHoursRanges: openingHours2,
   })[2];
-  assert.is(field2, 'closingHours1');
+  assert.is(field2, 'closingTime1');
   assert.is(message2, 'Check time is in 18:30 format');
 
   const { field: field3, message: message3 } = validOpeningHours({
     openingHoursRanges: openingHours3,
   })[0];
-  assert.is(field3, 'openingHours0');
+  assert.is(field3, 'openingTime0');
   assert.is(message3, 'Check opening time is earlier than closing time');
 
   const { field: field4, message: message4 } = validOpeningHours({
     openingHoursRanges: openingHours3,
   })[1];
-  assert.is(field4, 'closingHours0');
+  assert.is(field4, 'closingTime0');
   assert.is(message4, 'Check opening time is earlier than closing time');
 });
 

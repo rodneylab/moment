@@ -51,37 +51,23 @@ export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[]
     closingDate.setHours(closingHour);
     closingDate.setMinutes(closingMinute);
 
-    if (
-      typeof openingHour === 'undefined' ||
-      openingHour < 0 ||
-      openingHour > 23 ||
-      openingMinute < 0 ||
-      openingMinute > 59 ||
-      openingTime[2] !== ':'
-    ) {
-      result.push({ field: `openingHours${index}`, message: `Check time is in 18:30 format` });
-      errorsFoundOnThisElement = true;
+    // test openingTime is in 18:30 format
+    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(openingTime)) {
+      result.push({ field: `openingTime${index}`, message: `Check time is in 18:30 format` });
     }
 
-    if (
-      typeof closingHour === 'undefined' ||
-      closingHour < 0 ||
-      closingHour > 23 ||
-      closingMinute < 0 ||
-      closingMinute > 59 ||
-      closingTime[2] !== ':'
-    ) {
-      result.push({ field: `closingHours${index}`, message: `Check time is in 18:30 format` });
-      errorsFoundOnThisElement = true;
+    // test closingTime is in 18:30 format
+    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(closingTime)) {
+      result.push({ field: `closingTime${index}`, message: `Check time is in 18:30 format` });
     }
 
     if (!errorsFoundOnThisElement && closingDate < openingDate) {
       result.push({
-        field: `openingHours${index}`,
+        field: `openingTime${index}`,
         message: 'Check opening time is earlier than closing time',
       });
       result.push({
-        field: `closingHours${index}`,
+        field: `closingTime${index}`,
         message: 'Check opening time is earlier than closing time',
       });
     }

@@ -27,9 +27,9 @@
     "watch": "tsc -w",
     "prepare": "husky install"
   },
-  "name": "jffrank-server",
+  "name": "moment",
   "version": "0.0.1",
-  "description": "jfFrank Server",
+  "description": "moment",
   "main": "src/server.js",
   "devDependencies": {
     "@types/node": "^16.10.1",
