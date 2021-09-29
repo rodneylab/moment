@@ -87,7 +87,7 @@ export const openingHours4: OpeningHoursRange[] = [
     updatedAt: new Date('2021-09-24T14:21:14.000+0100'),
     startDay: 6,
     endDay: 6,
-    openingTime: '07:00',
+    openingTime: '17:00',
     closingTime: '08:00',
     openingHoursId: 1,
   },

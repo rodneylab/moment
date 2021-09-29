@@ -43,7 +43,7 @@ test('validOpeningHours', () => {
   assert.is(validOpeningHours({ openingHoursRanges: openingHours1 }).length, 0);
   assert.is(validOpeningHours({ openingHoursRanges: openingHours2 }).length, 3);
   assert.is(validOpeningHours({ openingHoursRanges: openingHours3 }).length, 2);
-  assert.is(validOpeningHours({ openingHoursRanges: openingHours4 }).length, 2);
+  assert.is(validOpeningHours({ openingHoursRanges: openingHours4 }).length, 4);
 
   const { field, message } = validOpeningHours({ openingHoursRanges: openingHours2 })[0];
   assert.is(field, 'openingHours0');
