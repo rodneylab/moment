@@ -20,11 +20,12 @@ model Gallery {
   address         PostalAddress?        @relation(fields: [postalAddressId], references: [id])
   openingHours    OpeningHours?         @relation(fields: [openingHoursId], references: [id])
   nearestTubes    GalleryTubeStations[]
-  googleMap       String?
+  location        Location?             @relation(fields: [locationId], references: [id])
   postalAddressId Int?
   website         String?
 
   openingHoursId Int?
+  locationId     Int?
 }
 
 model TubeStation {
@@ -45,6 +46,15 @@ model GalleryTubeStations {
   assignedBy    String?
 
   @@id([galleryId, tubeStationId])
+}
+
+model Location {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  latitude  Float
+  longitude Float
+  Gallery   Gallery[]
 }
 
 model PostalAddress {

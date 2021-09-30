@@ -3,9 +3,11 @@ import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } fro
 import type { Context } from '../context';
 import Gallery from '../entities/Gallery';
 import {
+  geoCordinatesFromOpenMapUrl,
   graphqlGallery,
   validName,
   validOpeningHours,
+  validOpenMapUrl,
   validPostalAddress,
   validSlug,
   validUrl,
@@ -48,6 +50,9 @@ class CreateGalleryInput {
 
   @Field(() => AddressInput, { nullable: true })
   postalAddress: AddressInput;
+
+  @Field({ nullable: true })
+  openStreetMapUrl: string;
 
   @Field(() => OpeningHoursInput, { nullable: true })
   openingHours: OpeningHoursInput;
@@ -101,7 +106,7 @@ class UpdateGalleryInput {
   slug?: string;
 
   @Field(() => String, { nullable: true })
-  googleMap?: string;
+  openStreetMapUrl?: string;
 
   @Field(() => String, { nullable: true })
   website?: string;
@@ -115,8 +120,9 @@ export class GalleryResolver {
       take: 100,
       orderBy: { name: 'asc' },
       include: {
-        nearestTubes: { include: { tubeStation: true } },
         address: true,
+        location: true,
+        nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
       },
     });
@@ -132,8 +138,9 @@ export class GalleryResolver {
     const gallery = await prisma.gallery.findUnique({
       where: { slug },
       include: {
-        nearestTubes: { include: { tubeStation: true } },
         address: true,
+        location: true,
+        nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
       },
     });
@@ -151,7 +158,8 @@ export class GalleryResolver {
     @Ctx() { prisma }: Context,
   ): Promise<CreateGalleryResponse> {
     try {
-      const { name, postalAddress, googleMap, nearestTubes, openingHours, slug, website } = input;
+      const { name, postalAddress, openStreetMapUrl, nearestTubes, openingHours, slug, website } =
+        input;
 
       const errors: FieldError[] = [];
 
@@ -166,14 +174,11 @@ export class GalleryResolver {
           errors.push({ field: 'slug', message: 'There is already a gallery with that slug.' });
         }
       }
-
       errors.push(...validName(name, 'name'));
       errors.push(...validOpeningHours(openingHours));
       errors.push(...validSlug(slug, 'slug'));
       errors.push(...validPostalAddress(postalAddress));
-      if (googleMap) {
-        errors.push(...validUrl(googleMap, 'googleMap'));
-      }
+      errors.push(...validOpenMapUrl(openStreetMapUrl));
       errors.push(...validUrl(website, 'website'));
 
       // query existing tube stations
@@ -215,7 +220,9 @@ export class GalleryResolver {
                 },
               }
             : undefined,
-          ...(googleMap ? { googleMap } : {}),
+          ...(openStreetMapUrl
+            ? { location: { create: { ...geoCordinatesFromOpenMapUrl(openStreetMapUrl) } } }
+            : {}),
           nearestTubes: {
             /* creating a gallery/station pairing here which is why we use create even though
              * stations exist already
@@ -229,8 +236,9 @@ export class GalleryResolver {
           website,
         },
         include: {
-          nearestTubes: { include: { tubeStation: true } },
           address: true,
+          location: true,
+          nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
         },
       });
@@ -274,7 +282,7 @@ export class GalleryResolver {
       if (!gallery) {
         return { errors: [{ field: 'id', message: `Wasn't able to find a gallery with that id` }] };
       }
-      const { name, slug, googleMap, website } = input;
+      const { name, slug, openStreetMapUrl, website } = input;
       const updatedGallery = await prisma.gallery.update({
         where: {
           uid,
@@ -282,12 +290,15 @@ export class GalleryResolver {
         data: {
           ...(name ? { name } : {}),
           ...(slug ? { slug } : {}),
-          ...(googleMap ? { googleMap } : {}),
+          ...(openStreetMapUrl
+            ? { location: { create: { ...geoCordinatesFromOpenMapUrl(openStreetMapUrl) } } }
+            : {}),
           ...(website ? { website } : {}),
         },
         include: {
-          nearestTubes: { include: { tubeStation: true } },
           address: true,
+          location: true,
+          nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
         },
       });

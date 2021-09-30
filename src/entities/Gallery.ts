@@ -4,6 +4,15 @@ import PostalAddress from './PostalAddress';
 import TubeStation from './TubeStation';
 
 @ObjectType()
+class Location {
+  @Field()
+  latitude: number;
+
+  @Field()
+  longitude: number;
+}
+
+@ObjectType()
 class Gallery {
   @Field()
   id!: string;
@@ -25,6 +34,12 @@ class Gallery {
 
   @Field(() => PostalAddress, { nullable: true })
   postalAddress?: PostalAddress | null;
+
+  @Field(() => Location, { nullable: true })
+  location?: Location | null;
+
+  @Field(() => String, { nullable: true })
+  openStreetMap?: string | null;
 
   @Field(() => String, { nullable: true })
   openingTimes?: String | null;

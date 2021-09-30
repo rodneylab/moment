@@ -1,5 +1,5 @@
 import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
-import { Gallery, GalleryTubeStations, OpeningHours } from '.prisma/client';
+import { Gallery, GalleryTubeStations, Location, OpeningHours } from '.prisma/client';
 import { TubeStation } from '@prisma/client';
 import GraphQLGallery from 'src/entities/Gallery';
 import type FieldError from 'src/resolvers/FieldError';
@@ -104,12 +104,33 @@ export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[]
   return result;
 }
 
+// https://www.openstreetmap.org/#map=15/46.2926/7.8782
+
+export function geoCordinatesFromOpenMapUrl(url: string) {
+  const startIndex = url.indexOf('#map');
+  const [_, latitude, longitude] = url.slice(startIndex + 5).split('/');
+  return {
+    latitude: parseFloat(latitude),
+    longitude: parseFloat(longitude),
+  };
+}
+
+export function validOpenMapUrl(url: string) {
+  const result: FieldError[] = [];
+  const openMapRegex = /^https:\/\/www\.openstreetmap\.org\/#map=\d+\/-?\d+\.\d+\/-?\d+\.\d+$/;
+  if (!openMapRegex.test(url)) {
+    result.push({ field: 'mapUrl', message: 'Check the map URL' });
+  }
+  return result;
+}
+
 export function graphqlGallery(
   gallery: Gallery & {
     nearestTubes: (GalleryTubeStations & {
       tubeStation: TubeStation;
     })[];
     address: PostalAddress | null;
+    location: Location | null;
     openingHours:
       | (OpeningHours & {
           openingHoursRanges: OpeningHoursRange[];
@@ -121,13 +142,13 @@ export function graphqlGallery(
     uid,
     createdAt,
     updatedAt,
-    name: updatedName,
-    slug: updatedSlug,
+    name,
+    slug,
     address,
+    location,
     openingHours,
     nearestTubes,
-    googleMap: updatedGoogleMap,
-    website: updatedWebsite,
+    website,
   } = gallery;
 
   const graphqlTubeStations = nearestTubes.map((element) => {
@@ -146,17 +167,20 @@ export function graphqlGallery(
     id: uid,
     createdAt,
     updatedAt,
-    name: updatedName,
-    slug: updatedSlug,
+    name,
+    slug,
     address: address ? addressStringFromPostalAddress(address) : null,
     postalAddress: address,
+    location: location ? location : null,
+    openStreetMap: location
+      ? `https://www.openstreetmap.org/#map=19/${location.latitude}/${location.longitude}`
+      : null,
     openingTimes: openingHours
       ? openingTimesFromOpeningHours(openingHours?.openingHoursRanges)
       : null,
     openingHours: graphqlOpeningHours,
     nearestTubes: graphqlTubeStations,
-    googleMap: updatedGoogleMap,
-    website: updatedWebsite,
+    website,
   };
 }
 
