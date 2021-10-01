@@ -21,7 +21,7 @@ export const registerInputShortUsernameInvalidEmailLongPassword = {
     'wlCYLjoak2ekcBItHt2nccohmLVC423gr1Ytz6zsLoCNp8dufYb9LxZnODikFNAvrt02U9l8e2At9lC32XXrq65G2z4JRNtkQTFZgZ8BXFoAOlCxNl3NMTCV92i6aueHq',
 };
 
-export const registerInputLongUsernameNoEmailLongPassword = {
+export const registerInputLongUsernameNoEmailShortPassword = {
   username: 'matthew-mark-like',
   email: '',
   password: 'aA!1@',

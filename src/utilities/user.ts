@@ -49,8 +49,8 @@ export function validateRegister(registerInput: UsernameEmailPasswordInput) {
       result.push({ field: 'password', message: 'Password should be a little more complex' });
     }
   } else if (
-    (!/[a-z]+/.test(password) || !/[A-Z]+/.test(password)) &&
-    (!/\d+/.test(password) || !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password))
+    (!/[a-z]+/.test(password) && !/[A-Z]+/.test(password)) ||
+    (!/\d+/.test(password) && !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password))
   ) {
     result.push({ field: 'password', message: 'Password should be a little more complex' });
   }

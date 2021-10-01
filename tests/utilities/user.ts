@@ -2,7 +2,7 @@ import { test } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
   dbUser,
-  registerInputLongUsernameNoEmailLongPassword,
+  registerInputLongUsernameNoEmailShortPassword,
   registerInputShortUsernameInvalidEmailLongPassword,
   registerInputValid,
 } from '../../fixtures/utilities/user';
@@ -50,7 +50,7 @@ test('it validates register inputs with short username, invalid email, long pass
 });
 
 test('it validates register inputs with short username, invalid email, long password corectly', () => {
-  const errors = validateRegister(registerInputLongUsernameNoEmailLongPassword);
+  const errors = validateRegister(registerInputLongUsernameNoEmailShortPassword);
   assert.is(errors.length, 3);
   assert.is(
     errors.some(
