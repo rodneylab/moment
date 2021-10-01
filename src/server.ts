@@ -79,8 +79,9 @@ async function startApolloServer() {
       fastifyAppClosePlugin(server),
       ApolloServerPluginDrainHttpServer({ httpServer: server.server }),
     ],
-    context: async ({ request }) => ({
+    context: async ({ request, reply }) => ({
       request,
+      reply,
       prisma,
       app: server,
       redis,

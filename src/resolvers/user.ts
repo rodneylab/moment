@@ -100,15 +100,16 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   logout(@Ctx() { request }: Context) {
-    const { session, sessionStore } = request;
-    const { sessionId } = session;
-    sessionStore.destroy(sessionId, (error) => {
-      if (error) {
-        console.error(`Error in logout mutation: ${error}`);
-        return false;
-      }
-      return true;
-    });
+    if (request.session.userId) {
+      request.destroySession((error) => {
+        if (error) {
+          console.error(`Error destroying session in logout mutation: ${error}`);
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
     return true;
   }
 
