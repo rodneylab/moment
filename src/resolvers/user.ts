@@ -114,7 +114,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options') registerInput: UsernameEmailPasswordInput,
+    @Arg('registerInput') registerInput: UsernameEmailPasswordInput,
     @Ctx() { prisma, request }: Context,
   ): Promise<UserResponse> {
     try {

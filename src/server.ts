@@ -59,10 +59,10 @@ async function startApolloServer() {
       domain: isProduction ? `.${process.env.DOMAIN}` : undefined,
     },
   });
-  server.addHook('preHandler', (request, _, next) => {
-    const session = request.session;
-    request.sessionStore.destroy(session.sessionId, next);
-  });
+  // server.addHook('preHandler', (request, _, next) => {
+  //   const session = request.session;
+  //   request.sessionStore.destroy(session.sessionId, next);
+  // });
   const { redis } = server;
 
   // server.register(prismaPlugin);

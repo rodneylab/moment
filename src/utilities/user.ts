@@ -8,9 +8,9 @@ export function graphqlUser(user: User): GraphQLUser {
   return { id, createdAt, updatedAt, username, email };
 }
 
-export function validateRegister(options: UsernameEmailPasswordInput) {
+export function validateRegister(registerInput: UsernameEmailPasswordInput) {
   const result: FieldError[] = [];
-  const { email, password, username } = options;
+  const { email, password, username } = registerInput;
   const passwordLength = password.length;
   const usernameLength = username.length;
 
@@ -24,10 +24,10 @@ export function validateRegister(options: UsernameEmailPasswordInput) {
   if (usernameLength < 8) {
     result.push({ field: 'username', message: 'Username should be a little longer' });
   }
-  if (usernameLength > 128) {
+  if (usernameLength > 16) {
     result.push({ field: 'username', message: 'Username should be a little shorter' });
   }
-  if (!/^[A-Z,a-z,0-9,-,_]+$/.test(username)) {
+  if (!/^[A-Z,a-z,0-9,\-,_]+$/.test(username)) {
     result.push({
       field: 'username',
       message: 'Could you choose a username with only letters, numbers, underscores and hyphens?',
@@ -39,14 +39,20 @@ export function validateRegister(options: UsernameEmailPasswordInput) {
   if (passwordLength > 128) {
     result.push({ field: 'password', message: 'Password should be a little shorter' });
   }
-  if (
-    passwordLength < 23 &&
-    (!/[a-z]+/.test(password) ||
+  if (passwordLength < 23) {
+    if (
+      !/[a-z]+/.test(password) ||
       !/[A-Z]+/.test(password) ||
       !/\d+/.test(password) ||
-      !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password))
+      !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password)
+    ) {
+      result.push({ field: 'password', message: 'Password should be a little more complex' });
+    }
+  } else if (
+    (!/[a-z]+/.test(password) || !/[A-Z]+/.test(password)) &&
+    (!/\d+/.test(password) || !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password))
   ) {
-    result.push({ field: 'password', message: 'Password should be a more complex' });
+    result.push({ field: 'password', message: 'Password should be a little more complex' });
   }
 
   return result;
