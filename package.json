@@ -6,7 +6,7 @@
     "apollo-server-fastify": "^3.3.0",
     "apollo-server-plugin-base": "^3.2.0",
     "argon2": "^0.28.2",
-    "fastify": "^3.21.6",
+    "fastify": "^3.22.0",
     "fastify-cookie": "^5.3.1",
     "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.6.0",
