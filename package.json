@@ -33,6 +33,7 @@
   "description": "moment",
   "main": "src/server.js",
   "devDependencies": {
+    "@commitlint/config-conventional": "^13.2.0",
     "@types/node": "^16.10.2",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "dotenv": "^10.0.0",
