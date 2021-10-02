@@ -34,7 +34,7 @@ export async function duoPing() {
   }
 }
 
-export async function duoAuth(duoUserId: string) {
+export async function duoAuth({ device, duoUserId }: { device: string; duoUserId: string }) {
   try {
     const date = new Date().toUTCString();
     const path = '/auth/v2/auth';
@@ -42,8 +42,8 @@ export async function duoAuth(duoUserId: string) {
     const params = new URLSearchParams({
       user_id: duoUserId,
       factor: 'push',
-      device: 'auto',
-      type: 'Moment Login',
+      device,
+      // type: 'Moment Login',
       async: '1',
     });
     const authorisationToken = duoAuthorisationToken({
@@ -80,7 +80,9 @@ export async function duoAuth(duoUserId: string) {
       await setTimeout(() => {
         result = duoAuthStatus(txid);
       }, 10_000);
-      return result;
+      if (result) {
+        return result;
+      }
     }
 
     if (status === 200 && stat === 'OK' && result === 'allow') {
@@ -297,20 +299,41 @@ export async function duoPreauth({
   username,
 }: {
   duoUserId: string | null;
-  username: string;
+  username?: string;
 }) {
   try {
     const date = new Date().toUTCString();
     const path = '/auth/v2/preauth';
     const method = 'POST';
-    const params = new URLSearchParams(duoUserId !== null ? { user_id: duoUserId } : { username });
+    if (duoUserId == null && typeof username === 'undefined') {
+      return { error: 'Server error: either duoUserId or username required' };
+    }
+    // condition above should prevent case where we send empty username in request
+    const params = new URLSearchParams(
+      duoUserId !== null ? { user_id: duoUserId } : { username: username ?? '' },
+    );
     const authorisationToken = duoAuthorisationToken({
       date,
       method,
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{ stat: string; response: { result: string } }> = await axios({
+    const response: AxiosResponse<{
+      stat: string;
+      response: {
+        result: string;
+        devices: [
+          {
+            capabilities: string[];
+            device: string;
+            display_name: string;
+            name: string;
+            number: number;
+            type: string;
+          },
+        ];
+      };
+    }> = await axios({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
@@ -323,10 +346,10 @@ export async function duoPreauth({
     });
     const { data, status } = response;
     const { stat, response: duoResponse } = data;
-    const { result } = duoResponse ?? {};
+    const { devices, result } = duoResponse ?? {};
     if (status === 200 && stat === 'OK') {
       if (result) {
-        return { result };
+        return { result, devices };
       }
     }
     return { error: 'unexpected response in duoPreauth' };

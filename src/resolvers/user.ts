@@ -66,9 +66,24 @@ class DuoEnrollStatusResponse {
 }
 
 @ObjectType()
+class DuoAuthDevice {
+  @Field(() => [String])
+  capabilities: string[];
+
+  @Field()
+  device: string;
+
+  @Field()
+  type: String;
+}
+
+@ObjectType()
 class DuoPreauthResponse {
   @Field(() => String, { nullable: true })
   result?: string;
+
+  @Field(() => [DuoAuthDevice], { nullable: true })
+  devices?: DuoAuthDevice[];
 
   @Field(() => String, { nullable: true })
   error?: String;
@@ -113,7 +128,7 @@ export class UserResolver {
       const { error, result } = await duoEnrollStatus({ activationCode, duoUserId });
       return error ? { error } : { result };
     } catch (error) {
-      console.error(`Error in duoPing query: ${error}`);
+      console.error(`Error in duoEnrollStatus query: ${error}`);
       return { error };
     }
   }
@@ -123,7 +138,7 @@ export class UserResolver {
     try {
       return duoPing();
     } catch (error) {
-      console.error(`Error in duoPing query: ${error}`);
+      console.error(`Error in duoEnrollStatus query: ${error}`);
       return null;
     }
   }
@@ -139,14 +154,17 @@ export class UserResolver {
         (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
 
       if (username && typeof duoUserId !== 'undefined') {
-        const { result } = await duoPreauth({ duoUserId, username });
+        const { devices, result } = await duoPreauth({ duoUserId, username });
         if (result === 'auth' || result === 'enroll') {
-          return { result };
+          return {
+            result,
+            devices: devices?.filter((element) => element.capabilities.includes('push')),
+          };
         }
       }
       return { error: 'Duo auth not allowed for user' };
     } catch (error) {
-      const message = `Error in duoPing query: ${error}`;
+      const message = `Error in DuoPreauthResponse query: ${error}`;
       console.error(message);
       return { error: message };
     }
@@ -168,7 +186,10 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async duoAuth(@Ctx() { prisma, request }: Context): Promise<Boolean> {
+  async duoAuth(
+    @Arg('device') device: string,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<Boolean> {
     try {
       const { userId } = request.session;
       if (!userId) {
@@ -180,7 +201,17 @@ export class UserResolver {
         return false;
       }
 
-      const { allow, error, message } = await duoAuth(duoUserId);
+      // todo(rodneyj): add device info to context to save additional preauth
+      const { devices } = await duoPreauth({ duoUserId });
+
+      if (
+        !devices?.some(
+          (element) => element.capabilities.includes('push') && element.device === device,
+        )
+      ) {
+        return false;
+      }
+      const { allow, error, message } = await duoAuth({ duoUserId, device });
       if (allow) {
         request.session.mfaAuthenticated = true;
         return true;
@@ -220,7 +251,7 @@ export class UserResolver {
 
       return { activationCode, qrCode };
     } catch (error) {
-      console.error(`Error in duoPing query: ${error}`);
+      console.error(`Error in duoEnroll query: ${error}`);
       return { error };
     }
   }
