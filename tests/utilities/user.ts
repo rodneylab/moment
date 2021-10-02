@@ -110,14 +110,8 @@ test('it validates register inputs with no username, non-complex password corect
 test('it validates register inputs with, non-complex password corectly', () => {
   const errors = validateRegister(registerInputNonComplexPassword);
   assert.is(errors.length, 1);
-  assert.is(
-    errors.some(
-      (element) =>
-        element.field === 'password' &&
-        element.message === 'Password should be a little more complex',
-    ),
-    true,
-  );
+  assert.is(errors[0].field, 'password');
+  assert.is(errors[0].message, 'Password should be a little more complex');
 });
 
 test('it validates register inputs with, complex password corectly', () => {
