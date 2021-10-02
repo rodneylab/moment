@@ -96,5 +96,6 @@ model User {
   updatedAt DateTime @updatedAt
   username  String   @unique
   email     String   @unique
+  duoUserId String?
   password  String
 }

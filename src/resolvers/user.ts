@@ -13,7 +13,16 @@ import {
 } from 'type-graphql';
 import { Context } from '../context';
 import User from '../entities/User';
-import { graphqlUser, validateRegister } from '../utilities/user';
+import {
+  duoAuth,
+  duoCheck,
+  duoEnroll,
+  duoEnrollStatus,
+  duoPing,
+  duoPreauth,
+  graphqlUser,
+  validateRegister,
+} from '../utilities/user';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
@@ -35,6 +44,36 @@ class UserResponse {
   errors?: FieldError[];
 }
 
+@ObjectType()
+class DuoEnrollResponse {
+  @Field(() => String, { nullable: true })
+  qrCode?: string;
+
+  @Field(() => String, { nullable: true })
+  activationCode?: string;
+
+  @Field(() => String, { nullable: true })
+  error?: String;
+}
+
+@ObjectType()
+class DuoEnrollStatusResponse {
+  @Field(() => String, { nullable: true })
+  result?: string;
+
+  @Field(() => String, { nullable: true })
+  error?: String;
+}
+
+@ObjectType()
+class DuoPreauthResponse {
+  @Field(() => String, { nullable: true })
+  result?: string;
+
+  @Field(() => String, { nullable: true })
+  error?: String;
+}
+
 @Resolver(User)
 export class UserResolver {
   @FieldResolver(() => String)
@@ -43,6 +82,74 @@ export class UserResolver {
       return user.email;
     }
     return '';
+  }
+
+  @Query(() => Boolean)
+  async duoCheck() {
+    try {
+      return duoCheck();
+    } catch (error) {
+      console.error(`Error in duoCheck query: ${error}`);
+      return null;
+    }
+  }
+
+  @Query(() => DuoEnrollStatusResponse)
+  async duoEnrollStatus(
+    @Arg('activationCode') activationCode: string,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<DuoEnrollStatusResponse> {
+    try {
+      const { userId } = request.session;
+      if (!userId) {
+        return { error: 'Invalid session' };
+      }
+
+      const { duoUserId } = (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
+      if (!duoUserId) {
+        return { error: 'Invalid session' };
+      }
+
+      const { error, result } = await duoEnrollStatus({ activationCode, duoUserId });
+      return error ? { error } : { result };
+    } catch (error) {
+      console.error(`Error in duoPing query: ${error}`);
+      return { error };
+    }
+  }
+
+  @Query(() => Boolean)
+  async duoPing() {
+    try {
+      return duoPing();
+    } catch (error) {
+      console.error(`Error in duoPing query: ${error}`);
+      return null;
+    }
+  }
+
+  @Query(() => DuoPreauthResponse)
+  async duoPreauth(@Ctx() { prisma, request }: Context): Promise<DuoPreauthResponse> {
+    try {
+      const { userId } = request.session;
+      if (!userId) {
+        return { error: 'Invalid session' };
+      }
+      const { duoUserId, username } =
+        (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
+
+      if (username && typeof duoUserId !== 'undefined') {
+        const { result } = await duoPreauth({ duoUserId, username });
+        if (result === 'auth' || result === 'enroll') {
+          return { result };
+        }
+      }
+      return { error: 'Duo auth not allowed for user' };
+    } catch (error) {
+      const message = `Error in duoPing query: ${error}`;
+      console.error(message);
+      return { error: message };
+    }
   }
 
   @Query(() => User, { nullable: true })
@@ -57,6 +164,64 @@ export class UserResolver {
     } catch (error) {
       console.error(`Error in me query: ${error}`);
       return null;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async duoAuth(@Ctx() { prisma, request }: Context): Promise<Boolean> {
+    try {
+      const { userId } = request.session;
+      if (!userId) {
+        return false;
+      }
+
+      const { duoUserId } = (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
+      if (!duoUserId) {
+        return false;
+      }
+
+      const { allow, error, message } = await duoAuth(duoUserId);
+      if (allow) {
+        request.session.mfaAuthenticated = true;
+        return true;
+      }
+      if (message) {
+        console.error(`Error in duoAuth: ${message}`);
+      }
+      if (error) {
+        console.error(`Error in duoAuth: ${message}`);
+      }
+      request.session.mfaAuthenticated = true;
+      return false;
+    } catch (error) {
+      console.error(`Error in duoAuth mutation: ${error}`);
+      return false;
+    }
+  }
+
+  @Mutation(() => DuoEnrollResponse)
+  async duoEnroll(@Ctx() { prisma, request }: Context): Promise<DuoEnrollResponse> {
+    try {
+      const { userId } = request.session;
+      if (!userId) {
+        return { error: 'Invalid session' };
+      }
+
+      const { username } = (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
+      if (!username) {
+        return { error: 'Invalid session' };
+      }
+
+      const { duoUserId, error, activationCode, qrCode } = await duoEnroll(username);
+      if (error) {
+        return { error };
+      }
+      await prisma.user.update({ where: { uid: userId }, data: { duoUserId } });
+
+      return { activationCode, qrCode };
+    } catch (error) {
+      console.error(`Error in duoPing query: ${error}`);
+      return { error };
     }
   }
 

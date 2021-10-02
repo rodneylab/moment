@@ -16,6 +16,9 @@ class User {
 
   @Field()
   email!: string;
+
+  @Field()
+  duoRegistered: boolean;
 }
 
 export { User as default };

@@ -6,6 +6,8 @@
     "apollo-server-fastify": "^3.3.0",
     "apollo-server-plugin-base": "^3.2.0",
     "argon2": "^0.28.2",
+    "axios": "^0.22.0",
+    "crypto-js": "^4.1.1",
     "fastify": "^3.22.0",
     "fastify-cookie": "^5.3.1",
     "fastify-plugin": "^3.0.0",
@@ -34,6 +36,7 @@
   "main": "src/server.js",
   "devDependencies": {
     "@commitlint/config-conventional": "^13.2.0",
+    "@types/crypto-js": "^4.0.2",
     "@types/node": "^16.10.2",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "dotenv": "^10.0.0",

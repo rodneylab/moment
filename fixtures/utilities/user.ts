@@ -4,8 +4,16 @@ export const dbUser = {
   updatedAt: new Date('2021-10-01T04:37:11.000+0100'),
   uid: 'cku00k400w1rl1erlb5k37hdx',
   username: 'matthew',
+  duoUserId: null,
   password: 'EEEgeoih8769knlkw=',
   email: 'matthew@email.com',
+};
+
+export const duoAuthorisationSignatureInput = {
+  date: 'Tue, 21 Aug 2012 17:29:18 -0000',
+  method: 'POST',
+  path: '/accounts/v1/account/list',
+  params: 'realname=First%20Last&username=root',
 };
 
 export const registerInputValid = {

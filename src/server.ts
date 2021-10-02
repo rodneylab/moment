@@ -19,6 +19,14 @@ import TubeStationResolver from './resolvers/tubeStation';
 import UserResolver from './resolvers/user';
 import { isProduction } from './utilities/utilities';
 
+if (!isProduction) {
+  delete process.env.https_proxy;
+  delete process.env.HTTPS_PROXY;
+  delete process.env.http_proxy;
+  delete process.env.HTTP_PROXY;
+  delete process.env._proxy;
+}
+
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
   return {
     async serverWillStart() {

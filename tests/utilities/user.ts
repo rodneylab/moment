@@ -2,6 +2,7 @@ import { test } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
   dbUser,
+  duoAuthorisationSignatureInput,
   registerInputComplexPassword,
   registerInputLongUsernameNoEmailShortPassword,
   registerInputNonComplexPassword,
@@ -10,17 +11,30 @@ import {
   registerInputShortUsernameInvalidEmailLongPassword,
   registerInputValid,
 } from '../../fixtures/utilities/user';
-import { graphqlUser, validateRegister } from '../../src/utilities/user';
+import { duoAuthorisationToken, graphqlUser, validateRegister } from '../../src/utilities/user';
+
+// These are test parameters taken from public Duo docs - safe to commit
+process.env.DUO_API_HOSTNAME = 'api-xxxxxxxx.duosecurity.com';
+process.env.DUO_CLIENT_ID = 'DIWJ8X6AEYOR5OMC6TQ1';
+process.env.DUO_CLIENT_SECRET = 'Zh5eGmUq9zpfQnyUIu5OL9iWoMMv5ZNmk3zLJ4Ep';
 
 test.before.each((meta) => {
   console.log(meta['__test__']);
+});
+
+test('it generates expected duo authorisation token', () => {
+  assert.type(duoAuthorisationToken, 'function');
+  assert.is(
+    duoAuthorisationToken(duoAuthorisationSignatureInput),
+    'RElXSjhYNkFFWU9SNU9NQzZUUTE6MmQ5N2Q2MTY2MzE5NzgxYjVhM2EwN2FmMzlkMzY2ZjQ5MTIzNGVkYw==',
+  );
 });
 
 test('it returns user from graphqlUser', () => {
   assert.type(graphqlUser, 'function');
   assert.snapshot(
     JSON.stringify(graphqlUser(dbUser)),
-    '{"id":"cku00k400w1rl1erlb5k37hdx","createdAt":"2021-10-01T03:37:11.000Z","updatedAt":"2021-10-01T03:37:11.000Z","username":"matthew","email":"matthew@email.com"}',
+    '{"id":"cku00k400w1rl1erlb5k37hdx","createdAt":"2021-10-01T03:37:11.000Z","updatedAt":"2021-10-01T03:37:11.000Z","username":"matthew","email":"matthew@email.com","duoRegistered":false}',
   );
 });
 
