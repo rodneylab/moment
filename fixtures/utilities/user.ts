@@ -1,10 +1,14 @@
-export const dbUser = {
+import { FidoU2FKey } from '.pnpm/@prisma+client@3.1.1_prisma@3.1.1/node_modules/.prisma/client';
+import { User } from '.prisma/client';
+
+export const dbUser: User & { fidoU2fKeys: FidoU2FKey[] } = {
   id: 1,
   createdAt: new Date('2021-10-01T04:37:11.000+0100'),
   updatedAt: new Date('2021-10-01T04:37:11.000+0100'),
   uid: 'cku00k400w1rl1erlb5k37hdx',
   username: 'matthew',
   duoUserId: null,
+  fidoU2fKeys: [],
   password: 'EEEgeoih8769knlkw=',
   email: 'matthew@email.com',
 };

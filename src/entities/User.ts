@@ -19,6 +19,9 @@ class User {
 
   @Field()
   duoRegistered: boolean;
+
+  @Field()
+  fidoU2fRegistered: boolean;
 }
 
 export { User as default };

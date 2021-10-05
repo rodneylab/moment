@@ -1,3 +1,4 @@
+import { FidoU2FKey } from '.pnpm/@prisma+client@3.1.1_prisma@3.1.1/node_modules/.prisma/client';
 import type { User } from '.prisma/client';
 import type { AxiosResponse } from 'axios';
 import axios from 'axios';
@@ -91,8 +92,18 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
     const message = `${result}, ${duoStatus}, ${statusMessage}`;
     return { allow: false, message };
   } catch (error) {
-    console.error(`Error in duoAuth: ${error}`);
-    return { error };
+    let message;
+    if (error.response) {
+      message = `Error in duoAuth server responded with non 2xx code: ${{
+        ...error.response.data,
+      }}`;
+    } else if (error.request) {
+      message = `Error in duoAuth no response received: ${error.request}`;
+    } else {
+      message = `Error in duoAuth error setting up storage response: ${error.message}`;
+    }
+    console.error(message);
+    return { error: message };
   }
 }
 
@@ -310,7 +321,7 @@ export async function duoPreauth({
     }
     // condition above should prevent case where we send empty username in request
     const params = new URLSearchParams(
-      duoUserId !== null ? { user_id: duoUserId } : { username: username ?? '' },
+      duoUserId != null ? { user_id: duoUserId } : { username: username ?? '' },
     );
     const authorisationToken = duoAuthorisationToken({
       date,
@@ -359,9 +370,17 @@ export async function duoPreauth({
   }
 }
 
-export function graphqlUser(user: User): GraphQLUser {
-  const { createdAt, updatedAt, uid: id, username, email, duoUserId } = user;
-  return { id, createdAt, updatedAt, username, email, duoRegistered: duoUserId != null };
+export function graphqlUser(user: User & { fidoU2fKeys: FidoU2FKey[] }): GraphQLUser {
+  const { createdAt, updatedAt, uid: id, username, email, duoUserId, fidoU2fKeys } = user;
+  return {
+    id,
+    createdAt,
+    updatedAt,
+    username,
+    email,
+    duoRegistered: duoUserId != null,
+    fidoU2fRegistered: fidoU2fKeys.length > 0,
+  };
 }
 
 export function validateRegister(registerInput: UsernameEmailPasswordInput) {

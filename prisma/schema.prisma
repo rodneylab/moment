@@ -90,12 +90,25 @@ model OpeningHoursRange {
 }
 
 model User {
+  id          Int          @id @default(autoincrement())
+  uid         String       @unique @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  username    String       @unique
+  email       String       @unique
+  duoUserId   String?
+  fidoU2fKeys FidoU2FKey[]
+  password    String
+}
+
+model FidoU2FKey {
   id        Int      @id @default(autoincrement())
   uid       String   @unique @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  username  String   @unique
-  email     String   @unique
-  duoUserId String?
-  password  String
+  publicKey String
+  keyHandle String
+  label     String
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
 }

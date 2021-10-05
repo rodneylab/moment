@@ -34,7 +34,7 @@ test('it returns user from graphqlUser', () => {
   assert.type(graphqlUser, 'function');
   assert.snapshot(
     JSON.stringify(graphqlUser(dbUser)),
-    '{"id":"cku00k400w1rl1erlb5k37hdx","createdAt":"2021-10-01T03:37:11.000Z","updatedAt":"2021-10-01T03:37:11.000Z","username":"matthew","email":"matthew@email.com","duoRegistered":false}',
+    '{"id":"cku00k400w1rl1erlb5k37hdx","createdAt":"2021-10-01T03:37:11.000Z","updatedAt":"2021-10-01T03:37:11.000Z","username":"matthew","email":"matthew@email.com","duoRegistered":false,"fidoU2fRegistered":false}',
   );
 });
 

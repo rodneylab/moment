@@ -11,6 +11,8 @@ import {
   Resolver,
   Root,
 } from 'type-graphql';
+// @ts-ignore
+import { checkRegistration, request as fidoU2FRequest } from 'u2f';
 import { Context } from '../context';
 import User from '../entities/User';
 import {
@@ -23,6 +25,7 @@ import {
   graphqlUser,
   validateRegister,
 } from '../utilities/user';
+import FidoU2FRequest from './FidoU2fRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
@@ -70,10 +73,10 @@ class DuoAuthDevice {
   @Field(() => [String])
   capabilities: string[];
 
-  @Field()
+  @Field(() => String)
   device: string;
 
-  @Field()
+  @Field(() => String)
   type: String;
 }
 
@@ -87,6 +90,27 @@ class DuoPreauthResponse {
 
   @Field(() => String, { nullable: true })
   error?: String;
+}
+
+@InputType()
+class FidoU2fRegistrationDataInput {
+  @Field(() => String)
+  clientData: string;
+
+  @Field(() => String)
+  registrationData: string;
+
+  @Field(() => String)
+  version: String;
+}
+
+@InputType()
+class FidoU2fRegisterInput {
+  @Field()
+  label: string;
+
+  @Field()
+  registerData: FidoU2fRegistrationDataInput;
 }
 
 @Resolver(User)
@@ -143,6 +167,16 @@ export class UserResolver {
     }
   }
 
+  @Query(() => FidoU2FRequest, { nullable: true })
+  async fidoU2FBeginRegister(): Promise<FidoU2FRequest | null> {
+    try {
+      return fidoU2FRequest('https://localhost:4000');
+    } catch (error) {
+      console.error(`Error in duoEnrollStatus query: ${error}`);
+      return null;
+    }
+  }
+
   @Query(() => DuoPreauthResponse)
   async duoPreauth(@Ctx() { prisma, request }: Context): Promise<DuoPreauthResponse> {
     try {
@@ -177,7 +211,10 @@ export class UserResolver {
       if (!userId) {
         return null;
       }
-      const user = await prisma.user.findUnique({ where: { uid: userId } });
+      const user = await prisma.user.findUnique({
+        where: { uid: userId },
+        include: { fidoU2fKeys: true },
+      });
       return user ? graphqlUser(user) : null;
     } catch (error) {
       console.error(`Error in me query: ${error}`);
@@ -220,7 +257,7 @@ export class UserResolver {
         console.error(`Error in duoAuth: ${message}`);
       }
       if (error) {
-        console.error(`Error in duoAuth: ${message}`);
+        console.error(`Error in duoAuth: ${error}`);
       }
       request.session.mfaAuthenticated = true;
       return false;
@@ -256,6 +293,29 @@ export class UserResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async fidoU2FRegister(
+    @Arg('registerInput') input: FidoU2fRegisterInput,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<boolean> {
+    try {
+      const { request: fidoU2fRequest } = request.session.user.fidoU2F;
+      const { registerData, label } = input;
+      const { keyHandle, publicKey } = checkRegistration(fidoU2fRequest, registerData);
+
+      if (keyHandle && publicKey) {
+        const { userId: uid } = request.session;
+        const { id } = (await prisma.user.findUnique({ where: { uid } })) ?? {};
+        await prisma.fidoU2FKey.create({ data: { keyHandle, publicKey, label, userId: id } });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+      return false;
+    }
+  }
+
   @Mutation(() => UserResponse)
   async login(
     @Arg('credentials') credentials: LoginInput,
@@ -263,7 +323,10 @@ export class UserResolver {
   ): Promise<UserResponse> {
     try {
       const { username, password } = credentials;
-      const user = await prisma.user.findUnique({ where: { username } });
+      const user = await prisma.user.findUnique({
+        where: { username },
+        include: { fidoU2fKeys: true },
+      });
 
       const credentialErrors = {
         errors: [
@@ -349,7 +412,7 @@ export class UserResolver {
       });
       const { uid } = user;
       request.session.userId = uid;
-      return { user: graphqlUser(user) };
+      return { user: graphqlUser({ ...user, fidoU2fKeys: [] }) };
     } catch (error) {
       console.error(`Error in register: ${error}`);
       return { errors: [{ field: 'unknown', message: error }] };
