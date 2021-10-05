@@ -272,9 +272,18 @@ export class GalleryResolver {
   @Mutation(() => CreateGalleryResponse)
   async updateGallery(
     @Arg('input') input: UpdateGalleryInput,
-    @Ctx() { prisma }: Context,
+    @Ctx() { prisma, request }: Context,
   ): Promise<CreateGalleryResponse> {
     try {
+      const { user } = request.session;
+      if (!user) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+
       const { id: uid } = input;
       const gallery = await prisma.gallery.findUnique({
         where: { uid },
