@@ -12,7 +12,7 @@ import {
   Root,
 } from 'type-graphql';
 // @ts-ignore
-import { checkRegistration, request as fidoU2FRequest } from 'u2f';
+import { checkRegistration, checkSignature, request as fidoU2fRequest } from 'u2f';
 import { Context } from '../context';
 import User from '../entities/User';
 import {
@@ -25,7 +25,8 @@ import {
   graphqlUser,
   validateRegister,
 } from '../utilities/user';
-import FidoU2FRequest from './FidoU2fRequest';
+import FidoU2fRegisterRequest from './FidoU2fRegisterRequest';
+import FidoU2fSignRequest from './FidoU2fSignRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
@@ -113,11 +114,35 @@ class FidoU2fRegisterInput {
   registerData: FidoU2fRegistrationDataInput;
 }
 
+@InputType()
+class FidoU2fSignResponseInput {
+  @Field()
+  clientData: string;
+
+  @Field()
+  keyHandle: string;
+
+  @Field()
+  signatureData: string;
+}
+
+@ObjectType()
+class FidoU2fAuthenticateRequest {
+  @Field(() => [String], { nullable: true })
+  labels?: string[];
+
+  @Field(() => [FidoU2fSignRequest], { nullable: true })
+  signRequests?: FidoU2fSignRequest[];
+
+  @Field({ nullable: true })
+  error?: string;
+}
+
 @Resolver(User)
 export class UserResolver {
   @FieldResolver(() => String)
   email(@Root() user: User, @Ctx() { request }: Context) {
-    if (request.session.userId === user.id) {
+    if (request.session.user.userId === user.id) {
       return user.email;
     }
     return '';
@@ -139,7 +164,7 @@ export class UserResolver {
     @Ctx() { prisma, request }: Context,
   ): Promise<DuoEnrollStatusResponse> {
     try {
-      const { userId } = request.session;
+      const { userId } = request.session.user;
       if (!userId) {
         return { error: 'Invalid session' };
       }
@@ -162,17 +187,51 @@ export class UserResolver {
     try {
       return duoPing();
     } catch (error) {
-      console.error(`Error in duoEnrollStatus query: ${error}`);
+      console.error(`Error in duoPing query: ${error}`);
       return null;
     }
   }
 
-  @Query(() => FidoU2FRequest, { nullable: true })
-  async fidoU2FBeginRegister(): Promise<FidoU2FRequest | null> {
+  @Query(() => FidoU2fAuthenticateRequest, { nullable: true })
+  async fidoU2fBeginAuthenticate(
+    @Ctx() { prisma, request }: Context,
+  ): Promise<FidoU2fAuthenticateRequest | null> {
     try {
-      return fidoU2FRequest('https://localhost:4000');
+      const { fidoU2fKeys } =
+        (await prisma.user.findUnique({
+          where: { uid: request.session.user.userId },
+          include: { fidoU2fKeys: true },
+        })) ?? {};
+      if (!fidoU2fKeys || fidoU2fKeys.length === 0) {
+        return { error: 'No key available to authenticate' };
+      }
+
+      const labels: string[] = [];
+      const signRequests: FidoU2fSignRequest[] = [];
+      fidoU2fKeys?.forEach((element) => {
+        labels.push(element.label === '' ? 'no name' : element.label);
+        signRequests.push(fidoU2fRequest('https://localhost:4000', element.keyHandle));
+      });
+      request.session.user.fidoU2f = { signRequests };
+
+      return {
+        labels,
+        signRequests,
+      };
     } catch (error) {
-      console.error(`Error in duoEnrollStatus query: ${error}`);
+      console.error(`Error in fidoU2fBeginAuthenticate query: ${error}`);
+      return { error: 'Error in fidoU2fBeginAuthenticate query' };
+    }
+  }
+
+  @Query(() => FidoU2fRegisterRequest, { nullable: true })
+  async fidoU2fBeginRegister(@Ctx() { request }: Context): Promise<FidoU2fRegisterRequest | null> {
+    try {
+      const newFidoU2fRequest = fidoU2fRequest('https://localhost:4000');
+      request.session.user.fidoU2f = { registerRequests: [newFidoU2fRequest] };
+      return newFidoU2fRequest;
+    } catch (error) {
+      console.error(`Error in fidoU2fBeginRegister query: ${error}`);
       return null;
     }
   }
@@ -180,7 +239,7 @@ export class UserResolver {
   @Query(() => DuoPreauthResponse)
   async duoPreauth(@Ctx() { prisma, request }: Context): Promise<DuoPreauthResponse> {
     try {
-      const { userId } = request.session;
+      const { userId } = request.session.user;
       if (!userId) {
         return { error: 'Invalid session' };
       }
@@ -207,10 +266,11 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { prisma, request }: Context) {
     try {
-      const { userId } = request.session;
-      if (!userId) {
+      const { user: sessionUser } = request.session;
+      if (!sessionUser?.userId) {
         return null;
       }
+      const { userId } = sessionUser;
       const user = await prisma.user.findUnique({
         where: { uid: userId },
         include: { fidoU2fKeys: true },
@@ -228,7 +288,7 @@ export class UserResolver {
     @Ctx() { prisma, request }: Context,
   ): Promise<Boolean> {
     try {
-      const { userId } = request.session;
+      const { userId } = request.session.user;
       if (!userId) {
         return false;
       }
@@ -250,7 +310,7 @@ export class UserResolver {
       }
       const { allow, error, message } = await duoAuth({ duoUserId, device });
       if (allow) {
-        request.session.mfaAuthenticated = true;
+        request.session.user.mfaAuthenticated = true;
         return true;
       }
       if (message) {
@@ -259,7 +319,7 @@ export class UserResolver {
       if (error) {
         console.error(`Error in duoAuth: ${error}`);
       }
-      request.session.mfaAuthenticated = true;
+      request.session.user.mfaAuthenticated = true;
       return false;
     } catch (error) {
       console.error(`Error in duoAuth mutation: ${error}`);
@@ -270,7 +330,7 @@ export class UserResolver {
   @Mutation(() => DuoEnrollResponse)
   async duoEnroll(@Ctx() { prisma, request }: Context): Promise<DuoEnrollResponse> {
     try {
-      const { userId } = request.session;
+      const { userId } = request.session.user;
       if (!userId) {
         return { error: 'Invalid session' };
       }
@@ -294,19 +354,93 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async fidoU2FRegister(
+  async fidoU2fCompleteAuthentication(
+    @Arg('signData') signData: FidoU2fSignResponseInput,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<boolean> {
+    try {
+      const { keyHandle } = signData;
+      const { signRequests } = request.session.user.fidoU2f ?? {};
+      const signRequest = signRequests?.find((element) => element.keyHandle === keyHandle);
+      if (!signRequest) {
+        return false;
+      }
+      const { fidoU2fKeys } =
+        (await prisma.user.findUnique({
+          where: { uid: request.session.user.userId },
+          include: { fidoU2fKeys: true },
+        })) ?? {};
+      if (!fidoU2fKeys) {
+        return false;
+      }
+      const fidoU2fKey = fidoU2fKeys.find((element) => element.keyHandle === keyHandle);
+      if (!fidoU2fKey) {
+        return false;
+      }
+      const { publicKey } = fidoU2fKey;
+      const { successful } = checkSignature(signRequest, signData, publicKey);
+      if (successful) {
+        request.session.user.mfaAuthenticated = true;
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async fidoU2fAuthenticate(
     @Arg('registerInput') input: FidoU2fRegisterInput,
     @Ctx() { prisma, request }: Context,
   ): Promise<boolean> {
     try {
-      const { request: fidoU2fRequest } = request.session.user.fidoU2F;
+      const { registerRequests } = request.session.user.fidoU2f ?? {};
+      if (!fidoU2fRequest || registerRequests?.length !== 1) {
+        return false;
+      }
+
       const { registerData, label } = input;
-      const { keyHandle, publicKey } = checkRegistration(fidoU2fRequest, registerData);
+      const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
 
       if (keyHandle && publicKey) {
-        const { userId: uid } = request.session;
+        const { userId: uid } = request.session.user;
         const { id } = (await prisma.user.findUnique({ where: { uid } })) ?? {};
         await prisma.fidoU2FKey.create({ data: { keyHandle, publicKey, label, userId: id } });
+        request.session.user.mfaAuthenticated = true;
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async fidoU2fRegister(
+    @Arg('registerInput') input: FidoU2fRegisterInput,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<boolean> {
+    try {
+      const { registerRequests } = request.session.user.fidoU2f ?? {};
+      if (!registerRequests || registerRequests?.length === 1) {
+        return false;
+      }
+
+      const { registerData, label } = input;
+      // todo(rodneylab): return a field error from this method instead of boolean and pass feedback on
+      if (label === '') {
+        return false;
+      }
+      const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
+
+      if (keyHandle && publicKey) {
+        const { userId: uid } = request.session.user;
+        const { id } = (await prisma.user.findUnique({ where: { uid } })) ?? {};
+        await prisma.fidoU2FKey.create({ data: { keyHandle, publicKey, label, userId: id } });
+        request.session.user.mfaAuthenticated = true;
         return true;
       }
       return false;
@@ -348,7 +482,7 @@ export class UserResolver {
         return credentialErrors;
       }
       const { uid } = user;
-      request.session.userId = uid;
+      request.session.user = { userId: uid, mfaAuthenticated: false };
 
       return { user: graphqlUser(user) };
     } catch (error) {
@@ -359,7 +493,7 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   logout(@Ctx() { request }: Context) {
-    if (request.session.userId) {
+    if (request.session.user.userId) {
       request.destroySession((error) => {
         if (error) {
           console.error(`Error destroying session in logout mutation: ${error}`);
@@ -411,7 +545,7 @@ export class UserResolver {
         },
       });
       const { uid } = user;
-      request.session.userId = uid;
+      request.session.user = { userId: uid, mfaAuthenticated: false };
       return { user: graphqlUser({ ...user, fidoU2fKeys: [] }) };
     } catch (error) {
       console.error(`Error in register: ${error}`);

@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
-class FidoU2fRequest {
+class FidoU2fRegisterRequest {
   @Field()
   version: string;
 
@@ -12,4 +12,4 @@ class FidoU2fRequest {
   challenge: string;
 }
 
-export { FidoU2fRequest as default };
+export { FidoU2fRegisterRequest as default };
