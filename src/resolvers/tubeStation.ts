@@ -32,9 +32,18 @@ export class TubeStationResolver {
   @Mutation(() => CreateTubeStationResponse)
   async createTubeStation(
     @Arg('name') name: string,
-    @Ctx() { prisma }: Context,
+    @Ctx() { prisma, request }: Context,
   ): Promise<CreateTubeStationResponse> {
     try {
+      const { user } = request.session;
+      if (!user) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+
       const existingTubeStation = await prisma.tubeStation.findUnique({ where: { name } });
       if (existingTubeStation) {
         return {
