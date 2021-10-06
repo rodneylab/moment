@@ -212,7 +212,6 @@ export class GalleryResolver {
       if (errors.length > 0) {
         return { errors };
       }
-
       // create new gallery
       const gallery = await prisma.gallery.create({
         data: {
@@ -225,8 +224,10 @@ export class GalleryResolver {
           },
           ...(openingHours && openingHours?.openingHoursRanges.length !== 0
             ? {
-                create: {
-                  openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
+                openingHours: {
+                  create: {
+                    openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
+                  },
                 },
               }
             : {}),
