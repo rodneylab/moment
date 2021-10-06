@@ -203,7 +203,7 @@ export function validPostalAddress(address: AddressInput) {
 
 export function validSlug(slug: string, field: string = 'slug') {
   const errors: FieldError[] = [];
-  const slugRegex = /^[a-z]+(-[a-z]+)*$/;
+  const slugRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   if (!slugRegex.test(slug)) {
     errors.push({ field, message: 'Check the slug is valid' });
   }

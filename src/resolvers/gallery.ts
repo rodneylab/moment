@@ -155,9 +155,17 @@ export class GalleryResolver {
   @Mutation(() => CreateGalleryResponse)
   async createGallery(
     @Arg('input') input: CreateGalleryInput,
-    @Ctx() { prisma }: Context,
+    @Ctx() { prisma, request }: Context,
   ): Promise<CreateGalleryResponse> {
     try {
+      const { user } = request.session;
+      if (!user) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
       const { name, postalAddress, openStreetMapUrl, nearestTubes, openingHours, slug, website } =
         input;
 
@@ -175,7 +183,9 @@ export class GalleryResolver {
         }
       }
       errors.push(...validName(name, 'name'));
-      errors.push(...validOpeningHours(openingHours));
+      if (openingHours) {
+        errors.push(...validOpeningHours(openingHours));
+      }
       errors.push(...validSlug(slug, 'slug'));
       errors.push(...validPostalAddress(postalAddress));
       errors.push(...validOpenMapUrl(openStreetMapUrl));
@@ -213,13 +223,20 @@ export class GalleryResolver {
               ...postalAddress,
             },
           },
-          openingHours: openingHours
+          ...(openingHours && openingHours?.openingHoursRanges.length !== 0
             ? {
                 create: {
                   openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
                 },
               }
-            : undefined,
+            : {}),
+          // openingHours: openingHours
+          //   ? {
+          //       create: {
+          //         openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
+          //       },
+          //     }
+          //   : undefined,
           ...(openStreetMapUrl
             ? { location: { create: { ...geoCordinatesFromOpenMapUrl(openStreetMapUrl) } } }
             : {}),
