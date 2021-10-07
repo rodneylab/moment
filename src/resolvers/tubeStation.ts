@@ -61,8 +61,20 @@ export class TubeStationResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteTubeStation(@Arg('id') id: string, @Ctx() { prisma }: Context): Promise<boolean> {
+  async deleteTubeStation(
+    @Arg('id') id: string,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<boolean> {
     try {
+      const { user } = request.session;
+      if (!user) {
+        return false;
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return false;
+      }
+
       // todo(rodneylab): check relations and only allow deletions if it makes sense
       const tubeStation = await prisma.tubeStation.findUnique({ where: { uid: id } });
       if (!tubeStation) {

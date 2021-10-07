@@ -231,13 +231,6 @@ export class GalleryResolver {
                 },
               }
             : {}),
-          // openingHours: openingHours
-          //   ? {
-          //       create: {
-          //         openingHoursRanges: { createMany: { data: openingHours.openingHoursRanges } },
-          //       },
-          //     }
-          //   : undefined,
           ...(openStreetMapUrl
             ? { location: { create: { ...geoCordinatesFromOpenMapUrl(openStreetMapUrl) } } }
             : {}),
@@ -268,8 +261,20 @@ export class GalleryResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteGallery(@Arg('id') id: string, @Ctx() { prisma }: Context): Promise<boolean> {
+  async deleteGallery(
+    @Arg('id') id: string,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<boolean> {
     try {
+      const { user } = request.session;
+      if (!user) {
+        return false;
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return false;
+      }
+
       // todo(rodneylab): check relations and only allow deletions where it makes sense
       const gallery = await prisma.gallery.findUnique({
         where: { uid: id },

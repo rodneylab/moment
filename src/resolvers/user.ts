@@ -30,6 +30,8 @@ import FidoU2fSignRequest from './FidoU2fSignRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
+const RESISTRATION_ALLOWED = false;
+
 @InputType()
 class LoginInput {
   @Field()
@@ -192,6 +194,33 @@ export class UserResolver {
     }
   }
 
+  @Query(() => DuoPreauthResponse)
+  async duoPreauth(@Ctx() { prisma, request }: Context): Promise<DuoPreauthResponse> {
+    try {
+      const { userId } = request.session.user;
+      if (!userId) {
+        return { error: 'Invalid session' };
+      }
+      const { duoUserId, username } =
+        (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
+
+      if (username && typeof duoUserId !== 'undefined') {
+        const { devices, result } = await duoPreauth({ duoUserId, username });
+        if (result === 'auth' || result === 'enroll') {
+          return {
+            result,
+            devices: devices?.filter((element) => element.capabilities.includes('push')),
+          };
+        }
+      }
+      return { error: 'Duo auth not allowed for user' };
+    } catch (error) {
+      const message = `Error in DuoPreauthResponse query: ${error}`;
+      console.error(message);
+      return { error: message };
+    }
+  }
+
   @Query(() => FidoU2fAuthenticateRequest, { nullable: true })
   async fidoU2fBeginAuthenticate(
     @Ctx() { prisma, request }: Context,
@@ -233,33 +262,6 @@ export class UserResolver {
     } catch (error) {
       console.error(`Error in fidoU2fBeginRegister query: ${error}`);
       return null;
-    }
-  }
-
-  @Query(() => DuoPreauthResponse)
-  async duoPreauth(@Ctx() { prisma, request }: Context): Promise<DuoPreauthResponse> {
-    try {
-      const { userId } = request.session.user;
-      if (!userId) {
-        return { error: 'Invalid session' };
-      }
-      const { duoUserId, username } =
-        (await prisma.user.findUnique({ where: { uid: userId } })) ?? {};
-
-      if (username && typeof duoUserId !== 'undefined') {
-        const { devices, result } = await duoPreauth({ duoUserId, username });
-        if (result === 'auth' || result === 'enroll') {
-          return {
-            result,
-            devices: devices?.filter((element) => element.capabilities.includes('push')),
-          };
-        }
-      }
-      return { error: 'Duo auth not allowed for user' };
-    } catch (error) {
-      const message = `Error in DuoPreauthResponse query: ${error}`;
-      console.error(message);
-      return { error: message };
     }
   }
 
@@ -512,6 +514,9 @@ export class UserResolver {
     @Ctx() { prisma, request }: Context,
   ): Promise<UserResponse> {
     try {
+      if (!RESISTRATION_ALLOWED) {
+        return { errors: [{ field: 'email', message: 'you are not authorised to register' }] };
+      }
       const errors = validateRegister(registerInput);
       const { email, password, username } = registerInput;
       const existingUser = await prisma.user.findFirst({
