@@ -386,13 +386,13 @@ export function graphqlUser(user: User & { fidoU2fKeys: FidoU2FKey[] }): GraphQL
 export function validateRegister(registerInput: UsernameEmailPasswordInput) {
   const result: FieldError[] = [];
   const { email, password, username } = registerInput;
-  const passwordLength = password.length;
-  const usernameLength = username.length;
+  const passwordLength = password.trim().length;
+  const usernameLength = username.trim().length;
 
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(email.trim())) {
     result.push({ field: 'email', message: 'Check the email address' });
   }
 

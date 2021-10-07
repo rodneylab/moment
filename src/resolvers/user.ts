@@ -30,7 +30,7 @@ import FidoU2fSignRequest from './FidoU2fSignRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
-const RESISTRATION_ALLOWED = false;
+const REGISTRATION_ALLOWED = false;
 
 @InputType()
 class LoginInput {
@@ -460,7 +460,7 @@ export class UserResolver {
     try {
       const { username, password } = credentials;
       const user = await prisma.user.findUnique({
-        where: { username },
+        where: { username: username.trim() },
         include: { fidoU2fKeys: true },
       });
 
@@ -474,7 +474,7 @@ export class UserResolver {
         return credentialErrors;
       }
 
-      const valid = await argon2.verify(user.password, password, {
+      const valid = await argon2.verify(user.password, password.trim(), {
         type: argon2.argon2id,
         memoryCost: 524_288,
         parallelism: 1,
@@ -514,20 +514,22 @@ export class UserResolver {
     @Ctx() { prisma, request }: Context,
   ): Promise<UserResponse> {
     try {
-      if (!RESISTRATION_ALLOWED) {
+      if (!REGISTRATION_ALLOWED) {
         return { errors: [{ field: 'email', message: 'you are not authorised to register' }] };
       }
       const errors = validateRegister(registerInput);
       const { email, password, username } = registerInput;
+      const trimmedEmail = email.trim();
+      const trimmedUsername = username.trim();
       const existingUser = await prisma.user.findFirst({
-        where: { OR: [{ username }, { email }] },
+        where: { OR: [{ username: trimmedUsername }, { email: trimmedEmail }] },
       });
       if (existingUser) {
-        if (existingUser.email === email) {
+        if (existingUser.email === trimmedEmail) {
           errors.push({ field: 'email', message: 'email already exists' });
           return { errors };
         }
-        if (existingUser.username === username) {
+        if (existingUser.username === trimmedUsername) {
           errors.push({ field: 'username', message: 'username already exists' });
         }
       }
@@ -535,7 +537,7 @@ export class UserResolver {
         return { errors };
       }
 
-      const hashedPassword = await argon2.hash(password, {
+      const hashedPassword = await argon2.hash(password.trim(), {
         type: argon2.argon2id,
         memoryCost: 524_288,
         parallelism: 1,
@@ -544,8 +546,8 @@ export class UserResolver {
 
       const user = await prisma.user.create({
         data: {
-          username,
-          email,
+          username: trimmedUsername,
+          email: trimmedEmail,
           password: hashedPassword,
         },
       });
