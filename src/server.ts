@@ -48,9 +48,11 @@ async function startApolloServer() {
   //   methods: ['GET', 'POST'],
   //   credentials: true,
   // });
+
   server.register(fastifyPostgres, {
     connectionString: process.env.DATABASE_URL,
   });
+
   server.register(fastifyCookie);
   server.register(fastifyRedis, { host: '127.0.0.1' });
   server.register(fastifySession, {
@@ -62,14 +64,9 @@ async function startApolloServer() {
       domain: isProduction ? `.${process.env.DOMAIN}` : undefined,
     },
   });
-  // server.addHook('preHandler', (request, _, next) => {
-  //   const session = request.session;
-  //   request.sessionStore.destroy(session.sessionId, next);
-  // });
   const { redis } = server;
 
   // server.register(prismaPlugin);
-
   // await context.prisma.gallery.deleteMany({});
   // await prisma.tubeStation.deleteMany({});
 
