@@ -55,6 +55,9 @@ class Gallery {
 
   @Field(() => String, { nullable: true })
   website?: string | null;
+
+  @Field(() => String, { nullable: true })
+  websiteUrl?: string | null;
 }
 
 export { Gallery as default };

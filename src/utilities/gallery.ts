@@ -180,7 +180,8 @@ export function graphqlGallery(
       : null,
     openingHours: graphqlOpeningHours,
     nearestTubes: graphqlTubeStations,
-    website,
+    website: website ? new URL(website).hostname : null,
+    websiteUrl: website,
   };
 }
 
