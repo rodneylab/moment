@@ -1,4 +1,22 @@
 {
+  "name": "moment",
+  "version": "0.0.1",
+  "description": "moment",
+  "main": "src/server.js",
+  "author": "Rodney Lab <ask@rodneylab.com> (@rodneyLab)",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon dist/server.js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "gen": "prisma migrate dev --name init",
+    "prettier:check": "prettier --config .prettierrc --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "start": "node dist/server.js",
+    "start:ts": "ts-node src/server.ts",
+    "test": "uvu -r ts-node/register tests",
+    "watch": "tsc -w",
+    "prepare": "husky install"
+  },
   "dependencies": {
     "@fastify/session": "^6.2.0",
     "@prisma/client": "^3.2.0",
@@ -20,22 +38,6 @@
     "u2f": "^0.1.3",
     "u2f-api": "^1.2.1"
   },
-  "scripts": {
-    "build": "tsc",
-    "dev": "nodemon dist/server.js",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "gen": "prisma migrate dev --name init",
-    "prettier:check": "prettier --config .prettierrc --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "node dist/server.js",
-    "start:ts": "ts-node src/server.ts",
-    "test": "uvu -r ts-node/register tests",
-    "watch": "tsc -w",
-    "prepare": "husky install"
-  },
-  "name": "moment",
-  "version": "0.0.1",
-  "description": "moment",
-  "main": "src/server.js",
   "devDependencies": {
     "@commitlint/config-conventional": "^13.2.0",
     "@types/crypto-js": "^4.0.2",
@@ -54,7 +56,5 @@
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3",
     "uvu": "^0.5.1"
-  },
-  "author": "Rodney Lab <ask@rodneylab.com> (@rodneyLab)",
-  "license": "BSD-3-Clause"
+  }
 }
