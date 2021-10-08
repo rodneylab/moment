@@ -1,5 +1,4 @@
-import { FidoU2FKey } from '.pnpm/@prisma+client@3.1.1_prisma@3.1.1/node_modules/.prisma/client';
-import type { User } from '.prisma/client';
+import type { FidoU2FKey, User } from '.prisma/client';
 import type { AxiosResponse } from 'axios';
 import axios from 'axios';
 import hmacSHA1 from 'crypto-js/hmac-sha1';

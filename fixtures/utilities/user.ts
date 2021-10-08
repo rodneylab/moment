@@ -1,5 +1,4 @@
-import { FidoU2FKey } from '.pnpm/@prisma+client@3.1.1_prisma@3.1.1/node_modules/.prisma/client';
-import { User } from '.prisma/client';
+import { FidoU2FKey, User } from '.prisma/client';
 
 export const dbUser: User & { fidoU2fKeys: FidoU2FKey[] } = {
   id: 1,
