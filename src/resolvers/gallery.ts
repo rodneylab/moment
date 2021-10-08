@@ -9,9 +9,9 @@ import {
   validOpeningHours,
   validOpenMapUrl,
   validPostalAddress,
-  validSlug,
   validUrl,
 } from '../utilities/gallery';
+import { validSlug } from '../utilities/utilities';
 import AddressInput from './AddressInput';
 import FieldError from './FieldError';
 

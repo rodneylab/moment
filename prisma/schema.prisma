@@ -34,6 +34,7 @@ model TubeStation {
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
   name      String                @unique
+  slug      String                @unique
   galleries GalleryTubeStations[]
 }
 

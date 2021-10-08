@@ -152,8 +152,8 @@ export function graphqlGallery(
   } = gallery;
 
   const graphqlTubeStations = nearestTubes.map((element) => {
-    const { createdAt, name, updatedAt, uid: id } = element.tubeStation;
-    return { id, createdAt, name, updatedAt };
+    const { createdAt, name, slug, updatedAt, uid: id } = element.tubeStation;
+    return { id, createdAt, name, slug, updatedAt };
   });
 
   const graphqlOpeningHours = {
@@ -199,15 +199,6 @@ export function validPostalAddress(address: AddressInput) {
   }
 
   errors.push(...validName(country, 'Country'));
-  return errors;
-}
-
-export function validSlug(slug: string, field: string = 'slug') {
-  const errors: FieldError[] = [];
-  const slugRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-  if (!slugRegex.test(slug)) {
-    errors.push({ field, message: 'Check the slug is valid' });
-  }
   return errors;
 }
 

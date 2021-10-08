@@ -15,6 +15,9 @@ class TubeStation {
   @Field()
   name!: string;
 
+  @Field()
+  slug: string;
+
   @Field(() => [Gallery], { nullable: true })
   galleries?: Gallery[];
 }

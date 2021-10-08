@@ -13,7 +13,11 @@ test.before.each((meta) => {
   console.log(meta['__test__']);
 });
 
-test.after(() => app.close());
+test.after(async () => {
+  if (typeof app != 'undefined') {
+    await app.close();
+  }
+});
 
 test('it sends expected response to hello query', async () => {
   try {
