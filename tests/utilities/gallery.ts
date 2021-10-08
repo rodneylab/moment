@@ -12,6 +12,7 @@ import {
   openingTimesFromOpeningHours,
   validName,
   validOpeningHours,
+  validUrl,
 } from '../../src/utilities/gallery';
 
 test('addressStringFromPostalAddress', () => {
@@ -71,6 +72,19 @@ test('validOpeningHours', () => {
   })[1];
   assert.is(field4, 'closingTime0');
   assert.is(message4, 'Check opening time is earlier than closing time');
+});
+
+test('it correctly validates urls', () => {
+  assert.type(validUrl, 'function');
+  assert.is(validUrl('https://www.example.com', 'url').length, 0);
+  assert.is(validUrl('https://www.example.com/home', 'url').length, 0);
+  assert.is(validUrl('https://www.example.com/home-page', 'url').length, 0);
+
+  const errors = validUrl('https://www.example', 'url');
+  const { field, message } = errors[0];
+  assert.is(errors.length, 1);
+  assert.is(field, 'url');
+  assert.is(message, 'Check this is a valid url');
 });
 
 test.run();
