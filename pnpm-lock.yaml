@@ -11,7 +11,7 @@ specifiers:
   apollo-server-fastify: ^3.4.0
   apollo-server-plugin-base: ^3.3.0
   argon2: ^0.28.2
-  axios: ^0.22.0
+  axios: ^0.23.0
   crypto-js: ^4.1.1
   dotenv: ^10.0.0
   eslint: ^8.0.0
@@ -45,7 +45,7 @@ dependencies:
   apollo-server-fastify: 3.4.0_fastify@3.22.0+graphql@15.6.1
   apollo-server-plugin-base: 3.3.0_graphql@15.6.1
   argon2: 0.28.2
-  axios: 0.22.0
+  axios: 0.23.0
   crypto-js: 4.1.1
   fastify: 3.22.0
   fastify-cookie: 5.3.1
@@ -766,8 +766,8 @@ packages:
       - supports-color
     dev: false
 
-  /axios/0.22.0:
-    resolution: {integrity: sha512-Z0U3uhqQeg1oNcihswf4ZD57O3NrR1+ZXhxaROaWpDmsDTx7T2HNBV2ulBtie2hwJptu8UvgnJoK+BIqdzh/1w==}
+  /axios/0.23.0:
+    resolution: {integrity: sha512-NmvAE4i0YAv5cKq8zlDoPd1VLKAqX5oLuZKs8xkJa4qi6RGn0uhCYFjWtHHC9EM/MwOwYWOs53W+V0aqEXq1sg==}
     dependencies:
       follow-redirects: 1.14.4
     transitivePeerDependencies:

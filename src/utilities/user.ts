@@ -1,5 +1,4 @@
 import type { FidoU2FKey, User } from '.prisma/client';
-import type { AxiosResponse } from 'axios';
 import axios from 'axios';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 // import { setTimeout } from 'timers/promises'; // requires node 15
@@ -11,7 +10,7 @@ const DUO_ENROLL_VALID_SECS = 3600;
 
 export async function duoPing() {
   try {
-    const response: AxiosResponse<{ response: { stat: string; time: number } }> = await axios({
+    const response = await axios.request<{ response: { stat: string; time: number } }>({
       url: `https://${process.env.DUO_API_HOSTNAME}/auth/v2/ping`,
       method: 'GET',
       headers: {
@@ -19,7 +18,7 @@ export async function duoPing() {
       },
     });
     const { status } = response;
-    const { response: duoResponse } = response.data;
+    const { response: duoResponse }: { response: { stat: string; time: number } } = response.data;
     const { stat, time } = duoResponse ?? {};
     if (status === 200) {
       if (stat === 'OK') {
@@ -52,7 +51,7 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{
+    const response = await axios.request<{
       stat: string;
       response: {
         result: string;
@@ -60,7 +59,7 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
         status_msg: number;
         txid: string;
       };
-    }> = await axios({
+    }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
@@ -120,7 +119,7 @@ export async function duoAuthStatus(transactionId: string) {
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{
+    const response = await axios.request<{
       stat: string;
       response: {
         result: string;
@@ -128,7 +127,7 @@ export async function duoAuthStatus(transactionId: string) {
         status_msg: number;
         txid: string;
       };
-    }> = await axios({
+    }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
@@ -185,7 +184,7 @@ export async function duoCheck() {
       path,
       params: '',
     });
-    const response: AxiosResponse<{ stat: string; response: { time: number } }> = await axios({
+    const response = await axios.request<{ stat: string; response: { time: number } }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       method,
       headers: {
@@ -222,7 +221,7 @@ export async function duoEnroll(username: string) {
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{
+    const response = await axios.request<{
       stat: string;
       response: {
         activation_barcode: string;
@@ -230,7 +229,7 @@ export async function duoEnroll(username: string) {
         expiration: number;
         user_id: string;
       };
-    }> = await axios({
+    }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
@@ -277,10 +276,10 @@ export async function duoEnrollStatus({
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{
+    const response = await axios.request<{
       stat: string;
       response: string;
-    }> = await axios({
+    }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
@@ -328,7 +327,7 @@ export async function duoPreauth({
       path,
       params: params.toString(),
     });
-    const response: AxiosResponse<{
+    const response = await axios.request<{
       stat: string;
       response: {
         result: string;
@@ -343,7 +342,7 @@ export async function duoPreauth({
           },
         ];
       };
-    }> = await axios({
+    }>({
       url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
       params,
       // paramsSerializer: (params) => params.toString(),
