@@ -6,6 +6,19 @@ import type FieldError from 'src/resolvers/FieldError';
 import type AddressInput from '../resolvers/AddressInput';
 import type { OpeningHoursInput } from '../resolvers/gallery';
 
+type DatabaseGallery = Gallery & {
+  nearestTubes: (GalleryTubeStations & {
+    tubeStation: TubeStation;
+  })[];
+  address: PostalAddress | null;
+  location: Location | null;
+  openingHours:
+    | (OpeningHours & {
+        openingHoursRanges: OpeningHoursRange[];
+      })
+    | null;
+};
+
 export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const N_DASH_ENTITY = '\u2013';
 
@@ -124,20 +137,7 @@ export function validOpenMapUrl(url: string) {
   return result;
 }
 
-export function graphqlGallery(
-  gallery: Gallery & {
-    nearestTubes: (GalleryTubeStations & {
-      tubeStation: TubeStation;
-    })[];
-    address: PostalAddress | null;
-    location: Location | null;
-    openingHours:
-      | (OpeningHours & {
-          openingHoursRanges: OpeningHoursRange[];
-        })
-      | null;
-  },
-): GraphQLGallery {
+export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
   const {
     uid,
     createdAt,
@@ -183,6 +183,12 @@ export function graphqlGallery(
     website: website ? new URL(website).hostname : null,
     websiteUrl: website,
   };
+}
+
+export function sortGalleries(galleries: DatabaseGallery[]): DatabaseGallery[] {
+  return galleries.sort((a, b) =>
+    a.name.replace(/^The /i, '') > b.name.replace(/^The /i, '') ? 1 : -1,
+  );
 }
 
 export function validPostalAddress(address: AddressInput) {

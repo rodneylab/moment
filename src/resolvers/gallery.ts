@@ -5,6 +5,7 @@ import Gallery from '../entities/Gallery';
 import {
   geoCordinatesFromOpenMapUrl,
   graphqlGallery,
+  sortGalleries,
   validName,
   validOpeningHours,
   validOpenMapUrl,
@@ -127,7 +128,10 @@ export class GalleryResolver {
       },
     });
 
-    return { galleries: galleries.map((element) => graphqlGallery(element)), hasMore: false };
+    return {
+      galleries: sortGalleries(galleries).map((element) => graphqlGallery(element)),
+      hasMore: false,
+    };
   }
 
   @Query(() => GalleryQueryResponse)
