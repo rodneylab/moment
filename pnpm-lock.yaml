@@ -5,7 +5,7 @@ specifiers:
   '@fastify/session': ^6.2.0
   '@prisma/client': ^3.2.1
   '@types/crypto-js': ^4.0.2
-  '@types/node': ^16.10.9
+  '@types/node': ^16.11.0
   '@typescript-eslint/eslint-plugin': ^5.0.0
   apollo-server-core: ^3.4.0
   apollo-server-fastify: ^3.4.0
@@ -62,7 +62,7 @@ dependencies:
 devDependencies:
   '@commitlint/config-conventional': 13.2.0
   '@types/crypto-js': 4.0.2
-  '@types/node': 16.10.9
+  '@types/node': 16.11.0
   '@typescript-eslint/eslint-plugin': 5.0.0_eslint@8.0.1+typescript@4.4.4
   dotenv: 10.0.0
   eslint: 8.0.1
@@ -74,7 +74,7 @@ devDependencies:
   nodemon: 2.0.13
   prettier: 2.4.1
   prisma: 3.2.1
-  ts-node: 10.3.0_1e613d4912436927b18b6995a7885e38
+  ts-node: 10.3.0_036181877a83ed913a2bbec8dcc74354
   typescript: 4.4.4
   uvu: 0.5.2
 
@@ -369,7 +369,7 @@ packages:
     resolution: {integrity: sha512-w+LsMxKyYQm347Otw+IfBXOv9UWVjpHpCDdbBMt8Kz/xbvCYNjP+0qPh91Km3iKfSRLBB0P7fAMf0KHrPu+MyA==}
     dependencies:
       '@types/minimatch': 3.0.5
-      '@types/node': 16.10.9
+      '@types/node': 16.11.0
     dev: false
 
   /@types/json-schema/7.0.9:
@@ -388,8 +388,8 @@ packages:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
     dev: false
 
-  /@types/node/16.10.9:
-    resolution: {integrity: sha512-H9ReOt+yqIJPCutkTYjFjlyK6WEMQYT9hLZMlWtOjFQY2ItppsWZ6RJf8Aw+jz5qTYceuHvFgPIaKOHtLAEWBw==}
+  /@types/node/16.11.0:
+    resolution: {integrity: sha512-8MLkBIYQMuhRBQzGN9875bYsOhPnf/0rgXGo66S2FemHkhbn9qtsz9ywV1iCG+vbjigE4WUNVvw37Dx+L0qsPg==}
 
   /@types/semver/7.3.8:
     resolution: {integrity: sha512-D/2EJvAlCEtYFEYmmlGwbGXuK886HzyCc3nZX/tkFTQdEU8jZDAgiv08P162yB17y4ZXZoq7yFAnW4GDBb9Now==}
@@ -2939,7 +2939,7 @@ packages:
     resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
     dev: false
 
-  /ts-node/10.3.0_1e613d4912436927b18b6995a7885e38:
+  /ts-node/10.3.0_036181877a83ed913a2bbec8dcc74354:
     resolution: {integrity: sha512-RYIy3i8IgpFH45AX4fQHExrT8BxDeKTdC83QFJkNzkvt8uFB6QJ8XMyhynYiKMLxt9a7yuXaDBZNOYS3XjDcYw==}
     hasBin: true
     peerDependencies:
@@ -2958,7 +2958,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
-      '@types/node': 16.10.9
+      '@types/node': 16.11.0
       acorn: 8.5.0
       acorn-walk: 8.2.0
       arg: 4.1.3
@@ -3008,7 +3008,7 @@ packages:
       graphql: ^15.3.0
     dependencies:
       '@types/glob': 7.1.4
-      '@types/node': 16.10.9
+      '@types/node': 16.11.0
       '@types/semver': 7.3.8
       glob: 7.2.0
       graphql: 15.6.1
