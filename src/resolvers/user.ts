@@ -300,7 +300,7 @@ export class UserResolver {
         return false;
       }
 
-      // todo(rodneyj): add device info to context to save additional preauth
+      // todo(rodneylab): add device info to context to save additional preauth
       const { devices } = await duoPreauth({ duoUserId });
 
       if (
@@ -427,7 +427,7 @@ export class UserResolver {
   ): Promise<boolean> {
     try {
       const { registerRequests } = request.session.user.fidoU2f ?? {};
-      if (!registerRequests || registerRequests?.length === 1) {
+      if (!registerRequests || registerRequests?.length !== 1) {
         return false;
       }
 
