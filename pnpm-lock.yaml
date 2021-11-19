@@ -5,7 +5,7 @@ specifiers:
   '@fastify/session': ^6.2.2
   '@prisma/client': ^3.5.0
   '@types/crypto-js': ^4.0.2
-  '@types/node': ^16.11.7
+  '@types/node': ^16.11.8
   '@typescript-eslint/eslint-plugin': ^5.4.0
   apollo-server-core: ^3.5.0
   apollo-server-fastify: ^3.5.0
@@ -60,7 +60,7 @@ dependencies:
 devDependencies:
   '@commitlint/config-conventional': 15.0.0
   '@types/crypto-js': 4.0.2
-  '@types/node': 16.11.7
+  '@types/node': 16.11.8
   '@typescript-eslint/eslint-plugin': 5.4.0_eslint@8.2.0+typescript@4.5.2
   axios: 0.24.0
   dotenv: 10.0.0
@@ -74,7 +74,7 @@ devDependencies:
   nodemon: 2.0.15
   prettier: 2.4.1
   prisma: 3.5.0
-  ts-node: 10.4.0_822df8cc64711c2db8d43ce90a8558a3
+  ts-node: 10.4.0_0328c8debf324ecb06e655d4af8a5035
   typescript: 4.5.2
   uvu: 0.5.2
 
@@ -369,7 +369,7 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 3.0.5
-      '@types/node': 16.11.7
+      '@types/node': 16.11.8
     dev: false
 
   /@types/json-schema/7.0.9:
@@ -388,8 +388,8 @@ packages:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
     dev: false
 
-  /@types/node/16.11.7:
-    resolution: {integrity: sha512-QB5D2sqfSjCmTuWcBWyJ+/44bcjO7VbjSbOE0ucoVbAsSNQc4Lt6QkgkVXkTDwkL4z/beecZNDvVX15D4P8Jbw==}
+  /@types/node/16.11.8:
+    resolution: {integrity: sha512-hmT5gfpRkkHr7DZZHMf3jBe/zNcVGN+jXSL2f8nAsYfBPxQFToKwQlS/zES4Sjp488Bi73i+p6bvrNRRGU0x9Q==}
 
   /@types/semver/7.3.9:
     resolution: {integrity: sha512-L/TMpyURfBkf+o/526Zb6kd/tchUP3iBDEPjqjb+U2MAJhVRxxrmr2fwpe08E7QsV7YLcpq0tUaQ9O9x97ZIxQ==}
@@ -1528,7 +1528,7 @@ packages:
       color-support: 1.1.3
       console-control-strings: 1.1.0
       has-unicode: 2.0.1
-      signal-exit: 3.0.5
+      signal-exit: 3.0.6
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wide-align: 1.1.5
@@ -2696,8 +2696,8 @@ packages:
       object-inspect: 1.11.0
     dev: true
 
-  /signal-exit/3.0.5:
-    resolution: {integrity: sha512-KWcOiKeQj6ZyXx7zq4YxSMgHRlod4czeBQZrPb8OKcohcqAXShm7E20kEMle9WBt26hFcAf0qLOcp5zmY7kOqQ==}
+  /signal-exit/3.0.6:
+    resolution: {integrity: sha512-sDl4qMFpijcGw22U5w63KmD3cZJfBuFlVNbVMKje2keoKML7X2UzWbc4XrmEbDwg0NXJc3yv4/ox7b+JWb57kQ==}
 
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -2832,7 +2832,7 @@ packages:
     resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
     dev: false
 
-  /ts-node/10.4.0_822df8cc64711c2db8d43ce90a8558a3:
+  /ts-node/10.4.0_0328c8debf324ecb06e655d4af8a5035:
     resolution: {integrity: sha512-g0FlPvvCXSIO1JDF6S232P5jPYqBkRL9qly81ZgAOSU7rwI0stphCgd2kLiCrU9DjQCrJMWEqcNSjQL02s6d8A==}
     hasBin: true
     peerDependencies:
@@ -2851,7 +2851,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
-      '@types/node': 16.11.7
+      '@types/node': 16.11.8
       acorn: 8.6.0
       acorn-walk: 8.2.0
       arg: 4.1.3
@@ -2901,7 +2901,7 @@ packages:
       graphql: ^15.3.0
     dependencies:
       '@types/glob': 7.2.0
-      '@types/node': 16.11.7
+      '@types/node': 16.11.8
       '@types/semver': 7.3.9
       glob: 7.2.0
       graphql: 15.6.1
@@ -3088,7 +3088,7 @@ packages:
     dependencies:
       imurmurhash: 0.1.4
       is-typedarray: 1.0.0
-      signal-exit: 3.0.5
+      signal-exit: 3.0.6
       typedarray-to-buffer: 3.1.5
     dev: true
 
