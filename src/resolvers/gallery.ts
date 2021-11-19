@@ -192,7 +192,7 @@ export class GalleryResolver {
       }
       errors.push(...validSlug(slug, 'slug'));
       errors.push(...validPostalAddress(postalAddress));
-      errors.push(...validOpenMapUrl(openStreetMapUrl));
+      openStreetMapUrl && errors.push(...validOpenMapUrl(openStreetMapUrl));
       errors.push(...validUrl(website, 'website'));
 
       // query existing tube stations

@@ -132,7 +132,7 @@ export function validOpenMapUrl(url: string) {
   const result: FieldError[] = [];
   const openMapRegex = /^https:\/\/www\.openstreetmap\.org\/#map=\d+\/-?\d+\.\d+\/-?\d+\.\d+$/;
   if (!openMapRegex.test(url)) {
-    result.push({ field: 'mapUrl', message: 'Check the map URL' });
+    result.push({ field: 'openStreetMap', message: 'Check the map URL' });
   }
   return result;
 }
