@@ -79,8 +79,9 @@ test('it correctly validates urls', () => {
   assert.is(validUrl('https://www.example.com', 'url').length, 0);
   assert.is(validUrl('https://www.example.com/home', 'url').length, 0);
   assert.is(validUrl('https://www.example.com/home-page', 'url').length, 0);
+  assert.is(validUrl('https://www.example.gallery/home-page', 'url').length, 0);
 
-  const errors = validUrl('https://www.example', 'url');
+  const errors = validUrl('https://www.exampleerror', 'url');
   const { field, message } = errors[0];
   assert.is(errors.length, 1);
   assert.is(field, 'url');
