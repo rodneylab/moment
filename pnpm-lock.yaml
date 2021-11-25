@@ -5,7 +5,7 @@ specifiers:
   '@fastify/session': ^6.2.2
   '@prisma/client': ^3.5.0
   '@types/crypto-js': ^4.0.2
-  '@types/node': ^16.11.9
+  '@types/node': ^16.11.10
   '@typescript-eslint/eslint-plugin': ^5.4.0
   apollo-server-core: ^3.5.0
   apollo-server-fastify: ^3.5.0
@@ -19,7 +19,7 @@ specifiers:
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
   fastify: ^3.24.0
-  fastify-cookie: ^5.3.2
+  fastify-cookie: ^5.4.0
   fastify-cors: ^6.0.2
   fastify-plugin: ^3.0.0
   fastify-postgres: ^3.6.0
@@ -47,7 +47,7 @@ dependencies:
   argon2: 0.28.2
   crypto-js: 4.1.1
   fastify: 3.24.0
-  fastify-cookie: 5.3.2
+  fastify-cookie: 5.4.0
   fastify-plugin: 3.0.0
   fastify-postgres: 3.6.0_pg@8.7.1
   fastify-redis: 4.3.3
@@ -60,7 +60,7 @@ dependencies:
 devDependencies:
   '@commitlint/config-conventional': 15.0.0
   '@types/crypto-js': 4.0.2
-  '@types/node': 16.11.9
+  '@types/node': 16.11.10
   '@typescript-eslint/eslint-plugin': 5.4.0_eslint@8.3.0+typescript@4.5.2
   axios: 0.24.0
   dotenv: 10.0.0
@@ -74,7 +74,7 @@ devDependencies:
   nodemon: 2.0.15
   prettier: 2.4.1
   prisma: 3.5.0
-  ts-node: 10.4.0_6d6d60348da931c98bc2cf01b7fcd2a7
+  ts-node: 10.4.0_36929cccfdb926da0bb85cc291f27124
   typescript: 4.5.2
   uvu: 0.5.2
 
@@ -172,8 +172,8 @@ packages:
       tslib: 2.3.1
     dev: false
 
-  /@graphql-tools/mock/8.4.3_graphql@15.6.1:
-    resolution: {integrity: sha512-jj7obzDz4FAfmIGSh1Mo6cUs9d8MSaN6TH/iju3Qyuz6CZ6NLuJrWOg50ysEUgkT4Y/Aey8SlWOf/U15Z7qWYw==}
+  /@graphql-tools/mock/8.4.4_graphql@15.6.1:
+    resolution: {integrity: sha512-lRdU6XaKxZk7qv4G+1IhbVF7gvb3AaOQUC3Xx1M0/1/fRwt+zcUOWzgC/LNjxAIOI2T8Eh9eqKyQXBIWbTA02Q==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
@@ -369,7 +369,7 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 3.0.5
-      '@types/node': 16.11.9
+      '@types/node': 16.11.10
     dev: false
 
   /@types/json-schema/7.0.9:
@@ -388,8 +388,8 @@ packages:
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
     dev: false
 
-  /@types/node/16.11.9:
-    resolution: {integrity: sha512-MKmdASMf3LtPzwLyRrFjtFFZ48cMf8jmX5VRYrDQiJa8Ybu5VAmkqBWqKU8fdCwD8ysw4mQ9nrEHvzg6gunR7A==}
+  /@types/node/16.11.10:
+    resolution: {integrity: sha512-3aRnHa1KlOEEhJ6+CvyHKK5vE9BcLGjtUpwvqYLRvYNQKMfabu3BwfJaA/SLW8dxe28LsNDjtHwePTuzn3gmOA==}
 
   /@types/semver/7.3.9:
     resolution: {integrity: sha512-L/TMpyURfBkf+o/526Zb6kd/tchUP3iBDEPjqjb+U2MAJhVRxxrmr2fwpe08E7QsV7YLcpq0tUaQ9O9x97ZIxQ==}
@@ -611,7 +611,7 @@ packages:
     dependencies:
       '@apollographql/apollo-tools': 0.5.2
       '@apollographql/graphql-playground-html': 1.6.29
-      '@graphql-tools/mock': 8.4.3_graphql@15.6.1
+      '@graphql-tools/mock': 8.4.4_graphql@15.6.1
       '@graphql-tools/schema': 8.3.1_graphql@15.6.1
       '@graphql-tools/utils': 8.5.3_graphql@15.6.1
       '@josephg/resolvable': 1.0.1
@@ -1368,10 +1368,9 @@ packages:
       fastify-plugin: 3.0.0
     dev: false
 
-  /fastify-cookie/5.3.2:
-    resolution: {integrity: sha512-7ZrRDOxlzO8dxgQSYd3yOd1AWRghpXTP/GxiBel44GVyRyPiYgHeLfqjcoyPNJYPYAEUpxi+6NHkc96Zl8yh9w==}
+  /fastify-cookie/5.4.0:
+    resolution: {integrity: sha512-uKTbOLx6pSyKqA9oD2G9hpMuRTVtKRm98bRwJVg4ga7GCm+RR6771stmfhbblXxHHcQQHuHvwdOdPeHJjr2sgg==}
     dependencies:
-      cookie: 0.4.1
       cookie-signature: 1.1.0
       fastify-plugin: 3.0.0
     dev: false
@@ -1422,7 +1421,7 @@ packages:
       fastify-warning: 0.2.0
       find-my-way: 4.4.0
       flatstr: 1.0.12
-      light-my-request: 4.6.0
+      light-my-request: 4.7.0
       pino: 6.13.3
       proxy-addr: 2.0.7
       rfdc: 1.3.0
@@ -2005,8 +2004,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /light-my-request/4.6.0:
-    resolution: {integrity: sha512-wQWGwMr7l7fzYPzzzutRoEI1vuREpIpJpTi3t8cHlGdsnBrOF5iR559Bkh+nkDGgnUJtNuuutjnqbxP7zPWKkA==}
+  /light-my-request/4.7.0:
+    resolution: {integrity: sha512-LTa8YZp3K2AUpqUnwwKajoIHcsKOBnzwJNQSrk7unziPwo6CjOYjyO0F9wfkxFvP+nBsCGe3eMPnedVgIIgdAw==}
     dependencies:
       ajv: 8.8.2
       cookie: 0.4.1
@@ -2832,7 +2831,7 @@ packages:
     resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
     dev: false
 
-  /ts-node/10.4.0_6d6d60348da931c98bc2cf01b7fcd2a7:
+  /ts-node/10.4.0_36929cccfdb926da0bb85cc291f27124:
     resolution: {integrity: sha512-g0FlPvvCXSIO1JDF6S232P5jPYqBkRL9qly81ZgAOSU7rwI0stphCgd2kLiCrU9DjQCrJMWEqcNSjQL02s6d8A==}
     hasBin: true
     peerDependencies:
@@ -2851,7 +2850,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
-      '@types/node': 16.11.9
+      '@types/node': 16.11.10
       acorn: 8.6.0
       acorn-walk: 8.2.0
       arg: 4.1.3
@@ -2901,7 +2900,7 @@ packages:
       graphql: ^15.3.0
     dependencies:
       '@types/glob': 7.2.0
-      '@types/node': 16.11.9
+      '@types/node': 16.11.10
       '@types/semver': 7.3.9
       glob: 7.2.0
       graphql: 15.6.1
