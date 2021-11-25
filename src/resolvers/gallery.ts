@@ -106,6 +106,15 @@ class UpdateGalleryInput {
   @Field(() => String, { nullable: true })
   slug?: string;
 
+  @Field(() => AddressInput, { nullable: true })
+  postalAddress: AddressInput;
+
+  @Field(() => [String], { nullable: true })
+  addNearestTubes: string[];
+
+  @Field(() => [String], { nullable: true })
+  removeNearestTubes: string[];
+
   @Field(() => String, { nullable: true })
   openStreetMapUrl?: string;
 
@@ -318,7 +327,32 @@ export class GalleryResolver {
       if (!gallery) {
         return { errors: [{ field: 'id', message: `Wasn't able to find a gallery with that id` }] };
       }
-      const { name, slug, openStreetMapUrl, website } = input;
+
+      const errors: FieldError[] = [];
+
+      const { addNearestTubes, name, postalAddress, slug, openStreetMapUrl, website } = input;
+      // query existing tube stations
+      let tubeStationsNotEmpty: TubeStation[] = [];
+      if (addNearestTubes) {
+        const promises = addNearestTubes.map((element) =>
+          prisma.tubeStation.findUnique({ where: { name: element } }),
+        );
+        const tubeStations = await Promise.all(promises);
+        tubeStationsNotEmpty = tubeStations.filter(notEmpty);
+        tubeStationsNotEmpty.forEach((element, index) => {
+          if (element == null) {
+            errors.push({
+              field: 'tubeStations',
+              message: `${tubeStations[index]} is not yet in database, add it first`,
+            });
+          }
+        });
+      }
+
+      if (errors.length > 0) {
+        return { errors };
+      }
+
       const updatedGallery = await prisma.gallery.update({
         where: {
           uid,
@@ -326,6 +360,21 @@ export class GalleryResolver {
         data: {
           ...(name ? { name } : {}),
           ...(slug ? { slug } : {}),
+          address: {
+            update: {
+              ...postalAddress,
+            },
+          },
+          nearestTubes: {
+            /* creating a gallery/station pairing here which is why we use create even though
+             * stations exist already
+             */
+            createMany: {
+              data: tubeStationsNotEmpty.map((element) => ({
+                tubeStationId: element.id,
+              })),
+            },
+          },
           ...(openStreetMapUrl
             ? { location: { create: { ...geoCordinatesFromOpenMapUrl(openStreetMapUrl) } } }
             : {}),
