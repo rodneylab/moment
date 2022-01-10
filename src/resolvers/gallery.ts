@@ -131,6 +131,7 @@ export class GalleryResolver {
       orderBy: { name: 'asc' },
       include: {
         address: true,
+        exhibitions: true,
         location: true,
         nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
@@ -152,6 +153,7 @@ export class GalleryResolver {
       where: { slug },
       include: {
         address: true,
+        exhibitions: true,
         location: true,
         nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
@@ -261,6 +263,7 @@ export class GalleryResolver {
         },
         include: {
           address: true,
+          exhibitions: true,
           location: true,
           nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
@@ -383,6 +386,7 @@ export class GalleryResolver {
         include: {
           address: true,
           location: true,
+          exhibitions: true,
           nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
         },

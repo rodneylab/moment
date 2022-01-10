@@ -1,4 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
+import Exhibition from './Exhibition';
 import OpeningHours from './OpeningHours';
 import PostalAddress from './PostalAddress';
 import TubeStation from './TubeStation';
@@ -46,6 +47,9 @@ class Gallery {
 
   @Field(() => OpeningHours, { nullable: true })
   openingHours?: OpeningHours | null;
+
+  @Field(() => [Exhibition], { nullable: true })
+  exhibitions: Exhibition[];
 
   @Field(() => [TubeStation], { nullable: true })
   nearestTubes?: TubeStation[];

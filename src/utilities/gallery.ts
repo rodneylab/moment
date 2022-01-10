@@ -1,12 +1,14 @@
 import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
-import { Gallery, GalleryTubeStations, Location, OpeningHours } from '.prisma/client';
+import { Exhibition, Gallery, GalleryTubeStations, Location, OpeningHours } from '.prisma/client';
 import { TubeStation } from '@prisma/client';
+// import Exhibition from 'src/entities/Exhibition';
 import GraphQLGallery from '../entities/Gallery';
 import type AddressInput from '../resolvers/AddressInput';
 import type FieldError from '../resolvers/FieldError';
 import type { OpeningHoursInput } from '../resolvers/gallery';
 
 export type DatabaseGallery = Gallery & {
+  exhibitions: Exhibition[];
   nearestTubes: (GalleryTubeStations & {
     tubeStation: TubeStation;
   })[];
@@ -144,6 +146,7 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
     updatedAt,
     name,
     slug,
+    exhibitions,
     address,
     location,
     openingHours,
@@ -163,6 +166,37 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
     }),
   };
 
+  const graphqlExhibitions = exhibitions.map((element) => {
+    const {
+      uid: id,
+      createdAt,
+      updatedAt,
+      name,
+      description,
+      summaryText,
+      hashtags,
+      start,
+      end,
+      freeEntry,
+      online,
+      inPerson,
+    } = element;
+    return {
+      id,
+      createdAt,
+      updatedAt,
+      name,
+      description,
+      summaryText,
+      hashtags,
+      start: start?.toUTCString(),
+      end: end?.toUTCString(),
+      freeEntry,
+      online,
+      inPerson,
+    };
+  });
+
   return {
     id: uid,
     createdAt,
@@ -179,6 +213,7 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
       ? openingTimesFromOpeningHours(openingHours?.openingHoursRanges)
       : null,
     openingHours: graphqlOpeningHours,
+    exhibitions: graphqlExhibitions,
     nearestTubes: graphqlTubeStations,
     tubes: graphqlTubeStations.map((element) => element.name).join(', '),
     website: website ? new URL(website).hostname : null,

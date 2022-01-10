@@ -66,6 +66,7 @@ export class ExhibitionResolver {
           gallery: {
             include: {
               address: true,
+              exhibitions: true,
               location: true,
               nearestTubes: { include: { tubeStation: true } },
               openingHours: { include: { openingHoursRanges: true } },
@@ -145,6 +146,7 @@ export class ExhibitionResolver {
           gallery: {
             include: {
               address: true,
+              exhibitions: true,
               location: true,
               nearestTubes: { include: { tubeStation: true } },
               openingHours: { include: { openingHoursRanges: true } },

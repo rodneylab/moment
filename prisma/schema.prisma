@@ -27,7 +27,7 @@ model Gallery {
   openingHoursId Int?
   locationId     Int?
   Event          Event[]
-  Exhibition     Exhibition[]
+  exhibitions    Exhibition[]
 }
 
 model SocialProfiles {
