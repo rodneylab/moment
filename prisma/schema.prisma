@@ -26,6 +26,149 @@ model Gallery {
 
   openingHoursId Int?
   locationId     Int?
+  Event          Event[]
+  Exhibition     Exhibition[]
+}
+
+model SocialProfiles {
+  id           Int            @id @default(autoincrement())
+  uid          String         @unique @default(cuid())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  createdBy    User           @relation(fields: [createdById], references: [id])
+  twitter      String?
+  instagram    String?
+  createdById  Int
+  Photographer Photographer[]
+  Curator      Curator[]
+  Speaker      Speaker[]
+}
+
+model Photographer {
+  id               Int            @id @default(autoincrement())
+  uid              String         @unique @default(cuid())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  createdBy        User           @relation(fields: [createdById], references: [id])
+  name             String
+  exhibitions      Exhibition[]
+  website          String?
+  socialProfiles   SocialProfiles @relation(fields: [socialProfilesId], references: [id])
+  createdById      Int
+  socialProfilesId Int
+  Event            Event?         @relation(fields: [eventId], references: [id])
+  eventId          Int?
+}
+
+model Curator {
+  id               Int            @id @default(autoincrement())
+  uid              String         @unique @default(cuid())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  createdBy        User           @relation(fields: [createdById], references: [id])
+  name             String
+  exhibitions      Exhibition[]
+  website          String?
+  socialProfiles   SocialProfiles @relation(fields: [socialProfilesId], references: [id])
+  createdById      Int
+  socialProfilesId Int
+  Event            Event?         @relation(fields: [eventId], references: [id])
+  eventId          Int?
+}
+
+model Speaker {
+  id               Int            @id @default(autoincrement())
+  uid              String         @unique @default(cuid())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  createdBy        User           @relation(fields: [createdById], references: [id])
+  name             String
+  exhibitions      Exhibition[]
+  website          String?
+  socialProfiles   SocialProfiles @relation(fields: [socialProfilesId], references: [id])
+  createdById      Int
+  socialProfilesId Int
+  Event            Event?         @relation(fields: [eventId], references: [id])
+  eventId          Int?
+}
+
+model Ticket {
+  id           Int      @id @default(autoincrement())
+  uid          String   @unique @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  name         String
+  price        Float
+  availability String
+  url          String
+  createdById  Int
+  Event        Event[]
+}
+
+model Event {
+  id            Int            @id @default(autoincrement())
+  uid           String         @unique @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  exhibition    Exhibition     @relation(fields: [exhibitionId], references: [id])
+  gallery       Gallery        @relation(fields: [galleryId], references: [id])
+  location      PostalAddress  @relation(fields: [postalAddressId], references: [id])
+  photographers Photographer[]
+  curators      Curator[]
+  speakers      Speaker[]
+  date          DateTime
+  ticket        Ticket         @relation(fields: [ticketId], references: [id])
+
+  createdById     Int
+  exhibitionId    Int
+  galleryId       Int
+  postalAddressId Int
+  ticketId        Int
+}
+
+model Image {
+  id          Int          @id @default(autoincrement())
+  uid         String       @unique @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById Int
+  url         String
+  caption     String?
+  copyright   String?
+  Exhibition  Exhibition[]
+}
+
+model Exhibition {
+  id            Int            @id @default(autoincrement())
+  uid           String         @unique @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  name          String
+  hashtags      String[]
+  description   String?
+  summaryText   String?
+  bodyText      String?
+  url           String?
+  gallery       Gallery        @relation(fields: [galleryId], references: [id])
+  start         DateTime?
+  end           DateTime?
+  photographers Photographer[]
+  curators      Curator[]
+  events        Event[]
+  image         Image?         @relation(fields: [imageId], references: [id])
+  freeEntry     Boolean
+  online        Boolean
+  inPerson      Boolean
+
+  Speaker     Speaker? @relation(fields: [speakerId], references: [id])
+  speakerId   Int?
+  createdById Int
+  galleryId   Int
+  imageId     Int?
 }
 
 model TubeStation {
@@ -68,6 +211,7 @@ model PostalAddress {
   postalCode    String
   country       String
   Gallery       Gallery[]
+  Event         Event[]
 }
 
 model OpeningHours {
@@ -91,15 +235,23 @@ model OpeningHoursRange {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  uid         String       @unique @default(cuid())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  username    String       @unique
-  email       String       @unique
-  duoUserId   String?
-  fidoU2fKeys FidoU2FKey[]
-  password    String
+  id             Int              @id @default(autoincrement())
+  uid            String           @unique @default(cuid())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  username       String           @unique
+  email          String           @unique
+  duoUserId      String?
+  fidoU2fKeys    FidoU2FKey[]
+  password       String
+  SocialProfiles SocialProfiles[]
+  Photographers  Photographer[]
+  Curators       Curator[]
+  Speakers       Speaker[]
+  Tickets        Ticket[]
+  Events         Event[]
+  Images         Image[]
+  Exhibitions    Exhibition[]
 }
 
 model FidoU2FKey {

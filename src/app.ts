@@ -12,7 +12,8 @@ import fastifyPostgres from 'fastify-postgres';
 import fastifyRedis from 'fastify-redis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
-import { GalleryResolver } from './resolvers/gallery';
+import ExhibitionResolver from './resolvers/Exhibition';
+import GalleryResolver from './resolvers/gallery';
 import HelloResolver from './resolvers/hello';
 import TubeStationResolver from './resolvers/tubeStation';
 import UserResolver from './resolvers/user';
@@ -72,7 +73,13 @@ export async function build(opts = {}): Promise<FastifyInstance> {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [GalleryResolver, HelloResolver, TubeStationResolver, UserResolver],
+      resolvers: [
+        ExhibitionResolver,
+        GalleryResolver,
+        HelloResolver,
+        TubeStationResolver,
+        UserResolver,
+      ],
       validate: false,
     }),
     plugins: [
