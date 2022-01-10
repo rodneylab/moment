@@ -51,6 +51,9 @@ class Gallery {
   nearestTubes?: TubeStation[];
 
   @Field(() => String, { nullable: true })
+  tubes?: String;
+
+  @Field(() => String, { nullable: true })
   googleMap?: string | null;
 
   @Field(() => String, { nullable: true })

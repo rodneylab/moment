@@ -180,6 +180,7 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
       : null,
     openingHours: graphqlOpeningHours,
     nearestTubes: graphqlTubeStations,
+    tubes: graphqlTubeStations.map((element) => element.name).join(', '),
     website: website ? new URL(website).hostname : null,
     websiteUrl: website,
   };
