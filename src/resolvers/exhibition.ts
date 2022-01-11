@@ -47,6 +47,15 @@ class CreateExhibitionResponse {
 }
 
 @ObjectType()
+class ExhibitionQueryResponse {
+  @Field(() => Exhibition, { nullable: true })
+  exhibition?: Exhibition;
+
+  @Field(() => String, { nullable: true })
+  error?: string;
+}
+
+@ObjectType()
 class PaginatedExhibitions {
   @Field(() => [Exhibition])
   exhibitions: Exhibition[];
@@ -57,6 +66,32 @@ class PaginatedExhibitions {
 
 @Resolver()
 export class ExhibitionResolver {
+  @Query(() => ExhibitionQueryResponse)
+  async exhibition(
+    @Arg('id') id: string,
+    @Ctx() { prisma }: Context,
+  ): Promise<ExhibitionQueryResponse> {
+    const exhibition = await prisma.exhibition.findUnique({
+      where: { uid: id },
+      include: {
+        gallery: {
+          include: {
+            address: true,
+            exhibitions: true,
+            location: true,
+            nearestTubes: { include: { tubeStation: true } },
+            openingHours: { include: { openingHoursRanges: true } },
+          },
+        },
+      },
+    });
+
+    if (!exhibition) {
+      return { error: 'No exhition found with that id' };
+    }
+    return { exhibition: graphqlExhibition(exhibition) };
+  }
+
   @Query(() => PaginatedExhibitions)
   async exhibitions(@Ctx() { prisma }: Context): Promise<PaginatedExhibitions> {
     const exhibitions =
