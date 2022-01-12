@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@commitlint/config-conventional': 16.0.0
-  '@fastify/session': ^6.3.0
+  '@fastify/session': ^6.4.0
   '@prisma/client': ^3.8.0
   '@types/crypto-js': ^4.1.0
   '@types/node': ^17.0.8
@@ -42,7 +42,7 @@ specifiers:
   uvu: ^0.5.3
 
 dependencies:
-  '@fastify/session': 6.3.0
+  '@fastify/session': 6.4.0
   '@prisma/client': 3.8.0_prisma@3.8.0
   apollo-server-core: 3.6.1_graphql@15.6.1
   apollo-server-fastify: 3.6.1_fastify@3.25.3+graphql@15.6.1
@@ -159,8 +159,8 @@ packages:
       ajv: 6.12.6
     dev: false
 
-  /@fastify/session/6.3.0:
-    resolution: {integrity: sha512-uRReopftoFCPWrbyc8/rfTb7uq003jnaFP2sIHBNhcT2Ov5DliUnXd/scacofrx0qeXlwPIzoKq/N190bgUTOQ==}
+  /@fastify/session/6.4.0:
+    resolution: {integrity: sha512-Dr3mOnx5aWdl9xKO5+xcvsz4GK5gVoyNj1aHwIQhQTDEzxFvR4uHoLSE3qKbgTPyXCcV930miU5sv4q5wduz4A==}
     engines: {node: '>= 10.13.0'}
     dependencies:
       cookie-signature: 1.1.0
