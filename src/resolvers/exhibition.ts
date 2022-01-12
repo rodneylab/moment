@@ -87,7 +87,7 @@ export class ExhibitionResolver {
     });
 
     if (!exhibition) {
-      return { error: 'No exhition found with that id' };
+      return { error: 'No exhibition found with that id' };
     }
     return { exhibition: graphqlExhibition(exhibition) };
   }

@@ -333,7 +333,16 @@ export class GalleryResolver {
 
       const errors: FieldError[] = [];
 
-      const { addNearestTubes, name, postalAddress, slug, openStreetMapUrl, website } = input;
+      const {
+        addNearestTubes,
+        name,
+        postalAddress,
+        slug,
+        openStreetMapUrl,
+        removeNearestTubes,
+        website,
+      } = input;
+
       // query existing tube stations
       let tubeStationsNotEmpty: TubeStation[] = [];
       if (addNearestTubes) {
@@ -354,6 +363,35 @@ export class GalleryResolver {
 
       if (errors.length > 0) {
         return { errors };
+      }
+
+      if (removeNearestTubes) {
+        const removeStationPromises = removeNearestTubes.map(async (element) =>
+          prisma.tubeStation.findUnique({ where: { name: element } }),
+        );
+        const removeStations = await Promise.all(removeStationPromises);
+        removeStations.forEach((element, index) => {
+          if (element == null) {
+            errors.push({
+              field: 'tubeStations',
+              message: `${removeNearestTubes[index]} is not yet in database, unable to delete`,
+            });
+          }
+        });
+
+        if (errors.length > 0) {
+          return { errors };
+        }
+
+        const { id: galleryId } = gallery;
+        const removePromises = removeStations.filter(notEmpty).map((element) => {
+          const { id: tubeStationId } = element;
+          return prisma.galleryTubeStations.delete({
+            where: { galleryId_tubeStationId: { galleryId, tubeStationId } },
+          });
+        });
+
+        await Promise.all(removePromises);
       }
 
       const updatedGallery = await prisma.gallery.update({
