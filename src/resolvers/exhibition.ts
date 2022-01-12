@@ -1,7 +1,7 @@
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import type { Context } from '../context';
 import Exhibition from '../entities/Exhibition';
-import { graphqlExhibition, validDate, validName } from '../utilities/exhibition';
+import { graphqlExhibition, sortExhibitions, validDate, validName } from '../utilities/exhibition';
 import FieldError from './FieldError';
 
 @InputType()
@@ -111,7 +111,7 @@ export class ExhibitionResolver {
       })) ?? {};
 
     return {
-      exhibitions: exhibitions.map((element) => graphqlExhibition(element)),
+      exhibitions: sortExhibitions(exhibitions).map((element) => graphqlExhibition(element)),
       hasMore: false,
     };
   }
