@@ -1,7 +1,6 @@
 import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
 import { Exhibition, Gallery, GalleryTubeStations, Location, OpeningHours } from '.prisma/client';
 import { TubeStation } from '@prisma/client';
-// import Exhibition from 'src/entities/Exhibition';
 import GraphQLGallery from '../entities/Gallery';
 import type AddressInput from '../resolvers/AddressInput';
 import type FieldError from '../resolvers/FieldError';
@@ -15,6 +14,11 @@ export type DatabaseGallery = Gallery & {
   address: PostalAddress | null;
   location: Location | null;
   openingHours:
+    | (OpeningHours & {
+        openingHoursRanges: OpeningHoursRange[];
+      })
+    | null;
+  byAppointmentOpeningHours:
     | (OpeningHours & {
         openingHoursRanges: OpeningHoursRange[];
       })
@@ -150,6 +154,7 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
     address,
     location,
     openingHours,
+    byAppointmentOpeningHours,
     nearestTubes,
     website,
   } = gallery;
@@ -161,6 +166,13 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
 
   const graphqlOpeningHours = {
     openingHoursRanges: openingHours?.openingHoursRanges.map((element) => {
+      const { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime } = element;
+      return { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime };
+    }),
+  };
+
+  const graphqlByAppointmentOpeningHours = {
+    openingHoursRanges: byAppointmentOpeningHours?.openingHoursRanges.map((element) => {
       const { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime } = element;
       return { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime };
     }),
@@ -212,7 +224,11 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
     openingTimes: openingHours
       ? openingTimesFromOpeningHours(openingHours?.openingHoursRanges)
       : null,
+    byAppointmentOpeningTimes: byAppointmentOpeningHours
+      ? openingTimesFromOpeningHours(byAppointmentOpeningHours?.openingHoursRanges)
+      : null,
     openingHours: graphqlOpeningHours,
+    byAppointmentOpeningHours: graphqlByAppointmentOpeningHours,
     exhibitions: graphqlExhibitions,
     nearestTubes: graphqlTubeStations,
     tubes: graphqlTubeStations.map((element) => element.name).join(', '),

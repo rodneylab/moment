@@ -112,6 +112,9 @@ class UpdateGalleryInput {
   @Field(() => OpeningHoursInput, { nullable: true })
   replacementOpeningHours?: OpeningHoursInput;
 
+  @Field(() => OpeningHoursInput, { nullable: true })
+  replacementByAppointmentOpeningHours?: OpeningHoursInput;
+
   @Field(() => [String], { nullable: true })
   addNearestTubes: string[];
 
@@ -138,6 +141,7 @@ export class GalleryResolver {
         location: true,
         nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
+        byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
       },
     });
 
@@ -160,6 +164,7 @@ export class GalleryResolver {
         location: true,
         nearestTubes: { include: { tubeStation: true } },
         openingHours: { include: { openingHoursRanges: true } },
+        byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
       },
     });
 
@@ -270,6 +275,7 @@ export class GalleryResolver {
           location: true,
           nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
+          byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
         },
       });
       return { gallery: graphqlGallery(gallery) };
@@ -344,11 +350,15 @@ export class GalleryResolver {
         openStreetMapUrl,
         removeNearestTubes,
         replacementOpeningHours,
+        replacementByAppointmentOpeningHours,
         website,
       } = input;
 
       if (replacementOpeningHours) {
         errors.push(...validOpeningHours(replacementOpeningHours));
+      }
+      if (replacementByAppointmentOpeningHours) {
+        errors.push(...validOpeningHours(replacementByAppointmentOpeningHours));
       }
 
       // query existing tube stations
@@ -377,6 +387,12 @@ export class GalleryResolver {
         const { openingHoursId } = gallery ?? {};
         if (openingHoursId) {
           await prisma.openingHoursRange.deleteMany({ where: { id: openingHoursId } });
+        }
+      }
+      if (replacementByAppointmentOpeningHours) {
+        const { byAppointmentOpeningHoursId } = gallery ?? {};
+        if (byAppointmentOpeningHoursId) {
+          await prisma.openingHoursRange.deleteMany({ where: { id: byAppointmentOpeningHoursId } });
         }
       }
       if (removeNearestTubes) {
@@ -431,6 +447,17 @@ export class GalleryResolver {
                 },
               }
             : {}),
+          ...(replacementByAppointmentOpeningHours
+            ? {
+                byAppointmentOpeningHours: {
+                  create: {
+                    openingHoursRanges: {
+                      createMany: { data: replacementByAppointmentOpeningHours.openingHoursRanges },
+                    },
+                  },
+                },
+              }
+            : {}),
           nearestTubes: {
             /* creating a gallery/station pairing here which is why we use create even though
              * stations exist already
@@ -452,6 +479,7 @@ export class GalleryResolver {
           exhibitions: true,
           nearestTubes: { include: { tubeStation: true } },
           openingHours: { include: { openingHoursRanges: true } },
+          byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
         },
       });
       return { gallery: graphqlGallery(updatedGallery) };

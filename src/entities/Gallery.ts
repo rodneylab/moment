@@ -45,8 +45,14 @@ class Gallery {
   @Field(() => String, { nullable: true })
   openingTimes?: String | null;
 
+  @Field(() => String, { nullable: true })
+  byAppointmentOpeningTimes?: String | null;
+
   @Field(() => OpeningHours, { nullable: true })
   openingHours?: OpeningHours | null;
+
+  @Field(() => OpeningHours, { nullable: true })
+  byAppointmentOpeningHours?: OpeningHours | null;
 
   @Field(() => [Exhibition], { nullable: true })
   exhibitions: Exhibition[];

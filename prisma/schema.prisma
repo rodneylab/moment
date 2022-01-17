@@ -11,23 +11,25 @@ generator client {
 }
 
 model Gallery {
-  id              Int                   @id @default(autoincrement())
-  uid             String                @unique @default(cuid())
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  name            String
-  slug            String                @unique
-  address         PostalAddress?        @relation(fields: [postalAddressId], references: [id])
-  openingHours    OpeningHours?         @relation(fields: [openingHoursId], references: [id])
-  nearestTubes    GalleryTubeStations[]
-  location        Location?             @relation(fields: [locationId], references: [id])
-  postalAddressId Int?
-  website         String?
+  id                        Int                   @id @default(autoincrement())
+  uid                       String                @unique @default(cuid())
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+  name                      String
+  slug                      String                @unique
+  address                   PostalAddress?        @relation(fields: [postalAddressId], references: [id])
+  openingHours              OpeningHours?         @relation(fields: [openingHoursId], references: [id], name: "GalleryOpeningHours")
+  byAppointmentOpeningHours OpeningHours?         @relation(fields: [byAppointmentOpeningHoursId], references: [id], name: "GalleryByAppointmentOpeningHours")
+  nearestTubes              GalleryTubeStations[]
+  location                  Location?             @relation(fields: [locationId], references: [id])
+  postalAddressId           Int?
+  website                   String?
 
-  openingHoursId Int?
-  locationId     Int?
-  Event          Event[]
-  exhibitions    Exhibition[]
+  openingHoursId              Int?
+  byAppointmentOpeningHoursId Int?
+  locationId                  Int?
+  Event                       Event[]
+  exhibitions                 Exhibition[]
 }
 
 model SocialProfiles {
@@ -215,11 +217,12 @@ model PostalAddress {
 }
 
 model OpeningHours {
-  id                 Int                 @id @default(autoincrement())
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  openingHoursRanges OpeningHoursRange[]
-  Gallery            Gallery[]
+  id                   Int                 @id @default(autoincrement())
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  openingHoursRanges   OpeningHoursRange[]
+  Gallery              Gallery[]           @relation("GalleryOpeningHours")
+  byAppointmentGallery Gallery[]           @relation("GalleryByAppointmentOpeningHours")
 }
 
 model OpeningHoursRange {
