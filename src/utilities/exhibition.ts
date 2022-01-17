@@ -44,8 +44,8 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
 export function sortExhibitions(exhibitions: DatabaseExhitibion[]): DatabaseExhitibion[] {
   const today = new Date();
 
-  function started(start: Date) {
-    return start <= today;
+  function upcoming(start: Date) {
+    return start >= today;
   }
 
   return exhibitions.sort((a, b) => {
@@ -55,25 +55,17 @@ export function sortExhibitions(exhibitions: DatabaseExhitibion[]): DatabaseExhi
     if (b?.start == null || b?.end == null) {
       return 1;
     }
+
     const { start: aStart, end: aEnd } = a;
     const { start: bStart, end: bEnd } = b;
-    const aStarted = started(aStart);
-    const bStarted = started(bStart);
 
-    if (aStarted && bStarted) {
-      return bEnd.getTime() !== aEnd.getTime()
-        ? bEnd.getTime() - aEnd.getTime()
-        : bStart.getTime() - aStart.getTime();
-    }
-    if (!aStarted && !bStarted) {
-      return bStart.getTime() !== aStart.getTime()
+    if (upcoming(aStart) || upcoming(bStart)) {
+      return bStart !== aStart
         ? bStart.getTime() - aStart.getTime()
         : bEnd.getTime() - aEnd.getTime();
     }
-    if (aStarted) {
-      return bStart.getTime() - aStart.getTime();
-    }
-    return aStart.getTime() - bStart.getTime();
+
+    return bEnd !== aEnd ? bEnd.getTime() - aEnd.getTime() : bStart.getTime() - aStart.getTime();
   });
 }
 
