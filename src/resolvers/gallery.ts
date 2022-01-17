@@ -383,18 +383,6 @@ export class GalleryResolver {
         return { errors };
       }
 
-      if (replacementOpeningHours) {
-        const { openingHoursId } = gallery ?? {};
-        if (openingHoursId) {
-          await prisma.openingHoursRange.deleteMany({ where: { id: openingHoursId } });
-        }
-      }
-      if (replacementByAppointmentOpeningHours) {
-        const { byAppointmentOpeningHoursId } = gallery ?? {};
-        if (byAppointmentOpeningHoursId) {
-          await prisma.openingHoursRange.deleteMany({ where: { id: byAppointmentOpeningHoursId } });
-        }
-      }
       if (removeNearestTubes) {
         const removeStationPromises = removeNearestTubes.map(async (element) =>
           prisma.tubeStation.findUnique({ where: { name: element } }),
@@ -424,6 +412,26 @@ export class GalleryResolver {
         await Promise.all(removePromises);
       }
 
+      if (replacementOpeningHours) {
+        await prisma.gallery.update({
+          where: { uid },
+          data: {
+            openingHours: {
+              disconnect: true,
+            },
+          },
+        });
+      }
+      if (replacementByAppointmentOpeningHours) {
+        await prisma.gallery.update({
+          where: { uid },
+          data: {
+            byAppointmentOpeningHours: {
+              disconnect: true,
+            },
+          },
+        });
+      }
       const updatedGallery = await prisma.gallery.update({
         where: {
           uid,
