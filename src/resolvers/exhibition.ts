@@ -37,6 +37,18 @@ class CreateExhibitionInput {
   inPerson: boolean;
 }
 
+@InputType()
+class UpdateExhibitionInput {
+  @Field()
+  id: string;
+
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => String)
+  summaryText: string;
+}
+
 @ObjectType()
 class CreateExhibitionResponse {
   @Field(() => Exhibition, { nullable: true })
@@ -195,6 +207,62 @@ export class ExhibitionResolver {
       return { exhibition: graphqlExhibition(exhibition) };
     } catch (error) {
       console.error('Error creating new exhibition');
+      return { errors: [{ field: 'unknown', message: error }] };
+    }
+  }
+
+  @Mutation(() => CreateExhibitionResponse)
+  async updateExhibition(
+    @Arg('input') input: UpdateExhibitionInput,
+    @Ctx() { prisma, request }: Context,
+  ): Promise<CreateExhibitionResponse> {
+    try {
+      const { user } = request.session;
+      if (!user) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+      const { mfaAuthenticated, userId } = user;
+      if (!userId || !mfaAuthenticated) {
+        return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
+      }
+
+      const { id: uid } = input;
+      const exhibition = await prisma.exhibition.findUnique({
+        where: { uid },
+      });
+      if (!exhibition) {
+        return {
+          errors: [{ field: 'id', message: `Wasn't able to find an exhibition with that id` }],
+        };
+      }
+
+      // const errors: FieldError[] = [];
+
+      const { summaryText } = input;
+
+      const updatedExhibition = await prisma.exhibition.update({
+        where: {
+          uid,
+        },
+        data: {
+          ...(summaryText ? { summaryText } : {}),
+        },
+        include: {
+          gallery: {
+            include: {
+              address: true,
+              exhibitions: true,
+              location: true,
+              nearestTubes: { include: { tubeStation: true } },
+              openingHours: { include: { openingHoursRanges: true } },
+              byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
+            },
+          },
+        },
+      });
+      return { exhibition: graphqlExhibition(updatedExhibition) };
+    } catch (error) {
+      console.error('Error updating exhibition');
       return { errors: [{ field: 'unknown', message: error }] };
     }
   }
