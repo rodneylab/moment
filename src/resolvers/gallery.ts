@@ -109,6 +109,9 @@ class UpdateGalleryInput {
   @Field(() => AddressInput, { nullable: true })
   postalAddress: AddressInput;
 
+  @Field(() => OpeningHoursInput, { nullable: true })
+  replacementOpeningHours?: OpeningHoursInput;
+
   @Field(() => [String], { nullable: true })
   addNearestTubes: string[];
 
@@ -340,8 +343,13 @@ export class GalleryResolver {
         slug,
         openStreetMapUrl,
         removeNearestTubes,
+        replacementOpeningHours,
         website,
       } = input;
+
+      if (replacementOpeningHours) {
+        errors.push(...validOpeningHours(replacementOpeningHours));
+      }
 
       // query existing tube stations
       let tubeStationsNotEmpty: TubeStation[] = [];
@@ -365,6 +373,12 @@ export class GalleryResolver {
         return { errors };
       }
 
+      if (replacementOpeningHours) {
+        const { openingHoursId } = gallery ?? {};
+        if (openingHoursId) {
+          await prisma.openingHoursRange.deleteMany({ where: { id: openingHoursId } });
+        }
+      }
       if (removeNearestTubes) {
         const removeStationPromises = removeNearestTubes.map(async (element) =>
           prisma.tubeStation.findUnique({ where: { name: element } }),
@@ -406,6 +420,17 @@ export class GalleryResolver {
               ...postalAddress,
             },
           },
+          ...(replacementOpeningHours
+            ? {
+                openingHours: {
+                  create: {
+                    openingHoursRanges: {
+                      createMany: { data: replacementOpeningHours.openingHoursRanges },
+                    },
+                  },
+                },
+              }
+            : {}),
           nearestTubes: {
             /* creating a gallery/station pairing here which is why we use create even though
              * stations exist already
