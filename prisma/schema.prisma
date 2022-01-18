@@ -47,18 +47,21 @@ model SocialProfiles {
 }
 
 model Photographer {
-  id               Int            @id @default(autoincrement())
-  uid              String         @unique @default(cuid())
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  createdBy        User           @relation(fields: [createdById], references: [id])
-  name             String
+  id               Int             @id @default(autoincrement())
+  uid              String          @unique @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  createdBy        User            @relation(fields: [createdById], references: [id])
+  firstName        String?
+  lastName         String?
+  otherNames       String?
+  slug             String          @unique
   exhibitions      Exhibition[]
   website          String?
-  socialProfiles   SocialProfiles @relation(fields: [socialProfilesId], references: [id])
+  socialProfiles   SocialProfiles? @relation(fields: [socialProfilesId], references: [id])
   createdById      Int
   socialProfilesId Int
-  Event            Event?         @relation(fields: [eventId], references: [id])
+  Event            Event?          @relation(fields: [eventId], references: [id])
   eventId          Int?
 }
 

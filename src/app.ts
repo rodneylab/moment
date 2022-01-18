@@ -15,6 +15,7 @@ import { buildSchema } from 'type-graphql';
 import ExhibitionResolver from './resolvers/Exhibition';
 import GalleryResolver from './resolvers/gallery';
 import HelloResolver from './resolvers/hello';
+import PhotographerResolver from './resolvers/photographer';
 import TubeStationResolver from './resolvers/tubeStation';
 import UserResolver from './resolvers/user';
 import { isProduction } from './utilities/utilities';
@@ -77,6 +78,7 @@ export async function build(opts = {}): Promise<FastifyInstance> {
         ExhibitionResolver,
         GalleryResolver,
         HelloResolver,
+        PhotographerResolver,
         TubeStationResolver,
         UserResolver,
       ],

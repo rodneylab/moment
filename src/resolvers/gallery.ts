@@ -10,9 +10,8 @@ import {
   validOpeningHours,
   validOpenMapUrl,
   validPostalAddress,
-  validUrl,
 } from '../utilities/gallery';
-import { validSlug } from '../utilities/utilities';
+import { validSlug, validUrl } from '../utilities/utilities';
 import AddressInput from './AddressInput';
 import FieldError from './FieldError';
 

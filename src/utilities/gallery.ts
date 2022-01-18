@@ -46,7 +46,7 @@ export function openingTimesFromOpeningHours(openingHoursRanges: OpeningHoursRan
 
 export function validName(name: string, fieldName: string): FieldError[] {
   const result: FieldError[] = [];
-  if (/[\0\n\f\v\n\r\t]/.test(name)) {
+  if (/[\0\n\f\v\r\t]/.test(name)) {
     result.push({ field: fieldName, message: `${fieldName} contains invalid characters` });
   }
   return result;
@@ -258,14 +258,4 @@ export function validPostalAddress(address: AddressInput) {
 
   errors.push(...validName(country, 'Country'));
   return errors;
-}
-
-export function validUrl(url: string, field: string) {
-  const result: FieldError[] = [];
-  const urlRegex =
-    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,7}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-  if (!urlRegex.test(url)) {
-    result.push({ field, message: 'Check this is a valid url' });
-  }
-  return result;
 }
