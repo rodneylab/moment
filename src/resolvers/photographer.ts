@@ -44,7 +44,7 @@ class PhotographerQueryResponse {
 @ObjectType()
 class PaginatedPhotographers {
   @Field(() => [Photographer])
-  exhibitions: Photographer[];
+  photographers: Photographer[];
 
   @Field()
   hasMore: boolean;
@@ -65,7 +65,7 @@ export class PhotographerResolver {
     });
 
     if (!photographer) {
-      return { error: 'No photographer found with that id' };
+      return { error: 'No photographer found with that slug' };
     }
     return { photographer: graphqlPhotographer(photographer) };
   }
@@ -81,13 +81,15 @@ export class PhotographerResolver {
       })) ?? {};
 
     return {
-      exhibitions: sortPhotographers(photographers).map((element) => graphqlPhotographer(element)),
+      photographers: sortPhotographers(photographers).map((element) =>
+        graphqlPhotographer(element),
+      ),
       hasMore: false,
     };
   }
 
   @Mutation(() => CreatePhotographerResponse)
-  async createGallery(
+  async createPhotographer(
     @Arg('input') input: CreatePhotographerInput,
     @Ctx() { prisma, request }: Context,
   ): Promise<CreatePhotographerResponse> {

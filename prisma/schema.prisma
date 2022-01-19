@@ -60,7 +60,7 @@ model Photographer {
   website          String?
   socialProfiles   SocialProfiles? @relation(fields: [socialProfilesId], references: [id])
   createdById      Int
-  socialProfilesId Int
+  socialProfilesId Int?
   Event            Event?          @relation(fields: [eventId], references: [id])
   eventId          Int?
 }

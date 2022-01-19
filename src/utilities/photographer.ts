@@ -17,8 +17,8 @@ export function getFullName({
 }): string {
   return [
     ...(firstName ? [firstName] : []),
-    otherNames ? [otherNames] : [],
-    lastName ? [lastName] : [],
+    ...(otherNames ? [otherNames] : []),
+    ...(lastName ? [lastName] : []),
   ].join(' ');
 }
 
@@ -78,42 +78,35 @@ export function graphqlPhotographer(photographer: DatabasePhotographer): GraphQL
 
 export function sortPhotographers(photographers: DatabasePhotographer[]): DatabasePhotographer[] {
   return photographers.sort((a, b) => {
-    const aPrimaryComperand =
+    const aPrimaryComparand =
       a.lastName ??
       [...(a.firstName ? [a.firstName] : []), a.otherNames ? [a.otherNames] : []].join(' ');
-    const bPrimaryComperand =
+    const bPrimaryComparand =
       b.lastName ??
       [...(b.firstName ? [b.firstName] : []), b.otherNames ? [b.otherNames] : []].join(' ');
 
-    if (aPrimaryComperand < bPrimaryComperand) {
+    if (aPrimaryComparand < bPrimaryComparand) {
       return -1;
     }
-    if (aPrimaryComperand > bPrimaryComperand) {
+    if (aPrimaryComparand > bPrimaryComparand) {
       return 1;
     }
     // primary comperands are equivalent
-    const aSecondaryComperand = a.lastName
+    const aSecondaryComparand = a.lastName
       ? [...(a.firstName ? [a.firstName] : []), a.otherNames ? [a.otherNames] : []].join(' ')
       : null;
 
-    const bSecondaryComperand = b.lastName
+    const bSecondaryComparand = b.lastName
       ? [...(b.firstName ? [b.firstName] : []), b.otherNames ? [b.otherNames] : []].join(' ')
       : null;
 
-    if (aSecondaryComperand && bSecondaryComperand) {
-      if (aSecondaryComperand < bSecondaryComperand) {
-        return -1;
-      }
-      if (aSecondaryComperand > bSecondaryComperand) {
-        return 1;
-      }
-      // primary and secondary conperands equivalent
-      return 0;
+    if (aSecondaryComparand && bSecondaryComparand) {
+      return aSecondaryComparand.localeCompare(bSecondaryComparand);
     }
-    if (!aSecondaryComperand && bSecondaryComperand) {
+    if (!aSecondaryComparand && bSecondaryComparand) {
       return -1;
     }
-    if (aSecondaryComperand && !bSecondaryComperand) {
+    if (aSecondaryComparand && !bSecondaryComparand) {
       return 1;
     }
     // neither a nor b has a secondary comperand
