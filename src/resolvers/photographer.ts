@@ -23,6 +23,27 @@ class CreatePhotographerInput {
   website: string;
 }
 
+// @InputType()
+// class UpdatePhotographerInput {
+//   @Field()
+//   id: string;
+
+//   @Field({ nullable: true })
+//   firstName?: string;
+
+//   @Field({ nullable: true })
+//   otherNames?: string;
+
+//   @Field({ nullable: true })
+//   lastName?: string;
+
+//   @Field(() => String)
+//   slug?: string;
+
+//   @Field({ nullable: true })
+//   website?: string;
+// }
+
 @ObjectType()
 class CreatePhotographerResponse {
   @Field(() => Photographer, { nullable: true })
@@ -128,7 +149,7 @@ export class PhotographerResolver {
       }
       errors.push(...validFullName({ firstName, otherNames, lastName }));
       errors.push(...validSlug(slug, 'slug'));
-      errors.push(...validUrl(website, 'website'));
+      website && errors.push(...validUrl(website, 'website'));
 
       if (errors.length > 0) {
         return { errors };

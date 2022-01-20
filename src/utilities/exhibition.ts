@@ -2,9 +2,11 @@ import { Exhibition } from '@prisma/client';
 import type FieldError from 'src/resolvers/FieldError';
 import GraphQLExhibition from '../entities/Exhibition';
 import { DatabaseGallery, graphqlGallery } from './gallery';
+import { DatabasePhotographer, graphqlPhotographer } from './photographer';
 
 type DatabaseExhitibion = Exhibition & {
   gallery: DatabaseGallery;
+  photographers: DatabasePhotographer[];
 };
 
 export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibition {
@@ -22,6 +24,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     online,
     inPerson,
     gallery,
+    photographers,
   } = exhibition;
 
   return {
@@ -38,6 +41,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     online,
     inPerson,
     gallery: graphqlGallery(gallery),
+    photographers: photographers.map((element) => graphqlPhotographer(element)),
   };
 }
 

@@ -11,13 +11,9 @@ import {
   validOpenMapUrl,
   validPostalAddress,
 } from '../utilities/gallery';
-import { validSlug, validUrl } from '../utilities/utilities';
+import { notEmpty, validSlug, validUrl } from '../utilities/utilities';
 import AddressInput from './AddressInput';
 import FieldError from './FieldError';
-
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined;
-}
 
 @InputType()
 class OpeningHoursRangeInput {

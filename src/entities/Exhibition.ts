@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import Gallery from './Gallery';
+import Photographer from './Photographer';
 
 @ObjectType()
 class Exhibition {
@@ -14,6 +15,9 @@ class Exhibition {
 
   @Field()
   name!: string;
+
+  @Field(() => [Photographer], { nullable: true })
+  photographers?: Photographer[];
 
   @Field(() => String, { nullable: true })
   description?: string | null;

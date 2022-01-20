@@ -2,6 +2,10 @@ import FieldError from 'src/resolvers/FieldError';
 
 export const isProduction = process.env.NODE_ENV === 'production';
 
+export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined;
+}
+
 export function validSlug(slug: string, field: string = 'slug') {
   const errors: FieldError[] = [];
   const slugRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/;

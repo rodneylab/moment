@@ -1,7 +1,9 @@
+import { Photographer } from '@prisma/client';
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import type { Context } from '../context';
 import Exhibition from '../entities/Exhibition';
 import { graphqlExhibition, sortExhibitions, validDate, validName } from '../utilities/exhibition';
+import { notEmpty } from '../utilities/utilities';
 import FieldError from './FieldError';
 
 @InputType()
@@ -45,8 +47,14 @@ class UpdateExhibitionInput {
   @Field(() => String, { nullable: true })
   name?: string;
 
-  @Field(() => String)
-  summaryText: string;
+  @Field(() => [String], { nullable: true })
+  addPhotographers: string[];
+
+  @Field(() => [String], { nullable: true })
+  removePhotographers: string[];
+
+  @Field(() => String, { nullable: true })
+  summaryText?: string;
 }
 
 @ObjectType()
@@ -96,6 +104,7 @@ export class ExhibitionResolver {
             byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
           },
         },
+        photographers: { include: { exhibitions: true } },
       },
     });
 
@@ -121,6 +130,7 @@ export class ExhibitionResolver {
               byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
             },
           },
+          photographers: { include: { exhibitions: true } },
         },
       })) ?? {};
 
@@ -202,6 +212,7 @@ export class ExhibitionResolver {
               byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
             },
           },
+          photographers: { include: { exhibitions: true } },
         },
       });
       return { exhibition: graphqlExhibition(exhibition) };
@@ -226,9 +237,10 @@ export class ExhibitionResolver {
         return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
       }
 
-      const { id: uid } = input;
+      const { id: uid, addPhotographers, removePhotographers } = input;
       const exhibition = await prisma.exhibition.findUnique({
         where: { uid },
+        include: { photographers: true },
       });
       if (!exhibition) {
         return {
@@ -236,7 +248,63 @@ export class ExhibitionResolver {
         };
       }
 
-      // const errors: FieldError[] = [];
+      const errors: FieldError[] = [];
+
+      // query existing photographers
+      let addPhotographersNotEmpty: Photographer[] = [];
+      if (addPhotographers) {
+        const promises = addPhotographers.map((element) =>
+          prisma.photographer.findUnique({ where: { slug: element } }),
+        );
+        const photographers = await Promise.all(promises);
+        addPhotographersNotEmpty = photographers.filter(notEmpty);
+        addPhotographersNotEmpty.forEach((element, index) => {
+          if (element == null) {
+            errors.push({
+              field: 'addPhotographers',
+              message: `${addPhotographers[index]} is not yet in database, add it first`,
+            });
+          }
+        });
+
+        if (errors.length > 0) {
+          return { errors };
+        }
+
+        addPhotographersNotEmpty.forEach((element, index) => {
+          if (
+            exhibition.photographers.find(
+              (exhibitionPhotographerElement) => element.id === exhibitionPhotographerElement.id,
+            )
+          ) {
+            errors.push({
+              field: 'addPhotographers',
+              message: `${addPhotographers[index]} is already on ${exhibition.name} photographers list`,
+            });
+          }
+        });
+      }
+
+      let removePhotographersNotEmpty: Photographer[] = [];
+      if (removePhotographers) {
+        const promises = removePhotographers.map((element) =>
+          prisma.photographer.findUnique({ where: { slug: element } }),
+        );
+        const photographers = await Promise.all(promises);
+        removePhotographersNotEmpty = photographers.filter(notEmpty);
+        removePhotographersNotEmpty.forEach((element, index) => {
+          if (
+            !exhibition.photographers.find(
+              (exhibitionPhotographerElement) => element.id === exhibitionPhotographerElement.id,
+            )
+          ) {
+            errors.push({
+              field: 'addPhotographers',
+              message: `${addPhotographers[index]} is not on ${exhibition.name} photographers list`,
+            });
+          }
+        });
+      }
 
       const { summaryText } = input;
 
@@ -246,6 +314,26 @@ export class ExhibitionResolver {
         },
         data: {
           ...(summaryText ? { summaryText } : {}),
+          ...(addPhotographersNotEmpty || removePhotographersNotEmpty
+            ? {
+                photographers: {
+                  ...(addPhotographersNotEmpty
+                    ? {
+                        connect: addPhotographersNotEmpty.map((element) => ({
+                          id: element.id,
+                        })),
+                      }
+                    : {}),
+                  ...(removePhotographersNotEmpty
+                    ? {
+                        disconnect: removePhotographersNotEmpty.map((element) => ({
+                          id: element.id,
+                        })),
+                      }
+                    : {}),
+                },
+              }
+            : {}),
         },
         include: {
           gallery: {
@@ -258,6 +346,7 @@ export class ExhibitionResolver {
               byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
             },
           },
+          photographers: { include: { exhibitions: true } },
         },
       });
       return { exhibition: graphqlExhibition(updatedExhibition) };
