@@ -25,6 +25,12 @@ class Exhibition {
   @Field(() => String, { nullable: true })
   summaryText?: string | null;
 
+  @Field(() => String, { nullable: true })
+  bodyText?: string | null;
+
+  @Field(() => String, { nullable: true })
+  url?: string | null;
+
   @Field(() => [String], { nullable: true })
   hashtags: string[];
 

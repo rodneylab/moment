@@ -3,7 +3,7 @@ import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } fro
 import type { Context } from '../context';
 import Exhibition from '../entities/Exhibition';
 import { graphqlExhibition, sortExhibitions, validDate, validName } from '../utilities/exhibition';
-import { notEmpty } from '../utilities/utilities';
+import { notEmpty, validUrl } from '../utilities/utilities';
 import FieldError from './FieldError';
 
 @InputType()
@@ -16,6 +16,12 @@ class CreateExhibitionInput {
 
   @Field(() => String)
   summaryText: string;
+
+  @Field(() => String)
+  bodyText: string;
+
+  @Field(() => String)
+  url: string;
 
   @Field(() => [String], { nullable: true })
   hashtags: string[];
@@ -55,6 +61,12 @@ class UpdateExhibitionInput {
 
   @Field(() => String, { nullable: true })
   summaryText?: string;
+
+  @Field(() => String, { nullable: true })
+  bodyText?: string;
+
+  @Field(() => String, { nullable: true })
+  url?: string;
 }
 
 @ObjectType()
@@ -157,6 +169,7 @@ export class ExhibitionResolver {
       }
       const {
         name,
+        bodyText,
         description,
         end,
         freeEntry,
@@ -166,6 +179,7 @@ export class ExhibitionResolver {
         online,
         start,
         summaryText,
+        url,
       } = input;
 
       const errors: FieldError[] = [];
@@ -181,6 +195,7 @@ export class ExhibitionResolver {
       errors.push(...validName(name, 'name'));
       errors.push(...validDate(start, 'startDate'));
       errors.push(...validDate(end, 'endDate'));
+      url && errors.push(...validUrl(url, 'url'));
 
       if (errors.length > 0) {
         return { errors };
@@ -191,6 +206,7 @@ export class ExhibitionResolver {
         data: {
           createdBy: { connect: { uid: userId } },
           name,
+          ...(bodyText ? { bodyText } : {}),
           description,
           summaryText,
           hashtags,
@@ -200,6 +216,7 @@ export class ExhibitionResolver {
           freeEntry,
           online,
           inPerson,
+          ...(url ? { url } : {}),
         },
         include: {
           gallery: {
@@ -237,7 +254,7 @@ export class ExhibitionResolver {
         return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
       }
 
-      const { id: uid, addPhotographers, removePhotographers } = input;
+      const { id: uid, addPhotographers, removePhotographers, url } = input;
       const exhibition = await prisma.exhibition.findUnique({
         where: { uid },
         include: { photographers: true },
@@ -249,6 +266,7 @@ export class ExhibitionResolver {
       }
 
       const errors: FieldError[] = [];
+      url && errors.push(...validUrl(url, 'url'));
 
       // query existing photographers
       let addPhotographersNotEmpty: Photographer[] = [];
@@ -306,14 +324,16 @@ export class ExhibitionResolver {
         });
       }
 
-      const { summaryText } = input;
+      const { bodyText, summaryText } = input;
 
       const updatedExhibition = await prisma.exhibition.update({
         where: {
           uid,
         },
         data: {
+          ...(bodyText ? { bodyText } : {}),
           ...(summaryText ? { summaryText } : {}),
+          ...(url ? { url } : {}),
           ...(addPhotographersNotEmpty || removePhotographersNotEmpty
             ? {
                 photographers: {

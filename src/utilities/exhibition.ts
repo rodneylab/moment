@@ -15,6 +15,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     createdAt,
     updatedAt,
     name,
+    bodyText,
     description,
     summaryText,
     hashtags,
@@ -25,6 +26,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     inPerson,
     gallery,
     photographers,
+    url,
   } = exhibition;
 
   return {
@@ -32,6 +34,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     createdAt,
     updatedAt,
     name,
+    bodyText,
     description: description,
     summaryText: summaryText,
     hashtags,
@@ -42,6 +45,7 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
     inPerson,
     gallery: graphqlGallery(gallery),
     photographers: photographers.map((element) => graphqlPhotographer(element)),
+    url,
   };
 }
 
