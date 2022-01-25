@@ -17,11 +17,11 @@ class CreateExhibitionInput {
   @Field(() => String)
   summaryText: string;
 
-  @Field(() => String)
-  bodyText: string;
+  @Field(() => String, { nullable: true })
+  bodyText?: string;
 
-  @Field(() => String)
-  url: string;
+  @Field(() => String, { nullable: true })
+  url?: string;
 
   @Field(() => [String], { nullable: true })
   hashtags: string[];
