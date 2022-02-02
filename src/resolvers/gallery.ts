@@ -205,7 +205,7 @@ export class GalleryResolver {
         errors.push(...validOpeningHours(openingHours));
       }
       errors.push(...validSlug(slug, 'slug'));
-      errors.push(...validPostalAddress(postalAddress));
+      postalAddress && errors.push(...validPostalAddress(postalAddress));
       openStreetMapUrl && errors.push(...validOpenMapUrl(openStreetMapUrl));
       errors.push(...validUrl(website, 'website'));
 
