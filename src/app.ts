@@ -6,7 +6,6 @@ import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import 'dotenv/config';
 import Fastify, { FastifyInstance } from 'fastify';
 import fastifyCookie from 'fastify-cookie';
-// import { Server, IncomingMessage, ServerResponse  } from 'http';
 // import fastifyCors from 'fastify-cors';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyRedis from 'fastify-redis';
@@ -61,7 +60,7 @@ export async function build(opts = {}): Promise<FastifyInstance> {
     secret: process.env.SESSION_SECRET as string,
     cookie: {
       secure: isProduction,
-      sameSite: 'Lax',
+      sameSite: 'lax',
       maxAge: 1_800_000,
       domain: isProduction ? `.${process.env.DOMAIN}` : undefined,
     },
@@ -104,7 +103,5 @@ export async function build(opts = {}): Promise<FastifyInstance> {
 
   return server;
 }
-
-// startApolloServer();
 
 export { build as default };
