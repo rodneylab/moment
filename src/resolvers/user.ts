@@ -496,7 +496,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   logout(@Ctx() { request }: Context) {
     if (request.session.user.userId) {
-      request.destroySession((error) => {
+      request.session.destroy((error) => {
         if (error) {
           console.error(`Error destroying session in logout mutation: ${error}`);
           return false;
