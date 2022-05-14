@@ -1,14 +1,13 @@
 import { PrismaClient } from '.prisma/client';
+import fastifyCookie from '@fastify/cookie';
+import fastifyPostgres from '@fastify/postgres';
+import fastifyRedis from '@fastify/redis';
 import fastifySession from '@fastify/session';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import 'dotenv/config';
 import Fastify, { FastifyInstance } from 'fastify';
-import fastifyCookie from 'fastify-cookie';
-// import fastifyCors from 'fastify-cors';
-import fastifyPostgres from 'fastify-postgres';
-import fastifyRedis from 'fastify-redis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import ExhibitionResolver from './resolvers/Exhibition';
