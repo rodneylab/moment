@@ -33,76 +33,24 @@ export async function duoPing() {
   }
 }
 
-export async function duoAuth({ device, duoUserId }: { device: string; duoUserId: string }) {
-  try {
-    const date = new Date().toUTCString();
-    const path = '/auth/v2/auth';
-    const method = 'POST';
-    const params = new URLSearchParams({
-      user_id: duoUserId,
-      factor: 'push',
-      device,
-      // type: 'Moment Login',
-      async: '1',
-    });
-    const authorisationToken = duoAuthorisationToken({
-      date,
-      method,
-      path,
-      params: params.toString(),
-    });
-    const response = await axios.request<{
-      stat: string;
-      response: {
-        result: string;
-        status: string;
-        status_msg: number;
-        txid: string;
-      };
-    }>({
-      url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
-      params,
-      // paramsSerializer: (params) => params.toString(),
-      method,
-      headers: {
-        Authorization: `Basic ${authorisationToken}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Date: date,
-      },
-    });
-    const { data, status } = response;
-    const { stat, response: duoResponse } = data;
-    const { result, status: duoStatus, status_msg: statusMessage, txid } = duoResponse ?? {};
-
-    if (txid) {
-      let result;
-      await setTimeout(() => {
-        result = duoAuthStatus(txid);
-      }, 10_000);
-      if (result) {
-        return result;
-      }
-    }
-
-    if (status === 200 && stat === 'OK' && result === 'allow') {
-      return { allow: true };
-    }
-    const message = `${result}, ${duoStatus}, ${statusMessage}`;
-    return { allow: false, message };
-  } catch (error) {
-    let message;
-    if (error.response) {
-      message = `Error in duoAuth server responded with non 2xx code: ${{
-        ...error.response.data,
-      }}`;
-    } else if (error.request) {
-      message = `Error in duoAuth no response received: ${error.request}`;
-    } else {
-      message = `Error in duoAuth error setting up storage response: ${error.message}`;
-    }
-    console.error(message);
-    return { error: message };
-  }
+export function duoAuthorisationToken({
+  date,
+  method,
+  path,
+  params,
+}: {
+  date: string;
+  method: string;
+  path: string;
+  params: string;
+}) {
+  const host = process.env.DUO_API_HOSTNAME as string;
+  const clientId = process.env.DUO_CLIENT_ID as string;
+  const clientSecret = process.env.DUO_CLIENT_SECRET as string;
+  const signature = [date, method, host, path, params].join('\n');
+  const hmacDigest = hmacSHA1(signature, clientSecret);
+  const authorisationToken = Buffer.from(`${clientId}:${hmacDigest}`, 'utf-8').toString('base64');
+  return authorisationToken;
 }
 
 export async function duoAuthStatus(transactionId: string) {
@@ -153,24 +101,76 @@ export async function duoAuthStatus(transactionId: string) {
   }
 }
 
-export function duoAuthorisationToken({
-  date,
-  method,
-  path,
-  params,
-}: {
-  date: string;
-  method: string;
-  path: string;
-  params: string;
-}) {
-  const host = process.env.DUO_API_HOSTNAME as string;
-  const clientId = process.env.DUO_CLIENT_ID as string;
-  const clientSecret = process.env.DUO_CLIENT_SECRET as string;
-  const signature = [date, method, host, path, params].join('\n');
-  const hmacDigest = hmacSHA1(signature, clientSecret);
-  const authorisationToken = Buffer.from(`${clientId}:${hmacDigest}`, 'utf-8').toString('base64');
-  return authorisationToken;
+export async function duoAuth({ device, duoUserId }: { device: string; duoUserId: string }) {
+  try {
+    const date = new Date().toUTCString();
+    const path = '/auth/v2/auth';
+    const method = 'POST';
+    const params = new URLSearchParams({
+      user_id: duoUserId,
+      factor: 'push',
+      device,
+      // type: 'Moment Login',
+      async: '1',
+    });
+    const authorisationToken = duoAuthorisationToken({
+      date,
+      method,
+      path,
+      params: params.toString(),
+    });
+    const response = await axios.request<{
+      stat: string;
+      response: {
+        result: string;
+        status: string;
+        status_msg: number;
+        txid: string;
+      };
+    }>({
+      url: `https://${process.env.DUO_API_HOSTNAME}${path}`,
+      params,
+      // paramsSerializer: (params) => params.toString(),
+      method,
+      headers: {
+        Authorization: `Basic ${authorisationToken}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Date: date,
+      },
+    });
+    const { data, status } = response;
+    const { stat, response: duoResponse } = data;
+    const { result, status: duoStatus, status_msg: statusMessage, txid } = duoResponse ?? {};
+
+    if (txid) {
+      let txidResult;
+      await setTimeout(() => {
+        txidResult = duoAuthStatus(txid);
+      }, 10_000);
+      if (txidResult) {
+        return txidResult;
+      }
+    }
+
+    if (status === 200 && stat === 'OK' && result === 'allow') {
+      return { allow: true };
+    }
+    const message = `${result}, ${duoStatus}, ${statusMessage}`;
+    return { allow: false, message };
+  } catch (error) {
+    let message;
+    if (error.response) {
+      message = `Error in duoAuth server responded with non 2xx code: ${{
+        ...error.response.data,
+      }}`;
+    } else if (error.request) {
+      message = `Error in duoAuth no response received: ${error.request}`;
+    } else {
+      message = `Error in duoAuth error setting up storage response: ${error.message}`;
+    }
+    console.error(message);
+    return { error: message };
+  }
 }
 
 export async function duoCheck() {
@@ -388,7 +388,7 @@ export function validateRegister(registerInput: UsernameEmailPasswordInput) {
   const usernameLength = username.trim().length;
 
   const emailRegex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   if (!emailRegex.test(email.trim())) {
     result.push({ field: 'email', message: 'Check the email address' });
@@ -417,13 +417,13 @@ export function validateRegister(registerInput: UsernameEmailPasswordInput) {
       !/[a-z]+/.test(password) ||
       !/[A-Z]+/.test(password) ||
       !/\d+/.test(password) ||
-      !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password)
+      !/[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+/.test(password)
     ) {
       result.push({ field: 'password', message: 'Password should be a little more complex' });
     }
   } else if (
     (!/[a-z]+/.test(password) && !/[A-Z]+/.test(password)) ||
-    (!/\d+/.test(password) && !/[ !"#$%&'()*+,\-\./:;<=>?@[\\\]\^_`{|}~]+/.test(password))
+    (!/\d+/.test(password) && !/[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+/.test(password))
   ) {
     result.push({ field: 'password', message: 'Password should be a little more complex' });
   }

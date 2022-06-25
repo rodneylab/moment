@@ -43,10 +43,10 @@ class Gallery {
   openStreetMap?: string | null;
 
   @Field(() => String, { nullable: true })
-  openingTimes?: String | null;
+  openingTimes?: string | null;
 
   @Field(() => String, { nullable: true })
-  byAppointmentOpeningTimes?: String | null;
+  byAppointmentOpeningTimes?: string | null;
 
   @Field(() => OpeningHours, { nullable: true })
   openingHours?: OpeningHours | null;
@@ -61,7 +61,7 @@ class Gallery {
   nearestTubes?: TubeStation[];
 
   @Field(() => String, { nullable: true })
-  tubes?: String;
+  tubes?: string;
 
   @Field(() => String, { nullable: true })
   googleMap?: string | null;

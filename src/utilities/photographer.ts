@@ -1,4 +1,4 @@
-import { Exhibition, Photographer } from '.prisma/client';
+import { Exhibition, Photographer } from '@prisma/client';
 import FieldError from 'src/resolvers/FieldError';
 import GraphQLPhotographer from '../entities/Photographer';
 
@@ -29,8 +29,8 @@ export function graphqlPhotographer(photographer: DatabasePhotographer): GraphQL
   const graphqlExhibitions = exhibitions.map((element) => {
     const {
       uid: id,
-      createdAt,
-      updatedAt,
+      createdAt: exhibitionCreatedAt,
+      updatedAt: exhibitionUpdatedAt,
       name,
       description,
       summaryText,
@@ -43,8 +43,8 @@ export function graphqlPhotographer(photographer: DatabasePhotographer): GraphQL
     } = element;
     return {
       id,
-      createdAt,
-      updatedAt,
+      createdAt: exhibitionCreatedAt,
+      updatedAt: exhibitionUpdatedAt,
       name,
       description,
       summaryText,

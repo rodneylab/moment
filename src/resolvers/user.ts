@@ -11,7 +11,7 @@ import {
   Resolver,
   Root,
 } from 'type-graphql';
-// @ts-ignore
+import type { Request } from 'u2f';
 import { checkRegistration, checkSignature, request as fidoU2fRequest } from 'u2f';
 import { Context } from '../context';
 import User from '../entities/User';
@@ -25,8 +25,8 @@ import {
   graphqlUser,
   validateRegister,
 } from '../utilities/user';
+import { notEmpty } from '../utilities/utilities';
 import FidoU2fRegisterRequest from './FidoU2fRegisterRequest';
-import FidoU2fSignRequest from './FidoU2fSignRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
@@ -59,7 +59,7 @@ class DuoEnrollResponse {
   activationCode?: string;
 
   @Field(() => String, { nullable: true })
-  error?: String;
+  error?: string;
 }
 
 @ObjectType()
@@ -68,7 +68,7 @@ class DuoEnrollStatusResponse {
   result?: string;
 
   @Field(() => String, { nullable: true })
-  error?: String;
+  error?: string;
 }
 
 @ObjectType()
@@ -80,7 +80,7 @@ class DuoAuthDevice {
   device: string;
 
   @Field(() => String)
-  type: String;
+  type: string;
 }
 
 @ObjectType()
@@ -92,7 +92,7 @@ class DuoPreauthResponse {
   devices?: DuoAuthDevice[];
 
   @Field(() => String, { nullable: true })
-  error?: String;
+  error?: string;
 }
 
 @InputType()
@@ -104,7 +104,7 @@ class FidoU2fRegistrationDataInput {
   registrationData: string;
 
   @Field(() => String)
-  version: String;
+  version: string;
 }
 
 @InputType()
@@ -133,8 +133,8 @@ class FidoU2fAuthenticateRequest {
   @Field(() => [String], { nullable: true })
   labels?: string[];
 
-  @Field(() => [FidoU2fSignRequest], { nullable: true })
-  signRequests?: FidoU2fSignRequest[];
+  @Field(() => [Request], { nullable: true })
+  signRequests?: Request[];
 
   @Field({ nullable: true })
   error?: string;
@@ -236,16 +236,15 @@ export class UserResolver {
       }
 
       const labels: string[] = [];
-      const signRequests: FidoU2fSignRequest[] = [];
+      const signRequests: Request[] = [];
       fidoU2fKeys?.forEach((element) => {
         labels.push(element.label === '' ? 'no name' : element.label);
         signRequests.push(fidoU2fRequest('https://localhost:4000', element.keyHandle));
       });
       request.session.user.fidoU2f = { signRequests };
-
       return {
         labels,
-        signRequests,
+        signRequests: signRequests.filter(notEmpty),
       };
     } catch (error) {
       console.error(`Error in fidoU2fBeginAuthenticate query: ${error}`);
@@ -288,7 +287,7 @@ export class UserResolver {
   async duoAuth(
     @Arg('device') device: string,
     @Ctx() { prisma, request }: Context,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     try {
       const { userId } = request.session.user;
       if (!userId) {
@@ -380,8 +379,10 @@ export class UserResolver {
         return false;
       }
       const { publicKey } = fidoU2fKey;
-      const { successful } = checkSignature(signRequest, signData, publicKey);
-      if (successful) {
+      // const { successful } = checkSignature(signRequest, signData, publicKey);
+      const checkSignatureResult = checkSignature(signRequest, signData, publicKey);
+
+      if ('successful' in checkSignatureResult) {
         request.session.user.mfaAuthenticated = true;
         return true;
       }
@@ -404,9 +405,11 @@ export class UserResolver {
       }
 
       const { registerData, label } = input;
-      const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
+      // const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
+      const checkRegistrationResult = checkRegistration(registerRequests[0], registerData);
 
-      if (keyHandle && publicKey) {
+      if ('keyHandle' in checkRegistrationResult) {
+        const { keyHandle, publicKey } = checkRegistrationResult;
         const { userId: uid } = request.session.user;
         const { id } = (await prisma.user.findUnique({ where: { uid } })) ?? {};
         await prisma.fidoU2FKey.create({ data: { keyHandle, publicKey, label, userId: id } });
@@ -436,9 +439,11 @@ export class UserResolver {
       if (label === '') {
         return false;
       }
-      const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
+      // const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData) ?? {};
+      const checkRegistrationResult = checkRegistration(registerRequests[0], registerData);
 
-      if (keyHandle && publicKey) {
+      if ('keyHandle' in checkRegistrationResult) {
+        const { keyHandle, publicKey } = checkRegistrationResult;
         const { userId: uid } = request.session.user;
         const { id } = (await prisma.user.findUnique({ where: { uid } })) ?? {};
         await prisma.fidoU2FKey.create({ data: { keyHandle, publicKey, label, userId: id } });

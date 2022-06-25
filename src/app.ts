@@ -1,8 +1,8 @@
-import { PrismaClient } from '.prisma/client';
 import fastifyCookie from '@fastify/cookie';
 import fastifyPostgres from '@fastify/postgres';
 import fastifyRedis from '@fastify/redis';
 import fastifySession from '@fastify/session';
+import { PrismaClient } from '@prisma/client';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
@@ -10,7 +10,7 @@ import 'dotenv/config';
 import Fastify, { FastifyInstance } from 'fastify';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
-import ExhibitionResolver from './resolvers/Exhibition';
+import ExhibitionResolver from './resolvers/exhibition';
 import GalleryResolver from './resolvers/gallery';
 import HelloResolver from './resolvers/hello';
 import PhotographerResolver from './resolvers/photographer';

@@ -1,4 +1,4 @@
-import { TubeStation } from '.prisma/client';
+import { TubeStation } from '@prisma/client';
 import FieldError from 'src/resolvers/FieldError';
 
 export function graphqlTubeStation(tubeStation: TubeStation) {

@@ -19,7 +19,7 @@ process.env.DUO_CLIENT_ID = 'DIWJ8X6AEYOR5OMC6TQ1';
 process.env.DUO_CLIENT_SECRET = 'Zh5eGmUq9zpfQnyUIu5OL9iWoMMv5ZNmk3zLJ4Ep';
 
 test.before.each((meta) => {
-  console.log(meta['__test__']);
+  console.log(meta.__test__);
 });
 
 test('it generates expected duo authorisation token', () => {

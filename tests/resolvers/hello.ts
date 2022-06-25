@@ -10,7 +10,7 @@ test.before(async () => {
 });
 
 test.before.each((meta) => {
-  console.log(meta['__test__']);
+  console.log(meta.__test__);
 });
 
 test.after(async () => {

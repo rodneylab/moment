@@ -1,4 +1,5 @@
 {
+  "ts-node": { "transpileOnly": true, "files": true },
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
@@ -23,6 +24,6 @@
     "resolveJsonModule": true,
     "baseUrl": "."
   },
-  "exclude": ["node_modules"],
-  "include": ["./src/**/*.ts"]
+  "exclude": ["node_modules", "./.eslintrc.cjs"],
+  "include": ["./src/**/*.ts", "./tests/**/*.ts"]
 }

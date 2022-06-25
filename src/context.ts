@@ -1,8 +1,7 @@
 import type { PrismaClient } from '.prisma/client';
 import type * as Fastify from 'fastify';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import type FidoU2FRegisterRequest from './resolvers/FidoU2fRegisterRequest';
-import FidoU2fSignRequest from './resolvers/FidoU2fSignRequest';
+import type { Request } from 'u2f';
 
 export interface Context {
   request: FastifyRequest & {
@@ -11,8 +10,8 @@ export interface Context {
         userId: string;
         mfaAuthenticated: boolean;
         fidoU2f?: {
-          registerRequests?: FidoU2FRegisterRequest[];
-          signRequests?: FidoU2fSignRequest[];
+          registerRequests?: Request[];
+          signRequests?: Request[];
         };
       };
     };

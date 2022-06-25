@@ -57,7 +57,7 @@ export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[]
   openingHours.openingHoursRanges.forEach((element, index) => {
     const { startDay, endDay, openingTime, closingTime } = element;
 
-    let errorsFoundOnThisElement = false;
+    const errorsFoundOnThisElement = false;
     const openingHour = parseInt(openingTime.slice(0, 2), 10);
     const openingMinute = parseInt(openingTime.slice(3, 5), 10);
     const openingDate = new Date('2000');
@@ -127,7 +127,7 @@ export function validOpeningHours(openingHours: OpeningHoursInput): FieldError[]
 
 export function geoCordinatesFromOpenMapUrl(url: string) {
   const startIndex = url.indexOf('#map');
-  const [_, latitude, longitude] = url.slice(startIndex + 5).split('/');
+  const [, latitude, longitude] = url.slice(startIndex + 5).split('/');
   return {
     latitude: parseFloat(latitude),
     longitude: parseFloat(longitude),
