@@ -1,4 +1,4 @@
-import type { PrismaClient } from '.prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import type * as Fastify from 'fastify';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { Request } from 'u2f';

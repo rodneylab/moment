@@ -1,4 +1,4 @@
-import { TubeStation } from '.prisma/client';
+import { TubeStation } from '@prisma/client';
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import type { Context } from '../context';
 import Gallery from '../entities/Gallery';

@@ -1,4 +1,4 @@
-import type { FidoU2FKey, User } from '.prisma/client';
+import type { FidoU2FKey, User } from '@prisma/client';
 import axios from 'axios';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 // import { setTimeout } from 'timers/promises'; // requires node 15
@@ -8,7 +8,7 @@ import type UsernameEmailPasswordInput from '../resolvers/UsernameEmailPasswordI
 
 const DUO_ENROLL_VALID_SECS = 3600;
 
-export async function duoPing() {
+export async function duoServerPing() {
   try {
     const response = await axios.request<{ response: { stat: string; time: number } }>({
       url: `https://${process.env.DUO_API_HOSTNAME}/auth/v2/ping`,

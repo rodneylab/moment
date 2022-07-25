@@ -20,8 +20,8 @@ import {
   duoCheck,
   duoEnroll,
   duoEnrollStatus,
-  duoPing,
   duoPreauth,
+  duoServerPing,
   graphqlUser,
   validateRegister,
 } from '../utilities/user';
@@ -187,7 +187,7 @@ export class UserResolver {
   @Query(() => Boolean)
   async duoPing() {
     try {
-      return duoPing();
+      return await duoServerPing();
     } catch (error) {
       console.error(`Error in duoPing query: ${error}`);
       return null;

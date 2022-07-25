@@ -1,4 +1,4 @@
-import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
+import type { OpeningHoursRange, PostalAddress } from '@prisma/client';
 
 export const address1: PostalAddress = {
   id: 1,

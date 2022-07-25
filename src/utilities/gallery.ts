@@ -1,6 +1,12 @@
-import type { OpeningHoursRange, PostalAddress } from '.prisma/client';
-import { Exhibition, Gallery, GalleryTubeStations, Location, OpeningHours } from '.prisma/client';
-import { TubeStation } from '@prisma/client';
+import type { OpeningHoursRange, PostalAddress } from '@prisma/client';
+import {
+  Exhibition,
+  Gallery,
+  GalleryTubeStations,
+  Location,
+  OpeningHours,
+  TubeStation,
+} from '@prisma/client';
 import GraphQLGallery from '../entities/Gallery';
 import type AddressInput from '../resolvers/AddressInput';
 import type FieldError from '../resolvers/FieldError';

@@ -40,7 +40,7 @@ function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
 
 const prisma = new PrismaClient();
 
-export async function build(opts = {}): Promise<FastifyInstance> {
+export async function build(opts = { logger: true }): Promise<FastifyInstance> {
   const server: FastifyInstance = Fastify(opts);
 
   // server.register(fastifyCors, {
@@ -96,11 +96,11 @@ export async function build(opts = {}): Promise<FastifyInstance> {
   });
   await apolloServer.start();
   server.register(apolloServer.createHandler());
-  await server.listen(4000);
+  await server.listen({ port: 4000 });
   console.log(`Server ready at
   http://localhost:4000${apolloServer.graphqlPath}`);
 
   return server;
 }
 
-export { build as default };
+export default build;
