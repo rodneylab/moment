@@ -1,5 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# pnpm run prettier:check && pnpm lint && pnpm test
-pnpm run prettier:check && pnpm test
+pnpm run prettier:check && pnpm lint && pnpm test
