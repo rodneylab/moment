@@ -17,13 +17,20 @@ import PhotographerResolver from './resolvers/photographer';
 import TubeStationResolver from './resolvers/tubeStation';
 import UserResolver from './resolvers/user';
 import { isProduction } from './utilities/utilities';
-
 if (!isProduction) {
   delete process.env.https_proxy;
   delete process.env.HTTPS_PROXY;
   delete process.env.http_proxy;
   delete process.env.HTTP_PROXY;
   delete process.env._proxy;
+}
+
+import type { FastifyRedis } from '@fastify/redis';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    redis: FastifyRedis;
+  }
 }
 
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
@@ -49,22 +56,22 @@ export async function build(opts = { logger: true }): Promise<FastifyInstance> {
   //   credentials: true,
   // });
 
-  server.register(fastifyPostgres, {
+  await server.register(fastifyPostgres, {
     connectionString: process.env.DATABASE_URL,
   });
 
-  server.register(fastifyCookie);
-  server.register(fastifyRedis, { host: '127.0.0.1' });
-  server.register(fastifySession, {
+  await server.register(fastifyCookie);
+  await server.register(fastifyRedis, { host: '127.0.0.1' });
+  await server.register(fastifySession, {
     secret: process.env.SESSION_SECRET as string,
     cookie: {
       secure: isProduction,
       sameSite: 'lax',
       maxAge: 1_800_000,
-      domain: isProduction ? `.${process.env.DOMAIN}` : undefined,
+      domain: isProduction && process.env.DOMAIN ? `.${process.env.DOMAIN}` : undefined,
     },
   });
-  const { redis } = server;
+  // const { redis } = server;
 
   // server.register(prismaPlugin);
   // await context.prisma.gallery.deleteMany({});
@@ -86,16 +93,16 @@ export async function build(opts = { logger: true }): Promise<FastifyInstance> {
       fastifyAppClosePlugin(server),
       ApolloServerPluginDrainHttpServer({ httpServer: server.server }),
     ],
-    context: async ({ request, reply }) => ({
+    context: ({ request, reply }) => ({
       request,
       reply,
       prisma,
       app: server,
-      redis,
+      // redis,
     }),
   });
   await apolloServer.start();
-  server.register(apolloServer.createHandler());
+  await server.register(apolloServer.createHandler());
   await server.listen(4000);
   console.log(`Server ready at
   http://localhost:4000${apolloServer.graphqlPath}`);

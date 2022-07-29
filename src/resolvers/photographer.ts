@@ -169,9 +169,9 @@ export class PhotographerResolver {
         },
       });
       return { photographer: graphqlPhotographer(photographer) };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating new photographer');
-      return { errors: [{ field: 'unknown', message: error }] };
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 }

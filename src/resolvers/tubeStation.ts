@@ -118,9 +118,9 @@ export class TubeStationResolver {
         data: { name, slug },
       });
       return { tubeStation: graphqlTubeStation(tubeStation) };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating new tubeStation');
-      return { errors: [{ field: 'unknown', message: error }] };
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 
@@ -150,8 +150,8 @@ export class TubeStationResolver {
       });
       await prisma.tubeStation.delete({ where: { id: tubeStationId } });
       return true;
-    } catch (error) {
-      console.error(`Error deleting tubeStation ${id}: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error deleting tubeStation ${id}: ${error as string}`);
       return false;
     }
   }
@@ -191,9 +191,9 @@ export class TubeStationResolver {
         },
       });
       return { tubeStation: graphqlTubeStation(updatedTubeStation) };
-    } catch (error) {
-      console.error(`Error updating tube station ${input.id}: ${error}`);
-      return { errors: [{ field: 'unknown', message: error }] };
+    } catch (error: unknown) {
+      console.error(`Error updating tube station ${input.id}: ${error as string}`);
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 }

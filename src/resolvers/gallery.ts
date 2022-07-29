@@ -217,13 +217,11 @@ export class GalleryResolver {
         );
         const tubeStations = await Promise.all(promises);
         tubeStationsNotEmpty = tubeStations.filter(notEmpty);
-        tubeStationsNotEmpty.forEach((element, index) => {
-          if (element == null) {
-            errors.push({
-              field: 'tubeStations',
-              message: `${tubeStations[index]} is not yet in database, add it first`,
-            });
-          }
+        tubeStationsNotEmpty.forEach(({ name }) => {
+          errors.push({
+            field: 'tubeStations',
+            message: `${name} is not yet in database, add it first`,
+          });
         });
       }
 
@@ -274,9 +272,9 @@ export class GalleryResolver {
         },
       });
       return { gallery: graphqlGallery(gallery) };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating new gallery');
-      return { errors: [{ field: 'unknown', message: error }] };
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 
@@ -306,8 +304,8 @@ export class GalleryResolver {
       await prisma.galleryTubeStations.deleteMany({ where: { galleryId } });
       await prisma.gallery.delete({ where: { id: galleryId } });
       return true;
-    } catch (error) {
-      console.error(`Error deleting tubeStation ${id}: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error deleting tubeStation ${id}: ${error as string}`);
       return false;
     }
   }
@@ -364,13 +362,11 @@ export class GalleryResolver {
         );
         const tubeStations = await Promise.all(promises);
         tubeStationsNotEmpty = tubeStations.filter(notEmpty);
-        tubeStationsNotEmpty.forEach((element, index) => {
-          if (element == null) {
-            errors.push({
-              field: 'tubeStations',
-              message: `${tubeStations[index]} is not yet in database, add it first`,
-            });
-          }
+        tubeStationsNotEmpty.forEach(({ name }) => {
+          errors.push({
+            field: 'tubeStations',
+            message: `${name} is not yet in database, add it first`,
+          });
         });
       }
 
@@ -486,9 +482,9 @@ export class GalleryResolver {
         },
       });
       return { gallery: graphqlGallery(updatedGallery) };
-    } catch (error) {
-      console.error(`Error updating gallery ${input.id}: ${error}`);
-      return { errors: [{ field: 'unknown', message: error }] };
+    } catch (error: unknown) {
+      console.error(`Error updating gallery ${input.id}: ${error as string}`);
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 }

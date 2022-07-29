@@ -233,9 +233,9 @@ export class ExhibitionResolver {
         },
       });
       return { exhibition: graphqlExhibition(exhibition) };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating new exhibition');
-      return { errors: [{ field: 'unknown', message: error }] };
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 
@@ -370,9 +370,9 @@ export class ExhibitionResolver {
         },
       });
       return { exhibition: graphqlExhibition(updatedExhibition) };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating exhibition');
-      return { errors: [{ field: 'unknown', message: error }] };
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 }
