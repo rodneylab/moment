@@ -36,11 +36,11 @@ declare module 'fastify' {
 function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
   return {
     async serverWillStart() {
-      return {
+      return Promise.resolve({
         async drainServer() {
           await app.close();
         },
-      };
+      });
     },
   };
 }
