@@ -1,4 +1,5 @@
 import type { FidoU2FKey, User } from '@prisma/client';
+import type { AxiosError } from 'axios';
 import axios from 'axios';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 // import { setTimeout } from 'timers/promises'; // requires node 15
@@ -10,6 +11,9 @@ const DUO_ENROLL_VALID_SECS = 3600;
 
 export async function duoServerPing() {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const response = await axios.request<{ response: { stat: string; time: number } }>({
       url: `https://${process.env.DUO_API_HOSTNAME}/auth/v2/ping`,
       method: 'GET',
@@ -22,13 +26,14 @@ export async function duoServerPing() {
     const { stat, time } = duoResponse ?? {};
     if (status === 200) {
       if (stat === 'OK') {
-        console.log(`${new Date(time * 1_000)}: no issues identified connecting to Duo.`);
+        const date = new Date(time * 1_000);
+        console.log(`${date.toISOString()}: no issues identified connecting to Duo.`);
       }
       return true;
     }
     return false;
-  } catch (error) {
-    console.error(`Error in duoPing: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoPing: ${error as string}`);
     return false;
   }
 }
@@ -49,12 +54,17 @@ export function duoAuthorisationToken({
   const clientSecret = process.env.DUO_CLIENT_SECRET as string;
   const signature = [date, method, host, path, params].join('\n');
   const hmacDigest = hmacSHA1(signature, clientSecret);
-  const authorisationToken = Buffer.from(`${clientId}:${hmacDigest}`, 'utf-8').toString('base64');
+  const authorisationToken = Buffer.from(`${clientId}:${hmacDigest.toString()}`, 'utf-8').toString(
+    'base64',
+  );
   return authorisationToken;
 }
 
 export async function duoAuthStatus(transactionId: string) {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/auth';
     const method = 'POST';
@@ -95,14 +105,17 @@ export async function duoAuthStatus(transactionId: string) {
     }
     const message = `${result}, ${duoStatus}, ${statusMessage}`;
     return { allow: false, message };
-  } catch (error) {
-    console.error(`Error in duoAuth: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoAuth: ${error as string}`);
     return { error };
   }
 }
 
 export async function duoAuth({ device, duoUserId }: { device: string; duoUserId: string }) {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/auth';
     const method = 'POST';
@@ -144,7 +157,7 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
 
     if (txid) {
       let txidResult;
-      await setTimeout(() => {
+      setTimeout(() => {
         txidResult = duoAuthStatus(txid);
       }, 10_000);
       if (txidResult) {
@@ -157,17 +170,23 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
     }
     const message = `${result}, ${duoStatus}, ${statusMessage}`;
     return { allow: false, message };
-  } catch (error) {
+  } catch (error: unknown) {
     let message;
-    if (error.response) {
-      message = `Error in duoAuth server responded with non 2xx code: ${{
-        ...error.response.data,
-      }}`;
-    } else if (error.request) {
-      message = `Error in duoAuth no response received: ${error.request}`;
+    const err = error as Error | AxiosError;
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        message = `Error in duoAuth server responded with non 2xx code: ${JSON.stringify(
+          err.response.data,
+        )}`;
+      } else if (err.request) {
+        message = `Error in duoAuth no response received: ${err.request as string}`;
+      } else {
+        message = `Error in duoAuth error setting up storage response: ${err.message}`;
+      }
     } else {
-      message = `Error in duoAuth error setting up storage response: ${error.message}`;
+      message = error as string;
     }
+
     console.error(message);
     return { error: message };
   }
@@ -175,6 +194,9 @@ export async function duoAuth({ device, duoUserId }: { device: string; duoUserId
 
 export async function duoCheck() {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/check';
     const method = 'POST';
@@ -198,19 +220,24 @@ export async function duoCheck() {
     const { time } = duoResponse ?? {};
     if (status === 200) {
       if (stat === 'OK') {
-        console.log(`${new Date(time * 1_000)}: no issues identified connecting to Duo.`);
+        const responseDate = new Date(time * 1_000);
+        // eslint-disable-next-line no-console
+        console.log(`${responseDate.toISOString()}: no issues identified connecting to Duo.`);
       }
       return true;
     }
     return false;
-  } catch (error) {
-    console.error(`Error in duoPing: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoPing: ${error as string}`);
     return false;
   }
 }
 
 export async function duoEnroll(username: string) {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/enroll';
     const method = 'POST';
@@ -252,8 +279,8 @@ export async function duoEnroll(username: string) {
       return { qrCode, activationCode, duoUserId };
     }
     return { error: stat };
-  } catch (error) {
-    console.error(`Error in duoEnroll: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoEnroll: ${error as string}`);
     return { error };
   }
 }
@@ -266,6 +293,9 @@ export async function duoEnrollStatus({
   activationCode: string;
 }) {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/enroll_status';
     const method = 'POST';
@@ -297,8 +327,8 @@ export async function duoEnrollStatus({
       return { result: duoResponse };
     }
     return { error: stat };
-  } catch (error) {
-    console.error(`Error in duoEnrollStatus: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoEnrollStatus: ${error as string}`);
     return { error };
   }
 }
@@ -311,6 +341,9 @@ export async function duoPreauth({
   username?: string;
 }) {
   try {
+    if (!process.env.DUO_API_HOSTNAME) {
+      throw new Error('DUO_API_HOSTNAME must be defined');
+    }
     const date = new Date().toUTCString();
     const path = '/auth/v2/preauth';
     const method = 'POST';
@@ -362,8 +395,8 @@ export async function duoPreauth({
       }
     }
     return { error: 'unexpected response in duoPreauth' };
-  } catch (error) {
-    console.error(`Error in duoAuth: ${error}`);
+  } catch (error: unknown) {
+    console.error(`Error in duoAuth: ${error as string}`);
     return { error };
   }
 }

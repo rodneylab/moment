@@ -34,12 +34,14 @@ test('it sends expected response to hello query', async () => {
       payload: { query, variables: {} },
     });
 
-    const json = await response.json();
+    const json: { data: { hello: string } } = await response.json();
     assert.snapshot(JSON.stringify(json), '{"data":{"hello":"Hello everybody!"}}');
     assert.is(json.data.hello, 'Hello everybody!');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
-      `Error in test resolvers/hello.ts: it sends expected response to hello query: ${error}`,
+      `Error in test resolvers/hello.ts: it sends expected response to hello query: ${
+        error as string
+      }`,
     );
   }
 });

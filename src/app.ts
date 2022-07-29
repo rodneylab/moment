@@ -96,7 +96,7 @@ export async function build(opts = { logger: true }): Promise<FastifyInstance> {
   });
   await apolloServer.start();
   server.register(apolloServer.createHandler());
-  await server.listen({ port: 4000 });
+  await server.listen(4000);
   console.log(`Server ready at
   http://localhost:4000${apolloServer.graphqlPath}`);
 

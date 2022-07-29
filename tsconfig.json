@@ -23,7 +23,5 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true,
     "baseUrl": "."
-  },
-  "exclude": ["node_modules", "./.eslintrc.cjs"],
-  "include": ["./src/**/*.ts", "./tests/**/*.ts"]
+  }
 }

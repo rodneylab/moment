@@ -5,13 +5,20 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: ['airbnb-typescript'],
+  extends: [
+    // 'airbnb-base',
+    // 'airbnb-typescript/base',
+    'plugin:prettier/recommended',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,
     project: './tsconfig.json',
     sourceType: 'module',
   },
-  plugins: ['import', 'react', '@typescript-eslint'],
-  rules: {},
+  plugins: ['import', 'prettier', '@typescript-eslint'],
+  rules: { 'prettier/prettier': ['error'] },
 };

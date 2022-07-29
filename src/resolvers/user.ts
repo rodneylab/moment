@@ -30,7 +30,7 @@ import FidoU2fRegisterRequest from './FidoU2fRegisterRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
-const REGISTRATION_ALLOWED = false;
+const REGISTRATION_ALLOWED = true;
 
 @InputType()
 class LoginInput {
@@ -133,7 +133,7 @@ class FidoU2fAuthenticateRequest {
   @Field(() => [String], { nullable: true })
   labels?: string[];
 
-  @Field(() => [Request], { nullable: true })
+  @Field(() => [FidoU2fRegisterRequest], { nullable: true })
   signRequests?: Request[];
 
   @Field({ nullable: true })
