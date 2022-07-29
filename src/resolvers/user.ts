@@ -30,7 +30,7 @@ import FidoU2fRegisterRequest from './FidoU2fRegisterRequest';
 import FieldError from './FieldError';
 import UsernameEmailPasswordInput from './UsernameEmailPasswordInput';
 
-const REGISTRATION_ALLOWED = true;
+const REGISTRATION_ALLOWED = false;
 
 @InputType()
 class LoginInput {
@@ -154,8 +154,8 @@ export class UserResolver {
   async duoCheck() {
     try {
       return duoCheck();
-    } catch (error) {
-      console.error(`Error in duoCheck query: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in duoCheck query: ${error as string}`);
       return null;
     }
   }
@@ -177,10 +177,10 @@ export class UserResolver {
       }
 
       const { error, result } = await duoEnrollStatus({ activationCode, duoUserId });
-      return error ? { error } : { result };
-    } catch (error) {
-      console.error(`Error in duoEnrollStatus query: ${error}`);
-      return { error };
+      return error ? { error: error as string } : { result };
+    } catch (error: unknown) {
+      console.error(`Error in duoEnrollStatus query: ${error as string}`);
+      return { error: error ? (error as string) : 'unknown error' };
     }
   }
 
@@ -188,8 +188,8 @@ export class UserResolver {
   async duoPing() {
     try {
       return await duoServerPing();
-    } catch (error) {
-      console.error(`Error in duoPing query: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in duoPing query: ${error as string}`);
       return null;
     }
   }
@@ -214,8 +214,8 @@ export class UserResolver {
         }
       }
       return { error: 'Duo auth not allowed for user' };
-    } catch (error) {
-      const message = `Error in DuoPreauthResponse query: ${error}`;
+    } catch (error: unknown) {
+      const message = `Error in DuoPreauthResponse query: ${error as string}`;
       console.error(message);
       return { error: message };
     }
@@ -246,20 +246,20 @@ export class UserResolver {
         labels,
         signRequests: signRequests.filter(notEmpty),
       };
-    } catch (error) {
-      console.error(`Error in fidoU2fBeginAuthenticate query: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in fidoU2fBeginAuthenticate query: ${error as string}`);
       return { error: 'Error in fidoU2fBeginAuthenticate query' };
     }
   }
 
   @Query(() => FidoU2fRegisterRequest, { nullable: true })
-  async fidoU2fBeginRegister(@Ctx() { request }: Context): Promise<FidoU2fRegisterRequest | null> {
+  fidoU2fBeginRegister(@Ctx() { request }: Context): FidoU2fRegisterRequest | null {
     try {
       const newFidoU2fRequest = fidoU2fRequest('https://localhost:4000');
       request.session.user.fidoU2f = { registerRequests: [newFidoU2fRequest] };
       return newFidoU2fRequest;
-    } catch (error) {
-      console.error(`Error in fidoU2fBeginRegister query: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in fidoU2fBeginRegister query: ${error as string}`);
       return null;
     }
   }
@@ -277,8 +277,8 @@ export class UserResolver {
         include: { fidoU2fKeys: true },
       });
       return user ? graphqlUser(user) : null;
-    } catch (error) {
-      console.error(`Error in me query: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in me query: ${error as string}`);
       return null;
     }
   }
@@ -322,8 +322,8 @@ export class UserResolver {
       }
       request.session.user.mfaAuthenticated = true;
       return false;
-    } catch (error) {
-      console.error(`Error in duoAuth mutation: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in duoAuth mutation: ${error as string}`);
       return false;
     }
   }
@@ -343,14 +343,14 @@ export class UserResolver {
 
       const { duoUserId, error, activationCode, qrCode } = await duoEnroll(username);
       if (error) {
-        return { error };
+        return { error: error as string };
       }
       await prisma.user.update({ where: { uid: userId }, data: { duoUserId } });
 
       return { activationCode, qrCode };
-    } catch (error) {
-      console.error(`Error in duoEnroll query: ${error}`);
-      return { error };
+    } catch (error: unknown) {
+      console.error(`Error in duoEnroll query: ${error as string}`);
+      return { error: error as string };
     }
   }
 
@@ -387,8 +387,8 @@ export class UserResolver {
         return true;
       }
       return false;
-    } catch (error) {
-      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in fidoU2FRegister mutation: ${error as string}`);
       return false;
     }
   }
@@ -417,8 +417,8 @@ export class UserResolver {
         return true;
       }
       return false;
-    } catch (error) {
-      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in fidoU2FRegister mutation: ${error as string}`);
       return false;
     }
   }
@@ -451,8 +451,8 @@ export class UserResolver {
         return true;
       }
       return false;
-    } catch (error) {
-      console.error(`Error in fidoU2FRegister mutation: ${error}`);
+    } catch (error: unknown) {
+      console.error(`Error in fidoU2FRegister mutation: ${error as string}`);
       return false;
     }
   }
@@ -492,18 +492,18 @@ export class UserResolver {
       request.session.user = { userId: uid, mfaAuthenticated: false };
 
       return { user: graphqlUser(user) };
-    } catch (error) {
-      console.error(`Error in login: ${error}`);
-      return { errors: [{ field: 'unknown', message: error }] };
+    } catch (error: unknown) {
+      console.error(`Error in login: ${error as string}`);
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 
   @Mutation(() => Boolean)
   logout(@Ctx() { request }: Context) {
     if (request.session.user.userId) {
-      request.session.destroy((error) => {
+      request.session.destroy((error: unknown) => {
         if (error) {
-          console.error(`Error destroying session in logout mutation: ${error}`);
+          console.error(`Error destroying session in logout mutation: ${error as string}`);
           return false;
         } else {
           return true;
@@ -559,9 +559,9 @@ export class UserResolver {
       const { uid } = user;
       request.session.user = { userId: uid, mfaAuthenticated: false };
       return { user: graphqlUser({ ...user, fidoU2fKeys: [] }) };
-    } catch (error) {
-      console.error(`Error in register: ${error}`);
-      return { errors: [{ field: 'unknown', message: error }] };
+    } catch (error: unknown) {
+      console.error(`Error in register: ${error as string}`);
+      return { errors: [{ field: 'unknown', message: error as string }] };
     }
   }
 }
