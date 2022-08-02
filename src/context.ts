@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client';
 import type * as Fastify from 'fastify';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { Request } from 'u2f';
+import { db } from './db';
 
 export interface Context {
   request: FastifyRequest & {
@@ -20,3 +21,5 @@ export interface Context {
   prisma: PrismaClient;
   app: FastifyInstance;
 }
+
+export const context = { db };
