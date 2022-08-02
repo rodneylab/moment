@@ -6,9 +6,6 @@ module.exports = {
     node: true,
   },
   extends: [
-    // 'airbnb-base',
-    // 'airbnb-typescript/base',
-    'plugin:prettier/recommended',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
@@ -19,6 +16,6 @@ module.exports = {
     project: './tsconfig.json',
     sourceType: 'module',
   },
-  plugins: ['import', 'prettier', '@typescript-eslint'],
-  rules: { 'prettier/prettier': ['error'] },
+  plugins: ['import', '@typescript-eslint'],
+  rules: {},
 };
