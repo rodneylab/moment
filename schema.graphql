@@ -2,6 +2,100 @@
 ### Do not make changes to this file directly
 
 
+input CreateExhibitionInput {
+  bodyText: String
+  description: String!
+  end: String!
+  freeEntry: Boolean!
+  gallery: String!
+  hashtags: [String!]!
+  inPerson: Boolean!
+  name: String!
+  online: Boolean!
+  start: String!
+  summaryText: String!
+  url: String
+}
+
+type CreateExhibitionResponse {
+  errors: [FieldError]
+  exhibition: Exhibition
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+type Exhibition {
+  bodyText: String
+  createdAt: String
+  description: String
+  end: String
+  freeEntry: Boolean
+  gallery: Gallery
+  hashtags: [String!]!
+  id: String!
+  inPerson: Boolean
+  name: String!
+  online: Boolean
+  photographers: [Photographer!]
+  start: String
+  summaryText: String
+  updatedAt: String
+  url: String
+}
+
+type ExhibitionQueryResponse {
+  error: String
+  exhibition: Exhibition
+}
+
+type FieldError {
+  field: String!
+  message: String!
+}
+
+type Gallery {
+  id: String!
+}
+
+type Mutation {
+  createExhibition(input: CreateExhibitionInput!): CreateExhibitionResponse!
+  updateExhibition(input: UpdateExhibitionInput!): CreateExhibitionResponse!
+}
+
+type PaginatedExhibitions {
+  exhibitions: [Exhibition]
+  hasMore: Boolean
+}
+
+type Photographer {
+  createdAt: Date!
+  exhibitions: [Exhibition!]
+  firstName: String
+  id: Int!
+  lastName: String
+  name: String
+  otherNames: String
+  slug: String!
+  updatedAt: Date!
+  website: String
+  websiteUrl: String
+}
+
 type Query {
+  exhibition(id: String!): ExhibitionQueryResponse!
+  exhibitions: PaginatedExhibitions!
   hello: String
+}
+
+input UpdateExhibitionInput {
+  addPhotographers: [String!]!
+  bodyText: String
+  id: String!
+  name: String
+  removePhotographers: [String!]!
+  summaryText: String
+  url: String
 }
