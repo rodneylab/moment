@@ -75,6 +75,11 @@ export interface NexusGenInputs {
     slug: string; // String!
     website?: string | null; // String
   };
+  CreateTubeStationInput: {
+    // input type
+    name: string; // String!
+    slug: string; // String!
+  };
   OpeningHoursInput: {
     // input type
     openingHoursRanges: NexusGenInputs['OpeningHoursRangeInput'][]; // [OpeningHoursRangeInput!]!
@@ -109,6 +114,12 @@ export interface NexusGenInputs {
     slug?: string | null; // String
     website?: string | null; // String
   };
+  UpdateTubeStationInput: {
+    // input type
+    id: string; // String!
+    name?: string | null; // String
+    slug?: string | null; // String
+  };
 }
 
 export interface NexusGenEnums {}
@@ -137,6 +148,11 @@ export interface NexusGenObjects {
     // root type
     errors: NexusGenRootTypes['FieldError']; // FieldError!
     photographer: NexusGenRootTypes['Photographer']; // Photographer!
+  };
+  CreateTubeStationResponse: {
+    // root type
+    errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
   Exhibition: {
     // root type
@@ -268,6 +284,11 @@ export interface NexusGenObjects {
     slug: string; // String!
     updatedAt: NexusGenScalars['Date']; // Date!
   };
+  TubeStationQueryResponse: {
+    // root type
+    error?: string | null; // String
+    tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
+  };
 }
 
 export interface NexusGenInterfaces {}
@@ -293,6 +314,11 @@ export interface NexusGenFieldTypes {
     // field return type
     errors: NexusGenRootTypes['FieldError']; // FieldError!
     photographer: NexusGenRootTypes['Photographer']; // Photographer!
+  };
+  CreateTubeStationResponse: {
+    // field return type
+    errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
   Exhibition: {
     // field return type
@@ -359,9 +385,12 @@ export interface NexusGenFieldTypes {
     createExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
     createGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
     createPhotographer: NexusGenRootTypes['CreatePhotographerResponse']; // CreatePhotographerResponse!
+    createTubeStation: NexusGenRootTypes['CreateTubeStationResponse']; // CreateTubeStationResponse!
     deleteGallery: boolean; // Boolean!
+    deleteTubeStation: boolean; // Boolean!
     updateExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
     updateGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
+    updateTubeStation: NexusGenRootTypes['CreateTubeStationResponse']; // CreateTubeStationResponse!
   };
   OpeningHours: {
     // field return type
@@ -431,6 +460,8 @@ export interface NexusGenFieldTypes {
     hello: string | null; // String
     photographer: NexusGenRootTypes['PhotographerQueryResponse']; // PhotographerQueryResponse!
     photographers: NexusGenRootTypes['PaginatedPhotographers']; // PaginatedPhotographers!
+    tubeStation: NexusGenRootTypes['TubeStationQueryResponse']; // TubeStationQueryResponse!
+    tubeStations: Array<NexusGenRootTypes['TubeStation'] | null>; // [TubeStation]!
   };
   TubeStation: {
     // field return type
@@ -440,6 +471,11 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     slug: string; // String!
     updatedAt: NexusGenScalars['Date']; // Date!
+  };
+  TubeStationQueryResponse: {
+    // field return type
+    error: string | null; // String
+    tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
 }
 
@@ -458,6 +494,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     errors: 'FieldError';
     photographer: 'Photographer';
+  };
+  CreateTubeStationResponse: {
+    // field return type name
+    errors: 'FieldError';
+    tubeStation: 'TubeStation';
   };
   Exhibition: {
     // field return type name
@@ -524,9 +565,12 @@ export interface NexusGenFieldTypeNames {
     createExhibition: 'CreateExhibitionResponse';
     createGallery: 'CreateGalleryResponse';
     createPhotographer: 'CreatePhotographerResponse';
+    createTubeStation: 'CreateTubeStationResponse';
     deleteGallery: 'Boolean';
+    deleteTubeStation: 'Boolean';
     updateExhibition: 'CreateExhibitionResponse';
     updateGallery: 'CreateGalleryResponse';
+    updateTubeStation: 'CreateTubeStationResponse';
   };
   OpeningHours: {
     // field return type name
@@ -596,6 +640,8 @@ export interface NexusGenFieldTypeNames {
     hello: 'String';
     photographer: 'PhotographerQueryResponse';
     photographers: 'PaginatedPhotographers';
+    tubeStation: 'TubeStationQueryResponse';
+    tubeStations: 'TubeStation';
   };
   TubeStation: {
     // field return type name
@@ -605,6 +651,11 @@ export interface NexusGenFieldTypeNames {
     name: 'String';
     slug: 'String';
     updatedAt: 'Date';
+  };
+  TubeStationQueryResponse: {
+    // field return type name
+    error: 'String';
+    tubeStation: 'TubeStation';
   };
 }
 
@@ -622,7 +673,15 @@ export interface NexusGenArgTypes {
       // args
       input: NexusGenInputs['CreatePhotographerInput']; // CreatePhotographerInput!
     };
+    createTubeStation: {
+      // args
+      input: NexusGenInputs['CreateTubeStationInput']; // CreateTubeStationInput!
+    };
     deleteGallery: {
+      // args
+      id: string; // String!
+    };
+    deleteTubeStation: {
       // args
       id: string; // String!
     };
@@ -633,6 +692,10 @@ export interface NexusGenArgTypes {
     updateGallery: {
       // args
       input: NexusGenInputs['UpdateGalleryInput']; // UpdateGalleryInput!
+    };
+    updateTubeStation: {
+      // args
+      input: NexusGenInputs['UpdateTubeStationInput']; // UpdateTubeStationInput!
     };
   };
   Query: {
@@ -645,6 +708,10 @@ export interface NexusGenArgTypes {
       slug: string; // String!
     };
     photographer: {
+      // args
+      slug: string; // String!
+    };
+    tubeStation: {
       // args
       slug: string; // String!
     };

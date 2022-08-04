@@ -59,6 +59,16 @@ type CreatePhotographerResponse {
   photographer: Photographer!
 }
 
+input CreateTubeStationInput {
+  name: String!
+  slug: String!
+}
+
+type CreateTubeStationResponse {
+  errors: [FieldError!]
+  tubeStation: TubeStation!
+}
+
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -128,9 +138,12 @@ type Mutation {
   createExhibition(input: CreateExhibitionInput!): CreateExhibitionResponse!
   createGallery(input: CreateGalleryInput!): CreateGalleryResponse!
   createPhotographer(input: CreatePhotographerInput!): CreatePhotographerResponse!
+  createTubeStation(input: CreateTubeStationInput!): CreateTubeStationResponse!
   deleteGallery(id: String!): Boolean!
+  deleteTubeStation(id: String!): Boolean!
   updateExhibition(input: UpdateExhibitionInput!): CreateExhibitionResponse!
   updateGallery(input: UpdateGalleryInput!): CreateGalleryResponse!
+  updateTubeStation(input: UpdateTubeStationInput!): CreateTubeStationResponse!
 }
 
 type OpeningHours {
@@ -211,6 +224,8 @@ type Query {
   hello: String
   photographer(slug: String!): PhotographerQueryResponse!
   photographers: PaginatedPhotographers!
+  tubeStation(slug: String!): TubeStationQueryResponse!
+  tubeStations: [TubeStation]!
 }
 
 type TubeStation {
@@ -220,6 +235,11 @@ type TubeStation {
   name: String!
   slug: String!
   updatedAt: Date!
+}
+
+type TubeStationQueryResponse {
+  error: String
+  tubeStation: TubeStation!
 }
 
 input UpdateExhibitionInput {
@@ -243,4 +263,10 @@ input UpdateGalleryInput {
   replacementOpeningHours: OpeningHoursInput!
   slug: String
   website: String
+}
+
+input UpdateTubeStationInput {
+  id: String!
+  name: String
+  slug: String
 }
