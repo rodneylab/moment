@@ -46,6 +46,19 @@ type CreateGalleryResponse {
   gallery: Gallery!
 }
 
+input CreatePhotographerInput {
+  firstName: String
+  lastName: String
+  otherNames: String
+  slug: String!
+  website: String
+}
+
+type CreatePhotographerResponse {
+  errors: FieldError!
+  photographer: Photographer!
+}
+
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -114,6 +127,7 @@ type Location {
 type Mutation {
   createExhibition(input: CreateExhibitionInput!): CreateExhibitionResponse!
   createGallery(input: CreateGalleryInput!): CreateGalleryResponse!
+  createPhotographer(input: CreatePhotographerInput!): CreatePhotographerResponse!
   deleteGallery(id: String!): Boolean!
   updateExhibition(input: UpdateExhibitionInput!): CreateExhibitionResponse!
   updateGallery(input: UpdateGalleryInput!): CreateGalleryResponse!
@@ -154,6 +168,11 @@ type PaginatedGalleries {
   hasMore: Boolean
 }
 
+type PaginatedPhotographers {
+  hasMore: Boolean
+  photographers: [Photographer!]
+}
+
 type Photographer {
   createdAt: Date!
   exhibitions: [Exhibition!]
@@ -166,6 +185,11 @@ type Photographer {
   updatedAt: Date!
   website: String
   websiteUrl: String
+}
+
+type PhotographerQueryResponse {
+  error: String
+  photographer: Photographer!
 }
 
 type PostalAddress {
@@ -185,6 +209,8 @@ type Query {
   galleries: PaginatedGalleries!
   gallery(slug: String!): GalleryQueryResponse!
   hello: String
+  photographer(slug: String!): PhotographerQueryResponse!
+  photographers: PaginatedPhotographers!
 }
 
 type TubeStation {

@@ -67,6 +67,14 @@ export interface NexusGenInputs {
     slug: string; // String!
     website: string; // String!
   };
+  CreatePhotographerInput: {
+    // input type
+    firstName?: string | null; // String
+    lastName?: string | null; // String
+    otherNames?: string | null; // String
+    slug: string; // String!
+    website?: string | null; // String
+  };
   OpeningHoursInput: {
     // input type
     openingHoursRanges: NexusGenInputs['OpeningHoursRangeInput'][]; // [OpeningHoursRangeInput!]!
@@ -124,6 +132,11 @@ export interface NexusGenObjects {
     // root type
     errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
     gallery: NexusGenRootTypes['Gallery']; // Gallery!
+  };
+  CreatePhotographerResponse: {
+    // root type
+    errors: NexusGenRootTypes['FieldError']; // FieldError!
+    photographer: NexusGenRootTypes['Photographer']; // Photographer!
   };
   Exhibition: {
     // root type
@@ -210,6 +223,11 @@ export interface NexusGenObjects {
     galleries?: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
     hasMore?: boolean | null; // Boolean
   };
+  PaginatedPhotographers: {
+    // root type
+    hasMore?: boolean | null; // Boolean
+    photographers?: NexusGenRootTypes['Photographer'][] | null; // [Photographer!]
+  };
   Photographer: {
     // root type
     createdAt: NexusGenScalars['Date']; // Date!
@@ -223,6 +241,11 @@ export interface NexusGenObjects {
     updatedAt: NexusGenScalars['Date']; // Date!
     website?: string | null; // String
     websiteUrl?: string | null; // String
+  };
+  PhotographerQueryResponse: {
+    // root type
+    error?: string | null; // String
+    photographer: NexusGenRootTypes['Photographer']; // Photographer!
   };
   PostalAddress: {
     // root type
@@ -265,6 +288,11 @@ export interface NexusGenFieldTypes {
     // field return type
     errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
     gallery: NexusGenRootTypes['Gallery']; // Gallery!
+  };
+  CreatePhotographerResponse: {
+    // field return type
+    errors: NexusGenRootTypes['FieldError']; // FieldError!
+    photographer: NexusGenRootTypes['Photographer']; // Photographer!
   };
   Exhibition: {
     // field return type
@@ -330,6 +358,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
     createGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
+    createPhotographer: NexusGenRootTypes['CreatePhotographerResponse']; // CreatePhotographerResponse!
     deleteGallery: boolean; // Boolean!
     updateExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
     updateGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
@@ -358,6 +387,11 @@ export interface NexusGenFieldTypes {
     galleries: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
     hasMore: boolean | null; // Boolean
   };
+  PaginatedPhotographers: {
+    // field return type
+    hasMore: boolean | null; // Boolean
+    photographers: NexusGenRootTypes['Photographer'][] | null; // [Photographer!]
+  };
   Photographer: {
     // field return type
     createdAt: NexusGenScalars['Date']; // Date!
@@ -371,6 +405,11 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date']; // Date!
     website: string | null; // String
     websiteUrl: string | null; // String
+  };
+  PhotographerQueryResponse: {
+    // field return type
+    error: string | null; // String
+    photographer: NexusGenRootTypes['Photographer']; // Photographer!
   };
   PostalAddress: {
     // field return type
@@ -390,6 +429,8 @@ export interface NexusGenFieldTypes {
     galleries: NexusGenRootTypes['PaginatedGalleries']; // PaginatedGalleries!
     gallery: NexusGenRootTypes['GalleryQueryResponse']; // GalleryQueryResponse!
     hello: string | null; // String
+    photographer: NexusGenRootTypes['PhotographerQueryResponse']; // PhotographerQueryResponse!
+    photographers: NexusGenRootTypes['PaginatedPhotographers']; // PaginatedPhotographers!
   };
   TubeStation: {
     // field return type
@@ -412,6 +453,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     errors: 'FieldError';
     gallery: 'Gallery';
+  };
+  CreatePhotographerResponse: {
+    // field return type name
+    errors: 'FieldError';
+    photographer: 'Photographer';
   };
   Exhibition: {
     // field return type name
@@ -477,6 +523,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createExhibition: 'CreateExhibitionResponse';
     createGallery: 'CreateGalleryResponse';
+    createPhotographer: 'CreatePhotographerResponse';
     deleteGallery: 'Boolean';
     updateExhibition: 'CreateExhibitionResponse';
     updateGallery: 'CreateGalleryResponse';
@@ -505,6 +552,11 @@ export interface NexusGenFieldTypeNames {
     galleries: 'Gallery';
     hasMore: 'Boolean';
   };
+  PaginatedPhotographers: {
+    // field return type name
+    hasMore: 'Boolean';
+    photographers: 'Photographer';
+  };
   Photographer: {
     // field return type name
     createdAt: 'Date';
@@ -518,6 +570,11 @@ export interface NexusGenFieldTypeNames {
     updatedAt: 'Date';
     website: 'String';
     websiteUrl: 'String';
+  };
+  PhotographerQueryResponse: {
+    // field return type name
+    error: 'String';
+    photographer: 'Photographer';
   };
   PostalAddress: {
     // field return type name
@@ -537,6 +594,8 @@ export interface NexusGenFieldTypeNames {
     galleries: 'PaginatedGalleries';
     gallery: 'GalleryQueryResponse';
     hello: 'String';
+    photographer: 'PhotographerQueryResponse';
+    photographers: 'PaginatedPhotographers';
   };
   TubeStation: {
     // field return type name
@@ -559,6 +618,10 @@ export interface NexusGenArgTypes {
       // args
       input: NexusGenInputs['CreateGalleryInput']; // CreateGalleryInput!
     };
+    createPhotographer: {
+      // args
+      input: NexusGenInputs['CreatePhotographerInput']; // CreatePhotographerInput!
+    };
     deleteGallery: {
       // args
       id: string; // String!
@@ -578,6 +641,10 @@ export interface NexusGenArgTypes {
       id: string; // String!
     };
     gallery: {
+      // args
+      slug: string; // String!
+    };
+    photographer: {
       // args
       slug: string; // String!
     };
