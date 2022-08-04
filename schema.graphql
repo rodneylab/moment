@@ -2,6 +2,14 @@
 ### Do not make changes to this file directly
 
 
+input AddressInput {
+  city: String
+  country: String
+  locality: String
+  postalCode: String
+  streetAddress: String
+}
+
 input CreateExhibitionInput {
   bodyText: String
   description: String!
@@ -20,6 +28,22 @@ input CreateExhibitionInput {
 type CreateExhibitionResponse {
   errors: [FieldError]
   exhibition: Exhibition
+}
+
+input CreateGalleryInput {
+  googleMap: String!
+  name: String!
+  nearestTubes: [String!]!
+  openStreetMapUrl: String
+  openingHours: OpeningHoursInput!
+  postalAddress: AddressInput!
+  slug: String!
+  website: String!
+}
+
+type CreateGalleryResponse {
+  errors: [FieldError!]
+  gallery: Gallery!
 }
 
 """
@@ -57,16 +81,76 @@ type FieldError {
 }
 
 type Gallery {
+  address: String
+  byAppointmentOpeningHours: OpeningHours!
+  byAppointmentOpeningTimes: String
+  createdAt: Date!
+  exhibitions: [Exhibition!]
+  googleMap: String
   id: String!
+  location: Location!
+  name: String!
+  nearestTubes: [TubeStation!]
+  openStreetMap: String
+  openingHours: OpeningHours!
+  openingTimes: String
+  postalAddress: PostalAddress!
+  slug: String!
+  tubes: String
+  website: String
+  websiteUrl: String
+}
+
+type GalleryQueryResponse {
+  error: String
+  galleries: [Gallery!]
+}
+
+type Location {
+  latitude: Float!
+  longitude: Float!
 }
 
 type Mutation {
   createExhibition(input: CreateExhibitionInput!): CreateExhibitionResponse!
+  createGallery(input: CreateGalleryInput!): CreateGalleryResponse!
+  deleteGallery(id: String!): Boolean!
   updateExhibition(input: UpdateExhibitionInput!): CreateExhibitionResponse!
+  updateGallery(input: UpdateGalleryInput!): CreateGalleryResponse!
+}
+
+type OpeningHours {
+  openingHoursRanges: [OpeningHoursRange!]!
+}
+
+input OpeningHoursInput {
+  openingHoursRanges: [OpeningHoursRangeInput!]!
+}
+
+type OpeningHoursRange {
+  closingTime: String
+  createdAt: Date!
+  endDay: String
+  id: Int!
+  openingTime: String
+  startDay: String
+  updatedAt: Date!
+}
+
+input OpeningHoursRangeInput {
+  closingTime: Int!
+  endDay: Int!
+  openingTime: Int!
+  startDay: Int!
 }
 
 type PaginatedExhibitions {
   exhibitions: [Exhibition]
+  hasMore: Boolean
+}
+
+type PaginatedGalleries {
+  galleries: [Gallery!]
   hasMore: Boolean
 }
 
@@ -84,10 +168,32 @@ type Photographer {
   websiteUrl: String
 }
 
+type PostalAddress {
+  city: String
+  country: String
+  createdAt: Date!
+  locality: String
+  postalCode: String
+  streetAddress: String
+  string: ID!
+  updatedAt: Date!
+}
+
 type Query {
   exhibition(id: String!): ExhibitionQueryResponse!
   exhibitions: PaginatedExhibitions!
+  galleries: PaginatedGalleries!
+  gallery(slug: String!): GalleryQueryResponse!
   hello: String
+}
+
+type TubeStation {
+  createdAt: Date!
+  galleries: [Gallery!]!
+  id: Int!
+  name: String!
+  slug: String!
+  updatedAt: Date!
 }
 
 input UpdateExhibitionInput {
@@ -98,4 +204,17 @@ input UpdateExhibitionInput {
   removePhotographers: [String!]!
   summaryText: String
   url: String
+}
+
+input UpdateGalleryInput {
+  addNearestTubes: [String!]
+  id: String!
+  name: String
+  openStreetMapUrl: String
+  postalAddress: AddressInput!
+  removeNearestTubes: [String!]
+  replacementByAppointmentOpeningHours: OpeningHoursInput!
+  replacementOpeningHours: OpeningHoursInput!
+  slug: String
+  website: String
 }

@@ -33,6 +33,14 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  AddressInput: {
+    // input type
+    city?: string | null; // String
+    country?: string | null; // String
+    locality?: string | null; // String
+    postalCode?: string | null; // String
+    streetAddress?: string | null; // String
+  };
   CreateExhibitionInput: {
     // input type
     bodyText?: string | null; // String
@@ -48,6 +56,28 @@ export interface NexusGenInputs {
     summaryText: string; // String!
     url?: string | null; // String
   };
+  CreateGalleryInput: {
+    // input type
+    googleMap: string; // String!
+    name: string; // String!
+    nearestTubes: string[]; // [String!]!
+    openStreetMapUrl?: string | null; // String
+    openingHours: NexusGenInputs['OpeningHoursInput']; // OpeningHoursInput!
+    postalAddress: NexusGenInputs['AddressInput']; // AddressInput!
+    slug: string; // String!
+    website: string; // String!
+  };
+  OpeningHoursInput: {
+    // input type
+    openingHoursRanges: NexusGenInputs['OpeningHoursRangeInput'][]; // [OpeningHoursRangeInput!]!
+  };
+  OpeningHoursRangeInput: {
+    // input type
+    closingTime: number; // Int!
+    endDay: number; // Int!
+    openingTime: number; // Int!
+    startDay: number; // Int!
+  };
   UpdateExhibitionInput: {
     // input type
     addPhotographers: string[]; // [String!]!
@@ -57,6 +87,19 @@ export interface NexusGenInputs {
     removePhotographers: string[]; // [String!]!
     summaryText?: string | null; // String
     url?: string | null; // String
+  };
+  UpdateGalleryInput: {
+    // input type
+    addNearestTubes?: string[] | null; // [String!]
+    id: string; // String!
+    name?: string | null; // String
+    openStreetMapUrl?: string | null; // String
+    postalAddress: NexusGenInputs['AddressInput']; // AddressInput!
+    removeNearestTubes?: string[] | null; // [String!]
+    replacementByAppointmentOpeningHours: NexusGenInputs['OpeningHoursInput']; // OpeningHoursInput!
+    replacementOpeningHours: NexusGenInputs['OpeningHoursInput']; // OpeningHoursInput!
+    slug?: string | null; // String
+    website?: string | null; // String
   };
 }
 
@@ -76,6 +119,11 @@ export interface NexusGenObjects {
     // root type
     errors?: Array<NexusGenRootTypes['FieldError'] | null> | null; // [FieldError]
     exhibition?: NexusGenRootTypes['Exhibition'] | null; // Exhibition
+  };
+  CreateGalleryResponse: {
+    // root type
+    errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    gallery: NexusGenRootTypes['Gallery']; // Gallery!
   };
   Exhibition: {
     // root type
@@ -108,12 +156,58 @@ export interface NexusGenObjects {
   };
   Gallery: {
     // root type
+    address?: string | null; // String
+    byAppointmentOpeningHours: NexusGenRootTypes['OpeningHours']; // OpeningHours!
+    byAppointmentOpeningTimes?: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    exhibitions?: NexusGenRootTypes['Exhibition'][] | null; // [Exhibition!]
+    googleMap?: string | null; // String
     id: string; // String!
+    location: NexusGenRootTypes['Location']; // Location!
+    name: string; // String!
+    nearestTubes?: NexusGenRootTypes['TubeStation'][] | null; // [TubeStation!]
+    openStreetMap?: string | null; // String
+    openingHours: NexusGenRootTypes['OpeningHours']; // OpeningHours!
+    openingTimes?: string | null; // String
+    postalAddress: NexusGenRootTypes['PostalAddress']; // PostalAddress!
+    slug: string; // String!
+    tubes?: string | null; // String
+    website?: string | null; // String
+    websiteUrl?: string | null; // String
+  };
+  GalleryQueryResponse: {
+    // root type
+    error?: string | null; // String
+    galleries?: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
+  };
+  Location: {
+    // root type
+    latitude: number; // Float!
+    longitude: number; // Float!
   };
   Mutation: {};
+  OpeningHours: {
+    // root type
+    openingHoursRanges: NexusGenRootTypes['OpeningHoursRange'][]; // [OpeningHoursRange!]!
+  };
+  OpeningHoursRange: {
+    // root type
+    closingTime?: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    endDay?: string | null; // String
+    id: number; // Int!
+    openingTime?: string | null; // String
+    startDay?: string | null; // String
+    updatedAt: NexusGenScalars['Date']; // Date!
+  };
   PaginatedExhibitions: {
     // root type
     exhibitions?: Array<NexusGenRootTypes['Exhibition'] | null> | null; // [Exhibition]
+    hasMore?: boolean | null; // Boolean
+  };
+  PaginatedGalleries: {
+    // root type
+    galleries?: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
     hasMore?: boolean | null; // Boolean
   };
   Photographer: {
@@ -130,7 +224,27 @@ export interface NexusGenObjects {
     website?: string | null; // String
     websiteUrl?: string | null; // String
   };
+  PostalAddress: {
+    // root type
+    city?: string | null; // String
+    country?: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    locality?: string | null; // String
+    postalCode?: string | null; // String
+    streetAddress?: string | null; // String
+    string: string; // ID!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  };
   Query: {};
+  TubeStation: {
+    // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    galleries: NexusGenRootTypes['Gallery'][]; // [Gallery!]!
+    id: number; // Int!
+    name: string; // String!
+    slug: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  };
 }
 
 export interface NexusGenInterfaces {}
@@ -146,6 +260,11 @@ export interface NexusGenFieldTypes {
     // field return type
     errors: Array<NexusGenRootTypes['FieldError'] | null> | null; // [FieldError]
     exhibition: NexusGenRootTypes['Exhibition'] | null; // Exhibition
+  };
+  CreateGalleryResponse: {
+    // field return type
+    errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    gallery: NexusGenRootTypes['Gallery']; // Gallery!
   };
   Exhibition: {
     // field return type
@@ -178,16 +297,65 @@ export interface NexusGenFieldTypes {
   };
   Gallery: {
     // field return type
+    address: string | null; // String
+    byAppointmentOpeningHours: NexusGenRootTypes['OpeningHours']; // OpeningHours!
+    byAppointmentOpeningTimes: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    exhibitions: NexusGenRootTypes['Exhibition'][] | null; // [Exhibition!]
+    googleMap: string | null; // String
     id: string; // String!
+    location: NexusGenRootTypes['Location']; // Location!
+    name: string; // String!
+    nearestTubes: NexusGenRootTypes['TubeStation'][] | null; // [TubeStation!]
+    openStreetMap: string | null; // String
+    openingHours: NexusGenRootTypes['OpeningHours']; // OpeningHours!
+    openingTimes: string | null; // String
+    postalAddress: NexusGenRootTypes['PostalAddress']; // PostalAddress!
+    slug: string; // String!
+    tubes: string | null; // String
+    website: string | null; // String
+    websiteUrl: string | null; // String
+  };
+  GalleryQueryResponse: {
+    // field return type
+    error: string | null; // String
+    galleries: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
+  };
+  Location: {
+    // field return type
+    latitude: number; // Float!
+    longitude: number; // Float!
   };
   Mutation: {
     // field return type
     createExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
+    createGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
+    deleteGallery: boolean; // Boolean!
     updateExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
+    updateGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
+  };
+  OpeningHours: {
+    // field return type
+    openingHoursRanges: NexusGenRootTypes['OpeningHoursRange'][]; // [OpeningHoursRange!]!
+  };
+  OpeningHoursRange: {
+    // field return type
+    closingTime: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    endDay: string | null; // String
+    id: number; // Int!
+    openingTime: string | null; // String
+    startDay: string | null; // String
+    updatedAt: NexusGenScalars['Date']; // Date!
   };
   PaginatedExhibitions: {
     // field return type
     exhibitions: Array<NexusGenRootTypes['Exhibition'] | null> | null; // [Exhibition]
+    hasMore: boolean | null; // Boolean
+  };
+  PaginatedGalleries: {
+    // field return type
+    galleries: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
     hasMore: boolean | null; // Boolean
   };
   Photographer: {
@@ -204,11 +372,33 @@ export interface NexusGenFieldTypes {
     website: string | null; // String
     websiteUrl: string | null; // String
   };
+  PostalAddress: {
+    // field return type
+    city: string | null; // String
+    country: string | null; // String
+    createdAt: NexusGenScalars['Date']; // Date!
+    locality: string | null; // String
+    postalCode: string | null; // String
+    streetAddress: string | null; // String
+    string: string; // ID!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  };
   Query: {
     // field return type
     exhibition: NexusGenRootTypes['ExhibitionQueryResponse']; // ExhibitionQueryResponse!
     exhibitions: NexusGenRootTypes['PaginatedExhibitions']; // PaginatedExhibitions!
+    galleries: NexusGenRootTypes['PaginatedGalleries']; // PaginatedGalleries!
+    gallery: NexusGenRootTypes['GalleryQueryResponse']; // GalleryQueryResponse!
     hello: string | null; // String
+  };
+  TubeStation: {
+    // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    galleries: NexusGenRootTypes['Gallery'][]; // [Gallery!]!
+    id: number; // Int!
+    name: string; // String!
+    slug: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
   };
 }
 
@@ -217,6 +407,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     errors: 'FieldError';
     exhibition: 'Exhibition';
+  };
+  CreateGalleryResponse: {
+    // field return type name
+    errors: 'FieldError';
+    gallery: 'Gallery';
   };
   Exhibition: {
     // field return type name
@@ -249,16 +444,65 @@ export interface NexusGenFieldTypeNames {
   };
   Gallery: {
     // field return type name
+    address: 'String';
+    byAppointmentOpeningHours: 'OpeningHours';
+    byAppointmentOpeningTimes: 'String';
+    createdAt: 'Date';
+    exhibitions: 'Exhibition';
+    googleMap: 'String';
     id: 'String';
+    location: 'Location';
+    name: 'String';
+    nearestTubes: 'TubeStation';
+    openStreetMap: 'String';
+    openingHours: 'OpeningHours';
+    openingTimes: 'String';
+    postalAddress: 'PostalAddress';
+    slug: 'String';
+    tubes: 'String';
+    website: 'String';
+    websiteUrl: 'String';
+  };
+  GalleryQueryResponse: {
+    // field return type name
+    error: 'String';
+    galleries: 'Gallery';
+  };
+  Location: {
+    // field return type name
+    latitude: 'Float';
+    longitude: 'Float';
   };
   Mutation: {
     // field return type name
     createExhibition: 'CreateExhibitionResponse';
+    createGallery: 'CreateGalleryResponse';
+    deleteGallery: 'Boolean';
     updateExhibition: 'CreateExhibitionResponse';
+    updateGallery: 'CreateGalleryResponse';
+  };
+  OpeningHours: {
+    // field return type name
+    openingHoursRanges: 'OpeningHoursRange';
+  };
+  OpeningHoursRange: {
+    // field return type name
+    closingTime: 'String';
+    createdAt: 'Date';
+    endDay: 'String';
+    id: 'Int';
+    openingTime: 'String';
+    startDay: 'String';
+    updatedAt: 'Date';
   };
   PaginatedExhibitions: {
     // field return type name
     exhibitions: 'Exhibition';
+    hasMore: 'Boolean';
+  };
+  PaginatedGalleries: {
+    // field return type name
+    galleries: 'Gallery';
     hasMore: 'Boolean';
   };
   Photographer: {
@@ -275,11 +519,33 @@ export interface NexusGenFieldTypeNames {
     website: 'String';
     websiteUrl: 'String';
   };
+  PostalAddress: {
+    // field return type name
+    city: 'String';
+    country: 'String';
+    createdAt: 'Date';
+    locality: 'String';
+    postalCode: 'String';
+    streetAddress: 'String';
+    string: 'ID';
+    updatedAt: 'Date';
+  };
   Query: {
     // field return type name
     exhibition: 'ExhibitionQueryResponse';
     exhibitions: 'PaginatedExhibitions';
+    galleries: 'PaginatedGalleries';
+    gallery: 'GalleryQueryResponse';
     hello: 'String';
+  };
+  TubeStation: {
+    // field return type name
+    createdAt: 'Date';
+    galleries: 'Gallery';
+    id: 'Int';
+    name: 'String';
+    slug: 'String';
+    updatedAt: 'Date';
   };
 }
 
@@ -289,15 +555,31 @@ export interface NexusGenArgTypes {
       // args
       input: NexusGenInputs['CreateExhibitionInput']; // CreateExhibitionInput!
     };
+    createGallery: {
+      // args
+      input: NexusGenInputs['CreateGalleryInput']; // CreateGalleryInput!
+    };
+    deleteGallery: {
+      // args
+      id: string; // String!
+    };
     updateExhibition: {
       // args
       input: NexusGenInputs['UpdateExhibitionInput']; // UpdateExhibitionInput!
+    };
+    updateGallery: {
+      // args
+      input: NexusGenInputs['UpdateGalleryInput']; // UpdateGalleryInput!
     };
   };
   Query: {
     exhibition: {
       // args
       id: string; // String!
+    };
+    gallery: {
+      // args
+      slug: string; // String!
     };
   };
 }

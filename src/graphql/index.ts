@@ -6,7 +6,11 @@ export const GQLDate: typeof GraphQLDate = decorateType(GraphQLDate, {
   asNexusMethod: 'date',
 });
 
+export * from './AddressInput';
 export * from './Exhibition';
 export * from './Gallery';
 export * from './Hello';
+export * from './OpeningHours';
 export * from './Photographer';
+export * from './PostalAddress';
+export * from './TubeStation';

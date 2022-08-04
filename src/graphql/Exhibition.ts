@@ -97,7 +97,7 @@ export const ExhibitionQuery = extendType({
     t.nonNull.field('exhibition', {
       type: ExhibitionQueryResponse,
       args: { id: nonNull(stringArg()) },
-      async resolve(_root, args: { id: string }, ctx: Context) {
+      async resolve(_root, args, ctx: Context) {
         const { id } = args;
         const exhibition = await ctx.prisma.exhibition.findUnique({
           where: { uid: id },
