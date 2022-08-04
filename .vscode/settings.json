@@ -4,6 +4,7 @@
   },
   "editor.formatOnSave": true,
   "spellright.language": ["en-GB"],
+  "typescript.preferences.importModuleSpecifier": "relative",
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
