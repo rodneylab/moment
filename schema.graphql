@@ -74,6 +74,29 @@ A date string, such as 2007-12-03, compliant with the `full-date` format outline
 """
 scalar Date
 
+type DuoAuthDevice {
+  capabilities: [String]
+  device: String
+  type: String
+}
+
+type DuoEnrollResponse {
+  activationCode: String
+  error: String
+  qrCode: String
+}
+
+type DuoEnrollStatusResponse {
+  error: String
+  result: String
+}
+
+type DuoPreauthResponse {
+  devices: [DuoAuthDevice!]
+  error: String
+  result: String
+}
+
 type Exhibition {
   bodyText: String
   createdAt: String
@@ -96,6 +119,35 @@ type Exhibition {
 type ExhibitionQueryResponse {
   error: String
   exhibition: Exhibition
+}
+
+type FidoU2fAuthenticateRequest {
+  error: String
+  labels: [String]
+  signRequests: [FidoU2fRegisterRequest!]
+}
+
+input FidoU2fRegisterInput {
+  label: String!
+  registerData: FidoU2fRegistrationDataInput!
+}
+
+type FidoU2fRegisterRequest {
+  appId: String
+  challenge: String
+  version: String
+}
+
+input FidoU2fRegistrationDataInput {
+  clientData: String!
+  registrationData: String!
+  version: String!
+}
+
+input FidoU2fSignResponseInput {
+  clientData: String!
+  keyHandle: String!
+  signatureData: String!
 }
 
 type FieldError {
@@ -134,6 +186,11 @@ type Location {
   longitude: Float!
 }
 
+input LoginInput {
+  password: String!
+  username: String!
+}
+
 type Mutation {
   createExhibition(input: CreateExhibitionInput!): CreateExhibitionResponse!
   createGallery(input: CreateGalleryInput!): CreateGalleryResponse!
@@ -141,6 +198,14 @@ type Mutation {
   createTubeStation(input: CreateTubeStationInput!): CreateTubeStationResponse!
   deleteGallery(id: String!): Boolean!
   deleteTubeStation(id: String!): Boolean!
+  duoAuth(device: String!): Boolean!
+  duoEnroll: DuoEnrollResponse!
+  fidoU2fAuthenticate(registerInput: FidoU2fRegisterInput!): Boolean!
+  fidoU2fCompleteAuthentication(signData: FidoU2fSignResponseInput!): Boolean!
+  fidoU2fRegister(registerInput: FidoU2fRegisterInput!): Boolean!
+  login(credentials: LoginInput!): UserResponse!
+  logout: Boolean!
+  register(registerInput: UsernameEmailPasswordInput!): UserResponse!
   updateExhibition(input: UpdateExhibitionInput!): CreateExhibitionResponse!
   updateGallery(input: UpdateGalleryInput!): CreateGalleryResponse!
   updateTubeStation(input: UpdateTubeStationInput!): CreateTubeStationResponse!
@@ -217,11 +282,19 @@ type PostalAddress {
 }
 
 type Query {
+  duoCheck: Boolean!
+  duoEnrollStatus(activationCode: String!): DuoEnrollStatusResponse!
+  duoPing: Boolean!
+  duoPreauth: DuoPreauthResponse!
+  email: String!
   exhibition(id: String!): ExhibitionQueryResponse!
   exhibitions: PaginatedExhibitions!
+  fidoU2fBeginAuthenticate: FidoU2fAuthenticateRequest!
+  fidoU2fBeginRegister: FidoU2fRegisterRequest!
   galleries: PaginatedGalleries!
   gallery(slug: String!): GalleryQueryResponse!
   hello: String
+  me: User!
   photographer(slug: String!): PhotographerQueryResponse!
   photographers: PaginatedPhotographers!
   tubeStation(slug: String!): TubeStationQueryResponse!
@@ -269,4 +342,26 @@ input UpdateTubeStationInput {
   id: String!
   name: String
   slug: String
+}
+
+type User {
+  createdAt: Date!
+  duoRegistered: Boolean
+  email: String!
+  fidoU2fRegistered: Boolean
+  id: String!
+  updatedAt: Date!
+  username: String!
+}
+
+type UserResponse {
+  challenge: String
+  errors: [FieldError!]
+  user: User
+}
+
+input UsernameEmailPasswordInput {
+  email: String!
+  password: String!
+  username: String!
 }

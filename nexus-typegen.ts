@@ -80,6 +80,28 @@ export interface NexusGenInputs {
     name: string; // String!
     slug: string; // String!
   };
+  FidoU2fRegisterInput: {
+    // input type
+    label: string; // String!
+    registerData: NexusGenInputs['FidoU2fRegistrationDataInput']; // FidoU2fRegistrationDataInput!
+  };
+  FidoU2fRegistrationDataInput: {
+    // input type
+    clientData: string; // String!
+    registrationData: string; // String!
+    version: string; // String!
+  };
+  FidoU2fSignResponseInput: {
+    // input type
+    clientData: string; // String!
+    keyHandle: string; // String!
+    signatureData: string; // String!
+  };
+  LoginInput: {
+    // input type
+    password: string; // String!
+    username: string; // String!
+  };
   OpeningHoursInput: {
     // input type
     openingHoursRanges: NexusGenInputs['OpeningHoursRangeInput'][]; // [OpeningHoursRangeInput!]!
@@ -120,6 +142,12 @@ export interface NexusGenInputs {
     name?: string | null; // String
     slug?: string | null; // String
   };
+  UsernameEmailPasswordInput: {
+    // input type
+    email: string; // String!
+    password: string; // String!
+    username: string; // String!
+  };
 }
 
 export interface NexusGenEnums {}
@@ -154,6 +182,29 @@ export interface NexusGenObjects {
     errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
     tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
+  DuoAuthDevice: {
+    // root type
+    capabilities?: Array<string | null> | null; // [String]
+    device?: string | null; // String
+    type?: string | null; // String
+  };
+  DuoEnrollResponse: {
+    // root type
+    activationCode?: string | null; // String
+    error?: string | null; // String
+    qrCode?: string | null; // String
+  };
+  DuoEnrollStatusResponse: {
+    // root type
+    error?: string | null; // String
+    result?: string | null; // String
+  };
+  DuoPreauthResponse: {
+    // root type
+    devices?: NexusGenRootTypes['DuoAuthDevice'][] | null; // [DuoAuthDevice!]
+    error?: string | null; // String
+    result?: string | null; // String
+  };
   Exhibition: {
     // root type
     bodyText?: string | null; // String
@@ -177,6 +228,18 @@ export interface NexusGenObjects {
     // root type
     error?: string | null; // String
     exhibition?: NexusGenRootTypes['Exhibition'] | null; // Exhibition
+  };
+  FidoU2fAuthenticateRequest: {
+    // root type
+    error?: string | null; // String
+    labels?: Array<string | null> | null; // [String]
+    signRequests?: NexusGenRootTypes['FidoU2fRegisterRequest'][] | null; // [FidoU2fRegisterRequest!]
+  };
+  FidoU2fRegisterRequest: {
+    // root type
+    appId?: string | null; // String
+    challenge?: string | null; // String
+    version?: string | null; // String
   };
   FieldError: {
     // root type
@@ -289,6 +352,22 @@ export interface NexusGenObjects {
     error?: string | null; // String
     tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
+  User: {
+    // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    duoRegistered?: boolean | null; // Boolean
+    email: string; // String!
+    fidoU2fRegistered?: boolean | null; // Boolean
+    id: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    username: string; // String!
+  };
+  UserResponse: {
+    // root type
+    challenge?: string | null; // String
+    errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    user?: NexusGenRootTypes['User'] | null; // User
+  };
 }
 
 export interface NexusGenInterfaces {}
@@ -320,6 +399,29 @@ export interface NexusGenFieldTypes {
     errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
     tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
   };
+  DuoAuthDevice: {
+    // field return type
+    capabilities: Array<string | null> | null; // [String]
+    device: string | null; // String
+    type: string | null; // String
+  };
+  DuoEnrollResponse: {
+    // field return type
+    activationCode: string | null; // String
+    error: string | null; // String
+    qrCode: string | null; // String
+  };
+  DuoEnrollStatusResponse: {
+    // field return type
+    error: string | null; // String
+    result: string | null; // String
+  };
+  DuoPreauthResponse: {
+    // field return type
+    devices: NexusGenRootTypes['DuoAuthDevice'][] | null; // [DuoAuthDevice!]
+    error: string | null; // String
+    result: string | null; // String
+  };
   Exhibition: {
     // field return type
     bodyText: string | null; // String
@@ -343,6 +445,18 @@ export interface NexusGenFieldTypes {
     // field return type
     error: string | null; // String
     exhibition: NexusGenRootTypes['Exhibition'] | null; // Exhibition
+  };
+  FidoU2fAuthenticateRequest: {
+    // field return type
+    error: string | null; // String
+    labels: Array<string | null> | null; // [String]
+    signRequests: NexusGenRootTypes['FidoU2fRegisterRequest'][] | null; // [FidoU2fRegisterRequest!]
+  };
+  FidoU2fRegisterRequest: {
+    // field return type
+    appId: string | null; // String
+    challenge: string | null; // String
+    version: string | null; // String
   };
   FieldError: {
     // field return type
@@ -388,6 +502,14 @@ export interface NexusGenFieldTypes {
     createTubeStation: NexusGenRootTypes['CreateTubeStationResponse']; // CreateTubeStationResponse!
     deleteGallery: boolean; // Boolean!
     deleteTubeStation: boolean; // Boolean!
+    duoAuth: boolean; // Boolean!
+    duoEnroll: NexusGenRootTypes['DuoEnrollResponse']; // DuoEnrollResponse!
+    fidoU2fAuthenticate: boolean; // Boolean!
+    fidoU2fCompleteAuthentication: boolean; // Boolean!
+    fidoU2fRegister: boolean; // Boolean!
+    login: NexusGenRootTypes['UserResponse']; // UserResponse!
+    logout: boolean; // Boolean!
+    register: NexusGenRootTypes['UserResponse']; // UserResponse!
     updateExhibition: NexusGenRootTypes['CreateExhibitionResponse']; // CreateExhibitionResponse!
     updateGallery: NexusGenRootTypes['CreateGalleryResponse']; // CreateGalleryResponse!
     updateTubeStation: NexusGenRootTypes['CreateTubeStationResponse']; // CreateTubeStationResponse!
@@ -453,11 +575,19 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
+    duoCheck: boolean; // Boolean!
+    duoEnrollStatus: NexusGenRootTypes['DuoEnrollStatusResponse']; // DuoEnrollStatusResponse!
+    duoPing: boolean; // Boolean!
+    duoPreauth: NexusGenRootTypes['DuoPreauthResponse']; // DuoPreauthResponse!
+    email: string; // String!
     exhibition: NexusGenRootTypes['ExhibitionQueryResponse']; // ExhibitionQueryResponse!
     exhibitions: NexusGenRootTypes['PaginatedExhibitions']; // PaginatedExhibitions!
+    fidoU2fBeginAuthenticate: NexusGenRootTypes['FidoU2fAuthenticateRequest']; // FidoU2fAuthenticateRequest!
+    fidoU2fBeginRegister: NexusGenRootTypes['FidoU2fRegisterRequest']; // FidoU2fRegisterRequest!
     galleries: NexusGenRootTypes['PaginatedGalleries']; // PaginatedGalleries!
     gallery: NexusGenRootTypes['GalleryQueryResponse']; // GalleryQueryResponse!
     hello: string | null; // String
+    me: NexusGenRootTypes['User']; // User!
     photographer: NexusGenRootTypes['PhotographerQueryResponse']; // PhotographerQueryResponse!
     photographers: NexusGenRootTypes['PaginatedPhotographers']; // PaginatedPhotographers!
     tubeStation: NexusGenRootTypes['TubeStationQueryResponse']; // TubeStationQueryResponse!
@@ -476,6 +606,22 @@ export interface NexusGenFieldTypes {
     // field return type
     error: string | null; // String
     tubeStation: NexusGenRootTypes['TubeStation']; // TubeStation!
+  };
+  User: {
+    // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    duoRegistered: boolean | null; // Boolean
+    email: string; // String!
+    fidoU2fRegistered: boolean | null; // Boolean
+    id: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    username: string; // String!
+  };
+  UserResponse: {
+    // field return type
+    challenge: string | null; // String
+    errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    user: NexusGenRootTypes['User'] | null; // User
   };
 }
 
@@ -500,6 +646,29 @@ export interface NexusGenFieldTypeNames {
     errors: 'FieldError';
     tubeStation: 'TubeStation';
   };
+  DuoAuthDevice: {
+    // field return type name
+    capabilities: 'String';
+    device: 'String';
+    type: 'String';
+  };
+  DuoEnrollResponse: {
+    // field return type name
+    activationCode: 'String';
+    error: 'String';
+    qrCode: 'String';
+  };
+  DuoEnrollStatusResponse: {
+    // field return type name
+    error: 'String';
+    result: 'String';
+  };
+  DuoPreauthResponse: {
+    // field return type name
+    devices: 'DuoAuthDevice';
+    error: 'String';
+    result: 'String';
+  };
   Exhibition: {
     // field return type name
     bodyText: 'String';
@@ -523,6 +692,18 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     error: 'String';
     exhibition: 'Exhibition';
+  };
+  FidoU2fAuthenticateRequest: {
+    // field return type name
+    error: 'String';
+    labels: 'String';
+    signRequests: 'FidoU2fRegisterRequest';
+  };
+  FidoU2fRegisterRequest: {
+    // field return type name
+    appId: 'String';
+    challenge: 'String';
+    version: 'String';
   };
   FieldError: {
     // field return type name
@@ -568,6 +749,14 @@ export interface NexusGenFieldTypeNames {
     createTubeStation: 'CreateTubeStationResponse';
     deleteGallery: 'Boolean';
     deleteTubeStation: 'Boolean';
+    duoAuth: 'Boolean';
+    duoEnroll: 'DuoEnrollResponse';
+    fidoU2fAuthenticate: 'Boolean';
+    fidoU2fCompleteAuthentication: 'Boolean';
+    fidoU2fRegister: 'Boolean';
+    login: 'UserResponse';
+    logout: 'Boolean';
+    register: 'UserResponse';
     updateExhibition: 'CreateExhibitionResponse';
     updateGallery: 'CreateGalleryResponse';
     updateTubeStation: 'CreateTubeStationResponse';
@@ -633,11 +822,19 @@ export interface NexusGenFieldTypeNames {
   };
   Query: {
     // field return type name
+    duoCheck: 'Boolean';
+    duoEnrollStatus: 'DuoEnrollStatusResponse';
+    duoPing: 'Boolean';
+    duoPreauth: 'DuoPreauthResponse';
+    email: 'String';
     exhibition: 'ExhibitionQueryResponse';
     exhibitions: 'PaginatedExhibitions';
+    fidoU2fBeginAuthenticate: 'FidoU2fAuthenticateRequest';
+    fidoU2fBeginRegister: 'FidoU2fRegisterRequest';
     galleries: 'PaginatedGalleries';
     gallery: 'GalleryQueryResponse';
     hello: 'String';
+    me: 'User';
     photographer: 'PhotographerQueryResponse';
     photographers: 'PaginatedPhotographers';
     tubeStation: 'TubeStationQueryResponse';
@@ -656,6 +853,22 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     error: 'String';
     tubeStation: 'TubeStation';
+  };
+  User: {
+    // field return type name
+    createdAt: 'Date';
+    duoRegistered: 'Boolean';
+    email: 'String';
+    fidoU2fRegistered: 'Boolean';
+    id: 'String';
+    updatedAt: 'Date';
+    username: 'String';
+  };
+  UserResponse: {
+    // field return type name
+    challenge: 'String';
+    errors: 'FieldError';
+    user: 'User';
   };
 }
 
@@ -685,6 +898,30 @@ export interface NexusGenArgTypes {
       // args
       id: string; // String!
     };
+    duoAuth: {
+      // args
+      device: string; // String!
+    };
+    fidoU2fAuthenticate: {
+      // args
+      registerInput: NexusGenInputs['FidoU2fRegisterInput']; // FidoU2fRegisterInput!
+    };
+    fidoU2fCompleteAuthentication: {
+      // args
+      signData: NexusGenInputs['FidoU2fSignResponseInput']; // FidoU2fSignResponseInput!
+    };
+    fidoU2fRegister: {
+      // args
+      registerInput: NexusGenInputs['FidoU2fRegisterInput']; // FidoU2fRegisterInput!
+    };
+    login: {
+      // args
+      credentials: NexusGenInputs['LoginInput']; // LoginInput!
+    };
+    register: {
+      // args
+      registerInput: NexusGenInputs['UsernameEmailPasswordInput']; // UsernameEmailPasswordInput!
+    };
     updateExhibition: {
       // args
       input: NexusGenInputs['UpdateExhibitionInput']; // UpdateExhibitionInput!
@@ -699,6 +936,10 @@ export interface NexusGenArgTypes {
     };
   };
   Query: {
+    duoEnrollStatus: {
+      // args
+      activationCode: string; // String!
+    };
     exhibition: {
       // args
       id: string; // String!
