@@ -14,3 +14,4 @@ export * from './OpeningHours';
 export * from './Photographer';
 export * from './PostalAddress';
 export * from './TubeStation';
+export * from './User';

@@ -1,7 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 
-// config({ path: process.env.NODE_ENV === 'production' ? '.env' : '.env.dev' });
-
 let db: PrismaClient;
 
 declare global {

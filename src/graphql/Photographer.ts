@@ -66,7 +66,7 @@ export const PhotographerQuery = extendType({
       async resolve(_root, args, ctx: Context) {
         try {
           const { slug } = args;
-          const photographer = await ctx.prisma.photographer.findUnique({
+          const photographer = await ctx.db.photographer.findUnique({
             where: { slug },
             include: {
               exhibitions: true,
@@ -89,7 +89,7 @@ export const PhotographerQuery = extendType({
         async resolve(_root, _args, ctx: Context) {
           try {
             const photographers =
-              (await ctx.prisma.photographer.findMany({
+              (await ctx.db.photographer.findMany({
                 take: 100,
                 include: {
                   exhibitions: true,
@@ -119,7 +119,7 @@ export const PhotographerMutation = extendType({
       args: { input: arg({ type: nonNull(CreatePhotographerInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { input } = args;
 
           if (!user) {
@@ -144,7 +144,7 @@ export const PhotographerMutation = extendType({
           const errors: NexusGenObjects['FieldError'][] = [];
 
           // check photographer does not already exist
-          const existingPhotographer = await ctx.prisma.photographer.findUnique({
+          const existingPhotographer = await ctx.db.photographer.findUnique({
             where: { slug },
           });
           if (existingPhotographer) {
@@ -161,7 +161,7 @@ export const PhotographerMutation = extendType({
             return { errors };
           }
           // create new photographer
-          const photographer = await ctx.prisma.photographer.create({
+          const photographer = await ctx.db.photographer.create({
             data: {
               createdBy: { connect: { uid: userId } },
               ...(firstName ? { firstName } : {}),

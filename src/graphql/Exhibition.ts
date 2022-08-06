@@ -99,7 +99,7 @@ export const ExhibitionQuery = extendType({
       args: { id: nonNull(stringArg()) },
       async resolve(_root, args, ctx: Context) {
         const { id } = args;
-        const exhibition = await ctx.prisma.exhibition.findUnique({
+        const exhibition = await ctx.db.exhibition.findUnique({
           where: { uid: id },
           include: {
             gallery: {
@@ -126,7 +126,7 @@ export const ExhibitionQuery = extendType({
         type: PaginatedExhibitions,
         async resolve(_root, _args, ctx: Context) {
           const exhibitions =
-            (await ctx.prisma.exhibition.findMany({
+            (await ctx.db.exhibition.findMany({
               take: 100,
               include: {
                 gallery: {
@@ -160,7 +160,7 @@ export const ExhibitionMutation = extendType({
       args: { input: arg({ type: nonNull(CreateExhibitionInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session ?? {};
+          const { user } = ctx.session ?? {};
           if (!user) {
             return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
           }
@@ -190,7 +190,7 @@ export const ExhibitionMutation = extendType({
 
           // check gallery does not already exist
           const gallery =
-            (await ctx.prisma.gallery.findUnique({
+            (await ctx.db.gallery.findUnique({
               where: { slug: gallerySlug },
             })) ?? {};
           if (!gallery) {
@@ -206,7 +206,7 @@ export const ExhibitionMutation = extendType({
           }
 
           // create new gallery
-          const exhibition = await ctx.prisma.exhibition.create({
+          const exhibition = await ctx.db.exhibition.create({
             data: {
               createdBy: { connect: { uid: userId } },
               name,
@@ -249,7 +249,7 @@ export const ExhibitionMutation = extendType({
       async resolve(_root, args, ctx: Context) {
         try {
           const { input } = args as { input: NexusGenInputs['UpdateExhibitionInput'] };
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           if (!user) {
             return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
           }
@@ -259,7 +259,7 @@ export const ExhibitionMutation = extendType({
           }
 
           const { id: uid, addPhotographers, removePhotographers, url } = input;
-          const exhibition = await ctx.prisma.exhibition.findUnique({
+          const exhibition = await ctx.db.exhibition.findUnique({
             where: { uid },
             include: { photographers: true },
           });
@@ -276,7 +276,7 @@ export const ExhibitionMutation = extendType({
           let addPhotographersNotEmpty: NexusGenObjects['Photographer'][] = [];
           if (addPhotographers) {
             const promises = addPhotographers.map((element) =>
-              ctx.prisma.photographer.findUnique({ where: { slug: element } }),
+              ctx.db.photographer.findUnique({ where: { slug: element } }),
             );
             const photographers = await Promise.all(promises);
             addPhotographersNotEmpty.forEach((element, index) => {
@@ -315,7 +315,7 @@ export const ExhibitionMutation = extendType({
 
           if (removePhotographers) {
             const promises = removePhotographers.map((element) =>
-              ctx.prisma.photographer.findUnique({ where: { slug: element } }),
+              ctx.db.photographer.findUnique({ where: { slug: element } }),
             );
             const photographers = await Promise.all(promises);
             removePhotographersNotEmpty = photographers.filter(notEmpty);
@@ -337,7 +337,7 @@ export const ExhibitionMutation = extendType({
 
           const { bodyText, summaryText } = input;
 
-          const updatedExhibition = await ctx.prisma.exhibition.update({
+          const updatedExhibition = await ctx.db.exhibition.update({
             where: {
               uid,
             },

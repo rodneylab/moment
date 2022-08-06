@@ -58,7 +58,7 @@ export const TubeStationQuery = extendType({
       async resolve(_root, args, ctx: Context) {
         try {
           const { slug } = args;
-          const tubeStation = await ctx.prisma.tubeStation.findUnique({
+          const tubeStation = await ctx.db.tubeStation.findUnique({
             where: { slug },
           });
 
@@ -71,23 +71,23 @@ export const TubeStationQuery = extendType({
           return { galleries: [], hasMore: false };
         }
       },
-    }),
-      t.nonNull.field('tubeStations', {
-        type: list(TubeStation),
-        args: {},
-        async resolve(_root, _args, ctx: Context) {
-          try {
-            const tubeStations = await ctx.prisma.tubeStation.findMany({
-              take: 999,
-              orderBy: { name: 'asc' },
-            });
-            return tubeStations.map((element) => graphqlTubeStation(element));
-          } catch (error) {
-            console.error('Unknown error running tubeStations query');
-            return [];
-          }
-        },
-      });
+    });
+    t.nonNull.field('tubeStations', {
+      type: list(TubeStation),
+      args: {},
+      async resolve(_root, _args, ctx: Context) {
+        try {
+          const tubeStations = await ctx.db.tubeStation.findMany({
+            take: 999,
+            orderBy: { name: 'asc' },
+          });
+          return tubeStations.map((element) => graphqlTubeStation(element));
+        } catch (error) {
+          console.error('Unknown error running tubeStations query');
+          return [];
+        }
+      },
+    });
   },
 });
 
@@ -99,7 +99,7 @@ export const TubeStationMutation = extendType({
       args: { input: arg({ type: nonNull(CreateTubeStationInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { input } = args;
 
           if (!user) {
@@ -119,7 +119,7 @@ export const TubeStationMutation = extendType({
             return { errors };
           }
 
-          const existingTubeStation = await ctx.prisma.tubeStation.findFirst({
+          const existingTubeStation = await ctx.db.tubeStation.findFirst({
             where: { OR: [{ name }, { slug }] },
           });
           if (existingTubeStation) {
@@ -138,7 +138,7 @@ export const TubeStationMutation = extendType({
             }
           }
 
-          const tubeStation = await ctx.prisma.tubeStation.create({
+          const tubeStation = await ctx.db.tubeStation.create({
             data: { name, slug },
           });
           return { tubeStation: graphqlTubeStation(tubeStation) };
@@ -152,7 +152,7 @@ export const TubeStationMutation = extendType({
       args: { id: nonNull(stringArg()) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { id } = args;
 
           if (!user) {
@@ -164,15 +164,15 @@ export const TubeStationMutation = extendType({
           }
 
           // todo(rodneylab): check relations and only allow deletions if it makes sense
-          const tubeStation = await ctx.prisma.tubeStation.findUnique({ where: { uid: id } });
+          const tubeStation = await ctx.db.tubeStation.findUnique({ where: { uid: id } });
           if (!tubeStation) {
             return false;
           }
           const { id: tubeStationId } = tubeStation;
-          await ctx.prisma.galleryTubeStations.deleteMany({
+          await ctx.db.galleryTubeStations.deleteMany({
             where: { tubeStationId },
           });
-          await ctx.prisma.tubeStation.delete({ where: { id: tubeStationId } });
+          await ctx.db.tubeStation.delete({ where: { id: tubeStationId } });
           return true;
         } catch (error: unknown) {
           const { id } = args;
@@ -186,7 +186,7 @@ export const TubeStationMutation = extendType({
       args: { input: arg({ type: nonNull(UpdateTubeStationInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { input } = args;
 
           if (!user) {
@@ -198,7 +198,7 @@ export const TubeStationMutation = extendType({
           }
 
           const { id: uid } = input;
-          const tubeStation = await ctx.prisma.tubeStation.findUnique({
+          const tubeStation = await ctx.db.tubeStation.findUnique({
             where: { uid },
           });
           if (!tubeStation) {
@@ -207,7 +207,7 @@ export const TubeStationMutation = extendType({
             };
           }
           const { name, slug } = input;
-          const updatedTubeStation = await ctx.prisma.tubeStation.update({
+          const updatedTubeStation = await ctx.db.tubeStation.update({
             where: {
               uid,
             },

@@ -128,7 +128,7 @@ export const GalleryQuery = extendType({
       args: {},
       async resolve(_root, _args, ctx: Context) {
         try {
-          const galleries = await ctx.prisma.gallery.findMany({
+          const galleries = await ctx.db.gallery.findMany({
             take: 100,
             orderBy: { name: 'asc' },
             include: {
@@ -157,7 +157,7 @@ export const GalleryQuery = extendType({
         async resolve(_root, args, ctx: Context) {
           try {
             const { slug } = args;
-            const gallery = await ctx.prisma.gallery.findUnique({
+            const gallery = await ctx.db.gallery.findUnique({
               where: { slug },
               include: {
                 address: true,
@@ -190,7 +190,7 @@ export const GalleryMutation = extendType({
       args: { input: arg({ type: nonNull(CreateGalleryInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { input } = args;
           if (!user) {
             return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
@@ -212,7 +212,7 @@ export const GalleryMutation = extendType({
           const errors: FieldError[] = [];
 
           // check gallery does not already exist
-          const existingGallery = await ctx.prisma.gallery.findFirst({
+          const existingGallery = await ctx.db.gallery.findFirst({
             where: { OR: [{ name }, { slug }] },
           });
           if (existingGallery) {
@@ -235,7 +235,7 @@ export const GalleryMutation = extendType({
           let tubeStationsNotEmpty: NexusGenObjects['TubeStation'][] = [];
           if (nearestTubes) {
             const promises = nearestTubes.map((element: string) =>
-              ctx.prisma.tubeStation.findUnique({ where: { name: element } }),
+              ctx.db.tubeStation.findUnique({ where: { name: element } }),
             );
             const tubeStations = await Promise.all(promises);
             tubeStationsNotEmpty.forEach(({ name }) => {
@@ -251,7 +251,7 @@ export const GalleryMutation = extendType({
             return { errors };
           }
           // create new gallery
-          const gallery = await ctx.prisma.gallery.create({
+          const gallery = await ctx.db.gallery.create({
             data: {
               name,
               slug,
@@ -306,7 +306,7 @@ export const GalleryMutation = extendType({
       args: { id: nonNull(stringArg()) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { id } = args;
           if (!user) {
             return false;
@@ -317,15 +317,15 @@ export const GalleryMutation = extendType({
           }
 
           // todo(rodneylab): check relations and only allow deletions where it makes sense
-          const gallery = await ctx.prisma.gallery.findUnique({
+          const gallery = await ctx.db.gallery.findUnique({
             where: { uid: id },
           });
           if (!gallery) {
             return false;
           }
           const { id: galleryId } = gallery;
-          await ctx.prisma.galleryTubeStations.deleteMany({ where: { galleryId } });
-          await ctx.prisma.gallery.delete({ where: { id: galleryId } });
+          await ctx.db.galleryTubeStations.deleteMany({ where: { galleryId } });
+          await ctx.db.gallery.delete({ where: { id: galleryId } });
           return true;
         } catch (error: unknown) {
           const { id } = args;
@@ -339,7 +339,7 @@ export const GalleryMutation = extendType({
       args: { input: arg({ type: nonNull(UpdateGalleryInput) }) },
       async resolve(_root, args, ctx: Context) {
         try {
-          const { user } = ctx.request.session;
+          const { user } = ctx.session;
           const { input } = args;
 
           if (!user) {
@@ -351,7 +351,7 @@ export const GalleryMutation = extendType({
           }
 
           const { id: uid } = input;
-          const gallery = await ctx.prisma.gallery.findUnique({
+          const gallery = await ctx.db.gallery.findUnique({
             where: { uid },
           });
           if (!gallery) {
@@ -385,7 +385,7 @@ export const GalleryMutation = extendType({
           let tubeStationsNotEmpty: NexusGenObjects['TubeStation'][] = [];
           if (addNearestTubes) {
             const promises = addNearestTubes.map((element) =>
-              ctx.prisma.tubeStation.findUnique({ where: { name: element } }),
+              ctx.db.tubeStation.findUnique({ where: { name: element } }),
             );
             const tubeStations = await Promise.all(promises);
             tubeStationsNotEmpty = tubeStations.filter(notEmpty);
@@ -403,7 +403,7 @@ export const GalleryMutation = extendType({
 
           if (removeNearestTubes) {
             const removeStationPromises = removeNearestTubes.map(async (element) =>
-              ctx.prisma.tubeStation.findUnique({ where: { name: element } }),
+              ctx.db.tubeStation.findUnique({ where: { name: element } }),
             );
             const removeStations = await Promise.all(removeStationPromises);
             removeStations.forEach((element, index) => {
@@ -422,7 +422,7 @@ export const GalleryMutation = extendType({
             const { id: galleryId } = gallery;
             const removePromises = removeStations.filter(notEmpty).map((element) => {
               const { id: tubeStationId } = element;
-              return ctx.prisma.galleryTubeStations.delete({
+              return ctx.db.galleryTubeStations.delete({
                 where: { galleryId_tubeStationId: { galleryId, tubeStationId } },
               });
             });
@@ -431,7 +431,7 @@ export const GalleryMutation = extendType({
           }
 
           if (replacementOpeningHours) {
-            await ctx.prisma.gallery.update({
+            await ctx.db.gallery.update({
               where: { uid },
               data: {
                 openingHours: {
@@ -441,7 +441,7 @@ export const GalleryMutation = extendType({
             });
           }
           if (replacementByAppointmentOpeningHours) {
-            await ctx.prisma.gallery.update({
+            await ctx.db.gallery.update({
               where: { uid },
               data: {
                 byAppointmentOpeningHours: {
@@ -450,7 +450,7 @@ export const GalleryMutation = extendType({
               },
             });
           }
-          const updatedGallery = await ctx.prisma.gallery.update({
+          const updatedGallery = await ctx.db.gallery.update({
             where: {
               uid,
             },

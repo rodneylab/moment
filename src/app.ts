@@ -17,19 +17,21 @@ if (!isProduction) {
   delete process.env._proxy;
 }
 
-const buildContext = async (req: FastifyRequest) => {
+const buildContext = async (request: FastifyRequest) => {
+  const { db } = context;
   return Promise.resolve({
-    authorization: req.headers.authorization,
-    ...context,
+    authorization: request.headers.authorization,
+    db,
+    session: request.session,
   });
 };
 
 let app: FastifyInstance | null = null;
 
-async function build(options: FastifyServerOptions = { logger: true }) {
+async function build(options: FastifyServerOptions = { logger: false }) {
   try {
     app = Fastify(options);
-    app.get('/', async function (req, reply) {
+    app.get('/', async function (_req, reply) {
       return reply.graphql('{}');
     });
 
