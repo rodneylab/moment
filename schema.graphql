@@ -124,7 +124,7 @@ type ExhibitionQueryResponse {
 type FidoU2fAuthenticateRequest {
   error: String
   labels: [String]
-  signRequests: [FidoU2fRegisterRequest!]
+  signRequests: [FidoU2fRequest!]
 }
 
 input FidoU2fRegisterInput {
@@ -141,6 +141,13 @@ type FidoU2fRegisterRequest {
 input FidoU2fRegistrationDataInput {
   clientData: String!
   registrationData: String!
+  version: String!
+}
+
+type FidoU2fRequest {
+  appId: String!
+  challenge: String!
+  keyHandle: String
   version: String!
 }
 

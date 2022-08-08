@@ -108,21 +108,31 @@ export const DuoPreauthResponse = objectType({
   },
 });
 
-export const FidoU2fAuthenticateRequest = objectType({
-  name: 'FidoU2fAuthenticateRequest',
-  definition(t) {
-    t.list.string('labels');
-    t.list.field('signRequests', { type: nonNull('FidoU2fRegisterRequest') });
-    t.string('error');
-  },
-});
-
 export const FidoU2fRegisterRequest = objectType({
   name: 'FidoU2fRegisterRequest',
   definition(t) {
     t.string('version');
     t.string('appId');
     t.string('challenge');
+  },
+});
+
+export const FidoU2fRequest = objectType({
+  name: 'FidoU2fRequest',
+  definition(t) {
+    t.nonNull.string('version');
+    t.nonNull.string('appId');
+    t.nonNull.string('challenge');
+    t.string('keyHandle');
+  },
+});
+
+export const FidoU2fAuthenticateRequest = objectType({
+  name: 'FidoU2fAuthenticateRequest',
+  definition(t) {
+    t.list.string('labels');
+    t.list.field('signRequests', { type: nonNull('FidoU2fRequest') });
+    t.string('error');
   },
 });
 
@@ -224,12 +234,12 @@ export const UserQuery = extendType({
     });
     t.nonNull.field('fidoU2fBeginAuthenticate', {
       type: FidoU2fAuthenticateRequest,
-      args: {},
       async resolve(_root, _args, ctx: Context) {
         try {
+          const { db, session } = ctx;
           const { fidoU2fKeys } =
-            (await ctx.db.user.findUnique({
-              where: { uid: ctx.session.user.userId },
+            (await db.user.findUnique({
+              where: { uid: session.user.userId },
               include: { fidoU2fKeys: true },
             })) ?? {};
           if (!fidoU2fKeys || fidoU2fKeys.length === 0) {

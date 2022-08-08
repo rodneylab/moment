@@ -233,13 +233,20 @@ export interface NexusGenObjects {
     // root type
     error?: string | null; // String
     labels?: Array<string | null> | null; // [String]
-    signRequests?: NexusGenRootTypes['FidoU2fRegisterRequest'][] | null; // [FidoU2fRegisterRequest!]
+    signRequests?: NexusGenRootTypes['FidoU2fRequest'][] | null; // [FidoU2fRequest!]
   };
   FidoU2fRegisterRequest: {
     // root type
     appId?: string | null; // String
     challenge?: string | null; // String
     version?: string | null; // String
+  };
+  FidoU2fRequest: {
+    // root type
+    appId: string; // String!
+    challenge: string; // String!
+    keyHandle?: string | null; // String
+    version: string; // String!
   };
   FieldError: {
     // root type
@@ -451,13 +458,20 @@ export interface NexusGenFieldTypes {
     // field return type
     error: string | null; // String
     labels: Array<string | null> | null; // [String]
-    signRequests: NexusGenRootTypes['FidoU2fRegisterRequest'][] | null; // [FidoU2fRegisterRequest!]
+    signRequests: NexusGenRootTypes['FidoU2fRequest'][] | null; // [FidoU2fRequest!]
   };
   FidoU2fRegisterRequest: {
     // field return type
     appId: string | null; // String
     challenge: string | null; // String
     version: string | null; // String
+  };
+  FidoU2fRequest: {
+    // field return type
+    appId: string; // String!
+    challenge: string; // String!
+    keyHandle: string | null; // String
+    version: string; // String!
   };
   FieldError: {
     // field return type
@@ -699,12 +713,19 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     error: 'String';
     labels: 'String';
-    signRequests: 'FidoU2fRegisterRequest';
+    signRequests: 'FidoU2fRequest';
   };
   FidoU2fRegisterRequest: {
     // field return type name
     appId: 'String';
     challenge: 'String';
+    version: 'String';
+  };
+  FidoU2fRequest: {
+    // field return type name
+    appId: 'String';
+    challenge: 'String';
+    keyHandle: 'String';
     version: 'String';
   };
   FieldError: {
