@@ -3,11 +3,11 @@
 
 
 input AddressInput {
-  city: String
-  country: String
-  locality: String
-  postalCode: String
-  streetAddress: String
+  city: String!
+  country: String!
+  locality: String!
+  postalCode: String!
+  streetAddress: String!
 }
 
 input CreateExhibitionInput {
@@ -43,7 +43,7 @@ input CreateGalleryInput {
 
 type CreateGalleryResponse {
   errors: [FieldError!]
-  gallery: Gallery!
+  gallery: Gallery
 }
 
 input CreatePhotographerInput {
@@ -55,8 +55,8 @@ input CreatePhotographerInput {
 }
 
 type CreatePhotographerResponse {
-  errors: FieldError!
-  photographer: Photographer!
+  errors: [FieldError]
+  photographer: Photographer
 }
 
 input CreateTubeStationInput {
@@ -65,8 +65,8 @@ input CreateTubeStationInput {
 }
 
 type CreateTubeStationResponse {
-  errors: [FieldError!]
-  tubeStation: TubeStation!
+  errors: [FieldError]
+  tubeStation: TubeStation
 }
 
 """
@@ -109,7 +109,7 @@ type Exhibition {
   inPerson: Boolean
   name: String!
   online: Boolean
-  photographers: [Photographer!]
+  photographers: [Photographer]
   start: String
   summaryText: String
   updatedAt: String
@@ -157,21 +157,22 @@ type FieldError {
 
 type Gallery {
   address: String
-  byAppointmentOpeningHours: OpeningHours!
+  byAppointmentOpeningHours: OpeningHours
   byAppointmentOpeningTimes: String
   createdAt: Date!
   exhibitions: [Exhibition!]
   googleMap: String
   id: String!
-  location: Location!
+  location: Location
   name: String!
   nearestTubes: [TubeStation!]
   openStreetMap: String
-  openingHours: OpeningHours!
+  openingHours: OpeningHours
   openingTimes: String
-  postalAddress: PostalAddress!
+  postalAddress: PostalAddress
   slug: String!
   tubes: String
+  updatedAt: Date!
   website: String
   websiteUrl: String
 }
@@ -212,7 +213,7 @@ type Mutation {
 }
 
 type OpeningHours {
-  openingHoursRanges: [OpeningHoursRange!]!
+  openingHoursRanges: [OpeningHoursRange!]
 }
 
 input OpeningHoursInput {
@@ -220,19 +221,19 @@ input OpeningHoursInput {
 }
 
 type OpeningHoursRange {
-  closingTime: String
+  closingTime: String!
   createdAt: Date!
-  endDay: String
+  endDay: Int!
   id: Int!
-  openingTime: String
-  startDay: String
+  openingTime: String!
+  startDay: Int!
   updatedAt: Date!
 }
 
 input OpeningHoursRangeInput {
-  closingTime: Int!
+  closingTime: String!
   endDay: Int!
-  openingTime: Int!
+  openingTime: String!
   startDay: Int!
 }
 
@@ -255,7 +256,7 @@ type Photographer {
   createdAt: Date!
   exhibitions: [Exhibition!]
   firstName: String
-  id: Int!
+  id: String!
   lastName: String
   name: String
   otherNames: String
@@ -267,34 +268,34 @@ type Photographer {
 
 type PhotographerQueryResponse {
   error: String
-  photographer: Photographer!
+  photographer: Photographer
 }
 
 type PostalAddress {
   city: String
   country: String
   createdAt: Date!
+  id: Int!
   locality: String
   postalCode: String
   streetAddress: String
-  string: ID!
   updatedAt: Date!
 }
 
 type Query {
   duoCheck: Boolean!
   duoEnrollStatus(activationCode: String!): DuoEnrollStatusResponse!
-  duoPing: Boolean!
+  duoPing: Boolean
   duoPreauth: DuoPreauthResponse!
   email: String!
   exhibition(id: String!): ExhibitionQueryResponse!
   exhibitions: PaginatedExhibitions!
   fidoU2fBeginAuthenticate: FidoU2fAuthenticateRequest!
-  fidoU2fBeginRegister: FidoU2fRegisterRequest!
+  fidoU2fBeginRegister: FidoU2fRegisterRequest
   galleries: PaginatedGalleries!
   gallery(slug: String!): GalleryQueryResponse!
   hello: String
-  me: User!
+  me: User
   photographer(slug: String!): PhotographerQueryResponse!
   photographers: PaginatedPhotographers!
   tubeStation(slug: String!): TubeStationQueryResponse!
@@ -303,8 +304,8 @@ type Query {
 
 type TubeStation {
   createdAt: Date!
-  galleries: [Gallery!]!
-  id: Int!
+  galleries: [Gallery]
+  id: String!
   name: String!
   slug: String!
   updatedAt: Date!
@@ -312,7 +313,7 @@ type TubeStation {
 
 type TubeStationQueryResponse {
   error: String
-  tubeStation: TubeStation!
+  tubeStation: TubeStation
 }
 
 input UpdateExhibitionInput {

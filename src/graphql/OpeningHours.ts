@@ -4,18 +4,18 @@ export const OpeningHoursRange = objectType({
   name: 'OpeningHoursRange',
   definition(t) {
     t.nonNull.int('id');
-    t.field('createdAt', { type: nonNull('Date') });
-    t.field('updatedAt', { type: nonNull('Date') });
-    t.string('startDay');
-    t.string('endDay');
-    t.string('openingTime');
-    t.string('closingTime');
+    t.nonNull.field('createdAt', { type: nonNull('Date') });
+    t.nonNull.field('updatedAt', { type: nonNull('Date') });
+    t.nonNull.int('startDay');
+    t.nonNull.int('endDay');
+    t.nonNull.string('openingTime');
+    t.nonNull.string('closingTime');
   },
 });
 
 export const OpeningHours = objectType({
   name: 'OpeningHours',
   definition(t) {
-    t.nonNull.list.nonNull.field('openingHoursRanges', { type: nonNull('OpeningHoursRange') });
+    t.list.nonNull.field('openingHoursRanges', { type: nonNull('OpeningHoursRange') });
   },
 });

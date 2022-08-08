@@ -2,10 +2,12 @@ import type { FidoU2FKey, User } from '@prisma/client';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
+import { NexusGenInputs, NexusGenObjects } from '../../nexus-typegen';
 // import { setTimeout } from 'timers/promises'; // requires node 15
-import type GraphQLUser from '../entities/User';
-import FieldError from '../resolvers/FieldError';
-import type UsernameEmailPasswordInput from '../resolvers/UsernameEmailPasswordInput';
+
+type FieldError = NexusGenObjects['FieldError'];
+type GraphQLUser = NexusGenObjects['User'];
+type UsernameEmailPasswordInput = NexusGenInputs['UsernameEmailPasswordInput'];
 
 const DUO_ENROLL_VALID_SECS = 3600;
 
@@ -27,6 +29,7 @@ export async function duoServerPing() {
     if (status === 200) {
       if (stat === 'OK') {
         const date = new Date(time * 1_000);
+        // eslint-disable-next-line no-console
         console.log(`${date.toISOString()}: no issues identified connecting to Duo.`);
       }
       return true;

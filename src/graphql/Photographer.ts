@@ -8,7 +8,7 @@ import { Exhibition } from './Exhibition';
 export const Photographer = objectType({
   name: 'Photographer',
   definition(t) {
-    t.nonNull.int('id');
+    t.nonNull.string('id');
     t.field('createdAt', { type: nonNull('Date') });
     t.field('updatedAt', { type: nonNull('Date') });
     t.string('firstName');
@@ -44,7 +44,7 @@ export const PaginatedPhotographers = objectType({
 export const PhotographerQueryResponse = objectType({
   name: 'PhotographerQueryResponse',
   definition(t) {
-    t.field('photographer', { type: nonNull('Photographer') });
+    t.field('photographer', { type: 'Photographer' });
     t.string('error');
   },
 });
@@ -52,8 +52,8 @@ export const PhotographerQueryResponse = objectType({
 export const CreatePhotographerResponse = objectType({
   name: 'CreatePhotographerResponse',
   definition(t) {
-    t.field('photographer', { type: nonNull('Photographer') });
-    t.field('errors', { type: nonNull('FieldError') });
+    t.field('photographer', { type: 'Photographer' });
+    t.list.field('errors', { type: 'FieldError' });
   },
 });
 
@@ -85,7 +85,6 @@ export const PhotographerQuery = extendType({
     }),
       t.nonNull.field('photographers', {
         type: PaginatedPhotographers,
-        args: {},
         async resolve(_root, _args, ctx: Context) {
           try {
             const photographers =

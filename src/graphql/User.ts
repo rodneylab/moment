@@ -184,8 +184,7 @@ export const UserQuery = extendType({
         }
       },
     });
-    t.nonNull.boolean('duoPing', {
-      args: {},
+    t.boolean('duoPing', {
       async resolve() {
         try {
           return await duoServerPing();
@@ -197,7 +196,6 @@ export const UserQuery = extendType({
     });
     t.nonNull.field('duoPreauth', {
       type: DuoPreauthResponse,
-      args: {},
       async resolve(_root, _args, ctx: Context) {
         try {
           const { userId } = ctx.session.user;
@@ -255,7 +253,7 @@ export const UserQuery = extendType({
         }
       },
     });
-    t.nonNull.field('fidoU2fBeginRegister', {
+    t.field('fidoU2fBeginRegister', {
       type: FidoU2fRegisterRequest,
       args: {},
       resolve(_root, _args, ctx: Context) {
@@ -269,7 +267,7 @@ export const UserQuery = extendType({
         }
       },
     });
-    t.nonNull.field('me', {
+    t.field('me', {
       type: User,
       args: {},
       async resolve(_root, _args, ctx: Context) {
@@ -392,7 +390,6 @@ export const UserMutation = extendType({
             return false;
           }
           const { publicKey } = fidoU2fKey;
-          // const { successful } = checkSignature(signRequest, signData, publicKey);
           const checkSignatureResult = checkSignature(signRequest, signData, publicKey);
 
           if ('successful' in checkSignatureResult) {
@@ -417,7 +414,6 @@ export const UserMutation = extendType({
           }
 
           const { registerData, label } = registerInput;
-          // const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData);
           const checkRegistrationResult = checkRegistration(registerRequests[0], registerData);
 
           if ('keyHandle' in checkRegistrationResult) {
@@ -452,7 +448,6 @@ export const UserMutation = extendType({
           if (label === '') {
             return false;
           }
-          // const { keyHandle, publicKey } = checkRegistration(registerRequests[0], registerData) ?? {};
           const checkRegistrationResult = checkRegistration(registerRequests[0], registerData);
 
           if ('keyHandle' in checkRegistrationResult) {
@@ -479,13 +474,10 @@ export const UserMutation = extendType({
         try {
           const { credentials } = args;
           const { username, password } = credentials;
-          // console.log('user: ', username);
           const user = await ctx.db.user.findUnique({
             where: { username: username.trim() },
             include: { fidoU2fKeys: true },
           });
-
-          console.log('user: ', user);
 
           const credentialErrors = {
             errors: [
@@ -518,9 +510,10 @@ export const UserMutation = extendType({
     });
     t.nonNull.boolean('logout', {
       resolve(_root, _args, ctx: Context) {
-        const { session } = ctx;
-        if (session.user.userId) {
-          session.destroy((error: unknown) => {
+        const { session, sessionStore } = ctx;
+        const { sessionId, user } = session;
+        if (user.userId) {
+          sessionStore.destroy(sessionId, (error: unknown) => {
             if (error) {
               console.error(`Error destroying session in logout mutation: ${error as string}`);
               return false;
@@ -542,7 +535,6 @@ export const UserMutation = extendType({
           }
           const { registerInput } = args;
           const errors = validateRegister(registerInput);
-          console.log('looks good');
           const { email, password, username } = registerInput;
           const trimmedEmail = email.trim();
           const trimmedUsername = username.trim();

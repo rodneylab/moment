@@ -1,3 +1,4 @@
+import { Photographer as DBPhotographer } from '@prisma/client';
 import { arg, extendType, inputObjectType, nonNull, objectType, stringArg } from 'nexus';
 import type { NexusGenInputs, NexusGenObjects } from 'nexus-typegen';
 import type { Context } from '../context';
@@ -13,7 +14,7 @@ export const Exhibition = objectType({
     t.string('createdAt');
     t.string('updatedAt');
     t.nonNull.string('name');
-    t.list.nonNull.field('photographers', { type: Photographer });
+    t.list.field('photographers', { type: Photographer });
     t.string('description');
     t.string('summaryText');
     t.string('bodyText');
@@ -273,7 +274,7 @@ export const ExhibitionMutation = extendType({
           url && errors.push(...validUrl(url, 'url'));
 
           // query existing photographers
-          let addPhotographersNotEmpty: NexusGenObjects['Photographer'][] = [];
+          let addPhotographersNotEmpty: DBPhotographer[] = [];
           if (addPhotographers) {
             const promises = addPhotographers.map((element) =>
               ctx.db.photographer.findUnique({ where: { slug: element } }),
@@ -311,7 +312,7 @@ export const ExhibitionMutation = extendType({
             });
           }
 
-          let removePhotographersNotEmpty: NexusGenObjects['Photographer'][] = [];
+          let removePhotographersNotEmpty: DBPhotographer[] = [];
 
           if (removePhotographers) {
             const promises = removePhotographers.map((element) =>

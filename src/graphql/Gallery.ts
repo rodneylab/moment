@@ -1,5 +1,6 @@
+import { TubeStation as DBTubeStation } from '@prisma/client';
 import { arg, extendType, inputObjectType, nonNull, objectType, stringArg } from 'nexus';
-import { NexusGenObjects } from 'nexus-typegen';
+import { NexusGenInputs, NexusGenObjects } from 'nexus-typegen';
 import { Context } from '../context';
 import {
   geoCordinatesFromOpenMapUrl,
@@ -16,6 +17,8 @@ import { OpeningHours } from './OpeningHours';
 import { PostalAddress } from './PostalAddress';
 import { TubeStation } from './TubeStation';
 
+type FieldError = NexusGenObjects['FieldError'];
+
 export const Location = objectType({
   name: 'Location',
   definition(t) {
@@ -29,17 +32,17 @@ export const Gallery = objectType({
   definition(t) {
     t.nonNull.string('id');
     t.field('createdAt', { type: nonNull('Date') });
-    t.field('createdAt', { type: nonNull('Date') });
+    t.field('updatedAt', { type: nonNull('Date') });
     t.nonNull.string('name');
     t.nonNull.string('slug');
     t.string('address');
-    t.field('postalAddress', { type: nonNull(PostalAddress) });
-    t.field('location', { type: nonNull(Location) });
+    t.field('postalAddress', { type: PostalAddress });
+    t.field('location', { type: Location });
     t.string('openStreetMap');
     t.string('openingTimes');
     t.string('byAppointmentOpeningTimes');
-    t.field('openingHours', { type: nonNull(OpeningHours) });
-    t.field('byAppointmentOpeningHours', { type: nonNull(OpeningHours) });
+    t.field('openingHours', { type: OpeningHours });
+    t.field('byAppointmentOpeningHours', { type: OpeningHours });
     t.list.nonNull.field('exhibitions', { type: nonNull(Exhibition) });
     t.list.nonNull.field('nearestTubes', { type: nonNull(TubeStation) });
     t.string('tubes');
@@ -77,8 +80,8 @@ export const OpeningHoursRangeInput = inputObjectType({
   definition(t) {
     t.nonNull.int('startDay');
     t.nonNull.int('endDay');
-    t.nonNull.int('openingTime');
-    t.nonNull.int('closingTime');
+    t.nonNull.string('openingTime');
+    t.nonNull.string('closingTime');
   },
 });
 
@@ -115,8 +118,8 @@ export const UpdateGalleryInput = inputObjectType({
 export const CreateGalleryResponse = objectType({
   name: 'CreateGalleryResponse',
   definition(t) {
-    t.field('gallery', { type: nonNull('Gallery') });
-    t.list.nonNull.field('errors', { type: nonNull('FieldError') });
+    t.field('gallery', { type: 'Gallery' });
+    t.list.nonNull.field('errors', { type: 'FieldError' });
   },
 });
 
@@ -191,7 +194,7 @@ export const GalleryMutation = extendType({
       async resolve(_root, args, ctx: Context) {
         try {
           const { user } = ctx.session;
-          const { input } = args;
+          const { input }: { input: NexusGenInputs['CreateGalleryInput'] } = args;
           if (!user) {
             return { errors: [{ field: 'user', message: 'Please sign in and try again' }] };
           }
@@ -232,7 +235,7 @@ export const GalleryMutation = extendType({
           errors.push(...validUrl(website, 'website'));
 
           // query existing tube stations
-          let tubeStationsNotEmpty: NexusGenObjects['TubeStation'][] = [];
+          let tubeStationsNotEmpty: DBTubeStation[] = [];
           if (nearestTubes) {
             const promises = nearestTubes.map((element: string) =>
               ctx.db.tubeStation.findUnique({ where: { name: element } }),
@@ -382,7 +385,7 @@ export const GalleryMutation = extendType({
           }
 
           // query existing tube stations
-          let tubeStationsNotEmpty: NexusGenObjects['TubeStation'][] = [];
+          let tubeStationsNotEmpty: DBTubeStation[] = [];
           if (addNearestTubes) {
             const promises = addNearestTubes.map((element) =>
               ctx.db.tubeStation.findUnique({ where: { name: element } }),

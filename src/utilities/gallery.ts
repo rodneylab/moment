@@ -7,10 +7,12 @@ import {
   OpeningHours,
   TubeStation,
 } from '@prisma/client';
-import GraphQLGallery from '../entities/Gallery';
-import type AddressInput from '../resolvers/AddressInput';
-import type FieldError from '../resolvers/FieldError';
-import type { OpeningHoursInput } from '../resolvers/gallery';
+import { NexusGenInputs, NexusGenObjects } from '../../nexus-typegen';
+
+type AddressInput = NexusGenInputs['AddressInput'];
+type FieldError = NexusGenObjects['FieldError'];
+type GraphQLGallery = NexusGenObjects['Gallery'];
+type OpeningHoursInput = NexusGenInputs['OpeningHoursInput'];
 
 export type DatabaseGallery = Gallery & {
   exhibitions: Exhibition[];
@@ -173,7 +175,15 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
   const graphqlOpeningHours = {
     openingHoursRanges: openingHours?.openingHoursRanges.map((element) => {
       const { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime } = element;
-      return { id, createdAt, updatedAt, startDay, endDay, openingTime, closingTime };
+      return {
+        id,
+        createdAt,
+        updatedAt,
+        startDay,
+        endDay,
+        openingTime,
+        closingTime,
+      };
     }),
   };
 
@@ -201,8 +211,8 @@ export function graphqlGallery(gallery: DatabaseGallery): GraphQLGallery {
     } = element;
     return {
       id,
-      createdAt,
-      updatedAt,
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString(),
       name,
       description,
       summaryText,

@@ -3,7 +3,7 @@ import { nonNull, objectType } from 'nexus';
 export const PostalAddress = objectType({
   name: 'PostalAddress',
   definition(t) {
-    t.nonNull.id('string');
+    t.nonNull.int('id');
     t.field('createdAt', { type: nonNull('Date') });
     t.field('updatedAt', { type: nonNull('Date') });
     t.string('streetAddress');

@@ -1,5 +1,7 @@
 import { TubeStation } from '@prisma/client';
-import FieldError from 'src/resolvers/FieldError';
+import { NexusGenObjects } from '../../nexus-typegen';
+
+type FieldError = NexusGenObjects['FieldError'];
 
 export function graphqlTubeStation(tubeStation: TubeStation) {
   const { uid: id, createdAt, updatedAt, name, slug } = tubeStation;

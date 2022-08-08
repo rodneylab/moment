@@ -19,10 +19,12 @@ if (!isProduction) {
 
 const buildContext = async (request: FastifyRequest) => {
   const { db } = context;
+  const { session, sessionStore } = request;
   return Promise.resolve({
     authorization: request.headers.authorization,
     db,
-    session: request.session,
+    session,
+    sessionStore,
   });
 };
 

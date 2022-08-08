@@ -1,6 +1,8 @@
 import { Exhibition, Photographer } from '@prisma/client';
-import FieldError from 'src/resolvers/FieldError';
-import GraphQLPhotographer from '../entities/Photographer';
+import { NexusGenObjects } from '../../nexus-typegen';
+
+type FieldError = NexusGenObjects['FieldError'];
+type GraphQLPhotographer = NexusGenObjects['Photographer'];
 
 export type DatabasePhotographer = Photographer & {
   exhibitions: Exhibition[];
@@ -43,8 +45,8 @@ export function graphqlPhotographer(photographer: DatabasePhotographer): GraphQL
     } = element;
     return {
       id,
-      createdAt: exhibitionCreatedAt,
-      updatedAt: exhibitionUpdatedAt,
+      createdAt: exhibitionCreatedAt.toISOString(),
+      updatedAt: exhibitionUpdatedAt.toISOString(),
       name,
       description,
       summaryText,

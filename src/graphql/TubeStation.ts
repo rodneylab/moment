@@ -7,12 +7,12 @@ import { validSlug } from '../utilities/utilities';
 export const TubeStation = objectType({
   name: 'TubeStation',
   definition(t) {
-    t.nonNull.int('id');
+    t.nonNull.string('id');
     t.field('createdAt', { type: nonNull('Date') });
     t.field('updatedAt', { type: nonNull('Date') });
     t.nonNull.string('name');
     t.nonNull.string('slug');
-    t.nonNull.list.nonNull.field('galleries', { type: nonNull('Gallery') });
+    t.list.field('galleries', { type: 'Gallery' });
   },
 });
 
@@ -36,15 +36,15 @@ export const UpdateTubeStationInput = inputObjectType({
 export const CreateTubeStationResponse = objectType({
   name: 'CreateTubeStationResponse',
   definition(t) {
-    t.field('tubeStation', { type: nonNull('TubeStation') });
-    t.list.field('errors', { type: nonNull('FieldError') });
+    t.field('tubeStation', { type: 'TubeStation' });
+    t.list.field('errors', { type: 'FieldError' });
   },
 });
 
 export const TubeStationQueryResponse = objectType({
   name: 'TubeStationQueryResponse',
   definition(t) {
-    t.field('tubeStation', { type: nonNull('TubeStation') });
+    t.field('tubeStation', { type: 'TubeStation' });
     t.string('error');
   },
 });
@@ -67,8 +67,9 @@ export const TubeStationQuery = extendType({
           }
           return { tubeStation: graphqlTubeStation(tubeStation) };
         } catch (error) {
-          console.error('Error in galleries Query resolver');
-          return { galleries: [], hasMore: false };
+          const message = 'Error in galleries Query resolver';
+          console.error(message);
+          return { error: message };
         }
       },
     });

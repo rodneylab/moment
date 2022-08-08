@@ -1,8 +1,10 @@
 import { Exhibition } from '@prisma/client';
-import type FieldError from 'src/resolvers/FieldError';
-import GraphQLExhibition from '../entities/Exhibition';
+import type { NexusGenObjects } from '../../nexus-typegen';
 import { DatabaseGallery, graphqlGallery } from './gallery';
 import { DatabasePhotographer, graphqlPhotographer } from './photographer';
+
+type FieldError = NexusGenObjects['FieldError'];
+type GraphQLExhibition = NexusGenObjects['Exhibition'];
 
 type DatabaseExhitibion = Exhibition & {
   gallery: DatabaseGallery;
@@ -31,8 +33,8 @@ export function graphqlExhibition(exhibition: DatabaseExhitibion): GraphQLExhibi
 
   return {
     id: uid,
-    createdAt,
-    updatedAt,
+    createdAt: createdAt.toISOString(),
+    updatedAt: updatedAt.toISOString(),
     name,
     bodyText,
     description: description,

@@ -1,4 +1,6 @@
-import FieldError from 'src/resolvers/FieldError';
+import { NexusGenObjects } from '../../nexus-typegen';
+
+type FieldError = NexusGenObjects['FieldError'];
 
 export const isProduction = process.env.NODE_ENV === 'production';
 
