@@ -1,2 +1,5 @@
 dist
 .eslintrc.cjs
+src/entities
+src/resolvers
+nexus-typegen.ts
