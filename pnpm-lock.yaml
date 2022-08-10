@@ -3,7 +3,6 @@ lockfileVersion: 5.4
 specifiers:
   '@commitlint/config-conventional': 17.0.3
   '@fastify/cookie': ^7.3.1
-  '@fastify/postgres': ^5.0.0
   '@fastify/redis': ^6.0.0
   '@fastify/session': ^9.0.0
   '@prisma/client': ^4.1.1
@@ -42,7 +41,6 @@ specifiers:
 
 dependencies:
   '@fastify/cookie': 7.3.1
-  '@fastify/postgres': 5.0.0_pg@8.7.3
   '@fastify/redis': 6.0.0
   '@fastify/session': 9.0.0
   '@prisma/client': 4.1.1_prisma@4.1.1
@@ -429,15 +427,6 @@ packages:
     resolution: {integrity: sha512-9pCi6c6tmGt/qfuf2koZQuSIG6ckP9q3mz+JoMmAq9eQ4EtA92sWoK7E0LJUn2FFTS/hp5kag+4+dWsV5ZfcXg==}
     dependencies:
       fast-json-stringify: 5.1.0
-    dev: false
-
-  /@fastify/postgres/5.0.0_pg@8.7.3:
-    resolution: {integrity: sha512-FXb6EA2bu18Gl4i82h82JUP7j704PCEin7fMf8Wm0MilZw2gJ0f/0qhEAP1XzZjFdhqLTAxNXCE5URt+nE+02Q==}
-    peerDependencies:
-      pg: '>=6.0.0'
-    dependencies:
-      fastify-plugin: 3.0.1
-      pg: 8.7.3
     dev: false
 
   /@fastify/redis/6.0.0:
