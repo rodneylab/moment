@@ -46,7 +46,6 @@ export const Gallery = objectType({
     t.list.nonNull.field('exhibitions', { type: nonNull(Exhibition) });
     t.list.nonNull.field('nearestTubes', { type: nonNull(TubeStation) });
     t.string('tubes');
-    t.string('googleMap');
     t.string('website');
     t.string('websiteUrl');
   },
@@ -94,7 +93,6 @@ export const CreateGalleryInput = inputObjectType({
     t.string('openStreetMapUrl');
     t.field('openingHours', { type: nonNull('OpeningHoursInput') });
     t.nonNull.list.nonNull.string('nearestTubes');
-    t.nonNull.string('googleMap');
     t.nonNull.string('website');
   },
 });
@@ -119,7 +117,7 @@ export const CreateGalleryResponse = objectType({
   name: 'CreateGalleryResponse',
   definition(t) {
     t.field('gallery', { type: 'Gallery' });
-    t.list.nonNull.field('errors', { type: 'FieldError' });
+    t.list.field('errors', { type: 'FieldError' });
   },
 });
 

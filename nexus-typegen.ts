@@ -58,7 +58,6 @@ export interface NexusGenInputs {
   };
   CreateGalleryInput: {
     // input type
-    googleMap: string; // String!
     name: string; // String!
     nearestTubes: string[]; // [String!]!
     openStreetMapUrl?: string | null; // String
@@ -169,7 +168,7 @@ export interface NexusGenObjects {
   };
   CreateGalleryResponse: {
     // root type
-    errors?: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    errors?: Array<NexusGenRootTypes['FieldError'] | null> | null; // [FieldError]
     gallery?: NexusGenRootTypes['Gallery'] | null; // Gallery
   };
   CreatePhotographerResponse: {
@@ -260,7 +259,6 @@ export interface NexusGenObjects {
     byAppointmentOpeningTimes?: string | null; // String
     createdAt: NexusGenScalars['Date']; // Date!
     exhibitions?: NexusGenRootTypes['Exhibition'][] | null; // [Exhibition!]
-    googleMap?: string | null; // String
     id: string; // String!
     location?: NexusGenRootTypes['Location'] | null; // Location
     name: string; // String!
@@ -394,7 +392,7 @@ export interface NexusGenFieldTypes {
   };
   CreateGalleryResponse: {
     // field return type
-    errors: NexusGenRootTypes['FieldError'][] | null; // [FieldError!]
+    errors: Array<NexusGenRootTypes['FieldError'] | null> | null; // [FieldError]
     gallery: NexusGenRootTypes['Gallery'] | null; // Gallery
   };
   CreatePhotographerResponse: {
@@ -485,7 +483,6 @@ export interface NexusGenFieldTypes {
     byAppointmentOpeningTimes: string | null; // String
     createdAt: NexusGenScalars['Date']; // Date!
     exhibitions: NexusGenRootTypes['Exhibition'][] | null; // [Exhibition!]
-    googleMap: string | null; // String
     id: string; // String!
     location: NexusGenRootTypes['Location'] | null; // Location
     name: string; // String!
@@ -740,7 +737,6 @@ export interface NexusGenFieldTypeNames {
     byAppointmentOpeningTimes: 'String';
     createdAt: 'Date';
     exhibitions: 'Exhibition';
-    googleMap: 'String';
     id: 'String';
     location: 'Location';
     name: 'String';

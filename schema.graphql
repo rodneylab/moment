@@ -31,7 +31,6 @@ type CreateExhibitionResponse {
 }
 
 input CreateGalleryInput {
-  googleMap: String!
   name: String!
   nearestTubes: [String!]!
   openStreetMapUrl: String
@@ -42,7 +41,7 @@ input CreateGalleryInput {
 }
 
 type CreateGalleryResponse {
-  errors: [FieldError!]
+  errors: [FieldError]
   gallery: Gallery
 }
 
@@ -168,7 +167,6 @@ type Gallery {
   byAppointmentOpeningTimes: String
   createdAt: Date!
   exhibitions: [Exhibition!]
-  googleMap: String
   id: String!
   location: Location
   name: String!
