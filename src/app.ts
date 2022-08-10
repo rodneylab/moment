@@ -37,10 +37,14 @@ async function build(options: FastifyServerOptions = { logger: false }) {
       return reply.graphql('{}');
     });
 
-    await app.register(fastifyCookie);
+    if (typeof process.env.SESSION_SECRET === 'undefined') {
+      throw new Error('SESSION_SECRET must be defined');
+    }
+
     await app.register(fastifyRedis, { host: '127.0.0.1' });
+    await app.register(fastifyCookie);
     await app.register(fastifySession, {
-      secret: process.env.SESSION_SECRET as string,
+      secret: process.env.SESSION_SECRET,
       cookie: {
         secure: isProduction,
         sameSite: 'lax',
