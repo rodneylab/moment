@@ -128,10 +128,10 @@ export interface NexusGenInputs {
     id: string; // String!
     name?: string | null; // String
     openStreetMapUrl?: string | null; // String
-    postalAddress: NexusGenInputs['AddressInput']; // AddressInput!
+    postalAddress?: NexusGenInputs['AddressInput'] | null; // AddressInput
     removeNearestTubes?: string[] | null; // [String!]
-    replacementByAppointmentOpeningHours: NexusGenInputs['OpeningHoursInput']; // OpeningHoursInput!
-    replacementOpeningHours: NexusGenInputs['OpeningHoursInput']; // OpeningHoursInput!
+    replacementByAppointmentOpeningHours?: NexusGenInputs['OpeningHoursInput'] | null; // OpeningHoursInput
+    replacementOpeningHours?: NexusGenInputs['OpeningHoursInput'] | null; // OpeningHoursInput
     slug?: string | null; // String
     website?: string | null; // String
   };
@@ -276,7 +276,7 @@ export interface NexusGenObjects {
   GalleryQueryResponse: {
     // root type
     error?: string | null; // String
-    galleries?: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
+    gallery?: NexusGenRootTypes['Gallery'] | null; // Gallery
   };
   Location: {
     // root type
@@ -500,7 +500,7 @@ export interface NexusGenFieldTypes {
   GalleryQueryResponse: {
     // field return type
     error: string | null; // String
-    galleries: NexusGenRootTypes['Gallery'][] | null; // [Gallery!]
+    gallery: NexusGenRootTypes['Gallery'] | null; // Gallery
   };
   Location: {
     // field return type
@@ -754,7 +754,7 @@ export interface NexusGenFieldTypeNames {
   GalleryQueryResponse: {
     // field return type name
     error: 'String';
-    galleries: 'Gallery';
+    gallery: 'Gallery';
   };
   Location: {
     // field return type name

@@ -54,7 +54,7 @@ export const Gallery = objectType({
 export const GalleryQueryResponse = objectType({
   name: 'GalleryQueryResponse',
   definition(t) {
-    t.list.field('galleries', { type: nonNull(Gallery) });
+    t.field('gallery', { type: Gallery });
     t.string('error');
   },
 });
@@ -103,9 +103,9 @@ export const UpdateGalleryInput = inputObjectType({
     t.nonNull.string('id');
     t.string('name');
     t.string('slug');
-    t.field('postalAddress', { type: nonNull('AddressInput') });
-    t.field('replacementOpeningHours', { type: nonNull('OpeningHoursInput') });
-    t.field('replacementByAppointmentOpeningHours', { type: nonNull('OpeningHoursInput') });
+    t.field('postalAddress', { type: 'AddressInput' });
+    t.field('replacementOpeningHours', { type: 'OpeningHoursInput' });
+    t.field('replacementByAppointmentOpeningHours', { type: 'OpeningHoursInput' });
     t.list.nonNull.string('addNearestTubes');
     t.list.nonNull.string('removeNearestTubes');
     t.string('openStreetMapUrl');
@@ -151,35 +151,36 @@ export const GalleryQuery = extendType({
           return { galleries: [], hasMore: false };
         }
       },
-    }),
-      t.nonNull.field('gallery', {
-        type: GalleryQueryResponse,
-        args: { slug: nonNull(stringArg()) },
-        async resolve(_root, args, ctx: Context) {
-          try {
-            const { slug } = args;
-            const gallery = await ctx.db.gallery.findUnique({
-              where: { slug },
-              include: {
-                address: true,
-                exhibitions: true,
-                location: true,
-                nearestTubes: { include: { tubeStation: true } },
-                openingHours: { include: { openingHoursRanges: true } },
-                byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
-              },
-            });
+    });
+    t.nonNull.field('gallery', {
+      type: GalleryQueryResponse,
+      args: { slug: nonNull(stringArg()) },
+      async resolve(_root, args, ctx: Context) {
+        try {
+          const { slug } = args;
+          const gallery = await ctx.db.gallery.findUnique({
+            where: { slug },
+            include: {
+              address: true,
+              exhibitions: true,
+              location: true,
+              nearestTubes: { include: { tubeStation: true } },
+              openingHours: { include: { openingHoursRanges: true } },
+              byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
+            },
+          });
 
-            if (!gallery) {
-              return { error: 'No gallery found with that slug' };
-            }
-            return { gallery: graphqlGallery(gallery) };
-          } catch (error) {
-            console.error('Error in gallery Query resolver');
-            return { galleries: [], hasMore: false };
+          if (!gallery) {
+            return { error: 'No gallery found with that slug' };
           }
-        },
-      });
+          return { gallery: graphqlGallery(gallery) };
+        } catch (error) {
+          const message = 'Error in gallery Query resolver';
+          console.error(message);
+          return { error: message };
+        }
+      },
+    });
   },
 });
 
@@ -385,9 +386,9 @@ export const GalleryMutation = extendType({
           // query existing tube stations
           let tubeStationsNotEmpty: DBTubeStation[] = [];
           if (addNearestTubes) {
-            const promises = addNearestTubes.map((element) =>
-              ctx.db.tubeStation.findUnique({ where: { name: element } }),
-            );
+            const promises = addNearestTubes
+              .filter(notEmpty)
+              .map((element) => ctx.db.tubeStation.findUnique({ where: { name: element } }));
             const tubeStations = await Promise.all(promises);
             tubeStationsNotEmpty = tubeStations.filter(notEmpty);
             tubeStationsNotEmpty.forEach(({ name }) => {
@@ -403,14 +404,17 @@ export const GalleryMutation = extendType({
           }
 
           if (removeNearestTubes) {
-            const removeStationPromises = removeNearestTubes.map(async (element) =>
-              ctx.db.tubeStation.findUnique({ where: { name: element } }),
-            );
+            const removeStationPromises = removeNearestTubes
+              .filter(notEmpty)
+              .map(async (element) => ctx.db.tubeStation.findUnique({ where: { name: element } }));
             const removeStations = await Promise.all(removeStationPromises);
             removeStations.forEach((element, index) => {
               if (element == null) {
+                // const removeName = removeNearestTubes[index];
+                // typeof removeName === 'string' &&
                 errors.push({
                   field: 'tubeStations',
+                  // message: `${removeName} is not yet in database, unable to delete`,
                   message: `${removeNearestTubes[index]} is not yet in database, unable to delete`,
                 });
               }

@@ -184,7 +184,7 @@ type Gallery {
 
 type GalleryQueryResponse {
   error: String
-  galleries: [Gallery!]
+  gallery: Gallery
 }
 
 type Location {
@@ -336,10 +336,10 @@ input UpdateGalleryInput {
   id: String!
   name: String
   openStreetMapUrl: String
-  postalAddress: AddressInput!
+  postalAddress: AddressInput
   removeNearestTubes: [String!]
-  replacementByAppointmentOpeningHours: OpeningHoursInput!
-  replacementOpeningHours: OpeningHoursInput!
+  replacementByAppointmentOpeningHours: OpeningHoursInput
+  replacementOpeningHours: OpeningHoursInput
   slug: String
   website: String
 }
