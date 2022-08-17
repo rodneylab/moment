@@ -184,7 +184,7 @@ type Gallery {
 
 type GalleryQueryResponse {
   error: String
-  galleries: [Gallery!]
+  gallery: Gallery
 }
 
 type Location {

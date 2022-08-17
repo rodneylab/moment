@@ -54,7 +54,7 @@ export const Gallery = objectType({
 export const GalleryQueryResponse = objectType({
   name: 'GalleryQueryResponse',
   definition(t) {
-    t.list.field('galleries', { type: nonNull(Gallery) });
+    t.field('gallery', { type: Gallery });
     t.string('error');
   },
 });
@@ -151,35 +151,36 @@ export const GalleryQuery = extendType({
           return { galleries: [], hasMore: false };
         }
       },
-    }),
-      t.nonNull.field('gallery', {
-        type: GalleryQueryResponse,
-        args: { slug: nonNull(stringArg()) },
-        async resolve(_root, args, ctx: Context) {
-          try {
-            const { slug } = args;
-            const gallery = await ctx.db.gallery.findUnique({
-              where: { slug },
-              include: {
-                address: true,
-                exhibitions: true,
-                location: true,
-                nearestTubes: { include: { tubeStation: true } },
-                openingHours: { include: { openingHoursRanges: true } },
-                byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
-              },
-            });
+    });
+    t.nonNull.field('gallery', {
+      type: GalleryQueryResponse,
+      args: { slug: nonNull(stringArg()) },
+      async resolve(_root, args, ctx: Context) {
+        try {
+          const { slug } = args;
+          const gallery = await ctx.db.gallery.findUnique({
+            where: { slug },
+            include: {
+              address: true,
+              exhibitions: true,
+              location: true,
+              nearestTubes: { include: { tubeStation: true } },
+              openingHours: { include: { openingHoursRanges: true } },
+              byAppointmentOpeningHours: { include: { openingHoursRanges: true } },
+            },
+          });
 
-            if (!gallery) {
-              return { error: 'No gallery found with that slug' };
-            }
-            return { gallery: graphqlGallery(gallery) };
-          } catch (error) {
-            console.error('Error in gallery Query resolver');
-            return { galleries: [], hasMore: false };
+          if (!gallery) {
+            return { error: 'No gallery found with that slug' };
           }
-        },
-      });
+          return { gallery: graphqlGallery(gallery) };
+        } catch (error) {
+          const message = 'Error in gallery Query resolver';
+          console.error(message);
+          return { error: message };
+        }
+      },
+    });
   },
 });
 
