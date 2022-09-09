@@ -30,7 +30,7 @@ const buildContext = async (request: FastifyRequest) => {
 
 let app: FastifyInstance | null = null;
 
-async function build(options: FastifyServerOptions = { logger: false }) {
+async function build(options: FastifyServerOptions = { logger: true }) {
   try {
     app = Fastify(options);
     app.get('/', async function (_req, reply) {
