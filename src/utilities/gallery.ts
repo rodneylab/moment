@@ -35,10 +35,20 @@ export type DatabaseGallery = Gallery & {
 
 export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const N_DASH_ENTITY = '\u2013';
+const THIN_SPACE_ENTITY = '\u2009';
 
 export function addressStringFromPostalAddress(postalAddress: PostalAddress) {
   const { streetAddress, locality, postalCode } = postalAddress;
-  return [streetAddress, locality, postalCode].filter((element) => element).join(', ');
+  return [
+    streetAddress.replace(
+      /(?<=\d+)–(?=\d+)|(?<=\d+) – (?=\d+)|(?<=\d+)-(?=\d+)|(?<=\d+) - (?=\d+)/g,
+      ' – ',
+    ),
+    locality,
+    postalCode,
+  ]
+    .filter((element) => element)
+    .join(', ');
 }
 
 export function openingTimesFromOpeningHours(openingHoursRanges: OpeningHoursRange[]) {
@@ -46,8 +56,8 @@ export function openingTimesFromOpeningHours(openingHoursRanges: OpeningHoursRan
     .map((element: OpeningHoursRange) => {
       const { closingTime, endDay, openingTime, startDay } = element;
       return startDay === endDay
-        ? `${DAYS[startDay]}s ${openingTime}${N_DASH_ENTITY}${closingTime}`
-        : `${DAYS[startDay]} to ${DAYS[endDay]} ${openingTime}${N_DASH_ENTITY}${closingTime}`;
+        ? `${DAYS[startDay]}s ${openingTime}${THIN_SPACE_ENTITY}${N_DASH_ENTITY}${THIN_SPACE_ENTITY}${closingTime}`
+        : `${DAYS[startDay]} to ${DAYS[endDay]} ${openingTime}${THIN_SPACE_ENTITY}${N_DASH_ENTITY}${THIN_SPACE_ENTITY}${closingTime}`;
     })
     .join(', ');
 }

@@ -16,14 +16,14 @@ import {
 
 test('addressStringFromPostalAddress', () => {
   assert.type(addressStringFromPostalAddress, 'function');
-  assert.is(addressStringFromPostalAddress(address1), '16–18 Berners Street, Fitzrovia, W1T 3LN');
+  assert.is(addressStringFromPostalAddress(address1), '16 – 18 Berners Street, Fitzrovia, W1T 3LN');
 });
 
 test('openingTimesFromOpeningHours', () => {
   assert.type(openingTimesFromOpeningHours, 'function');
   assert.is(
     openingTimesFromOpeningHours(openingHours1),
-    'Monday to Friday 09:00–17:00, Saturdays 10:00–18:00',
+    'Monday to Friday 09:00 – 17:00, Saturdays 10:00 – 18:00',
   );
 });
 
