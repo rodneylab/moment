@@ -3,7 +3,6 @@
     "source.organizeImports": true
   },
   "editor.formatOnSave": true,
-  "editor.experimental.stickyScroll.enabled": true,
   "spellright.language": ["en-GB"],
   "typescript.preferences.importModuleSpecifier": "relative",
   "[javascript]": {
@@ -13,5 +12,6 @@
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "editor.stickyScroll.enabled": true
 }
